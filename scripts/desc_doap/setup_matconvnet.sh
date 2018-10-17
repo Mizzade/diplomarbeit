@@ -22,14 +22,6 @@ if [ -f "$ROOT/desc_doap/$TARNAME" ]; then
   echo "Extraction done."
 fi
 
-
-#if [ -d "$ROOT/desc_doap/$FILENAME" ]; then
-#  echo "Compiling $FILENAME"
-#  cd -P "$ROOT/desc_doap/$FILENAME"
-#  make ARCH=glnxa64 MEX=$MATLAB_HOME/mex
-#  echo "Compilation done."
-#fi
-
 if [ -d "$ROOT/desc_doap" ]; then
   echo "Setup matlab and mex."
   cd -P "$ROOT/desc_doap"

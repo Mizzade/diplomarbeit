@@ -32,7 +32,6 @@ if [ -d "$ROOT/desc_doap/$FILENAME" ]; then
   echo "Copying mex done."
 fi
 
-
 if [ -f "$ROOT/desc_doap/$TARNAME" ]; then
   echo "Removing $TARNAME."
   rm "$ROOT/desc_doap/$TARNAME"
