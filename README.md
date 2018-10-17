@@ -15,8 +15,11 @@
   - **data**: Enthält Bildersets für die Auswertung.
   - **scripts**: Enthält alles Skripte, die benutzt und benötigt werden.
   - **docker**: Enhält Dockerfiles die zum Bauen der Umgebungen für einzelnen Detektoren und Deskriptoren.
-  - **config**: Eventuelle Konfigurationsdateien befinden sich hier drin.
+  - **desc_doap**: Enhält alle benötigten Files für den DOAP Deskriptor.
+  - **exmaples**: Enthält Beispielcode für die einzelnen Detektoren und Deskriptoren.
+  - **extern**: Enthält 3rd-party code der für das Setup des Projektes benötigt wird.
 
 ## Installation
 Tippe aus dem Projekt-Root-Verzeichnis (in dem sich diese Readme befindet) in das Terminal:
+
     $ ./scripts/setup_project.sh $(pwd)
