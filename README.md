@@ -14,8 +14,8 @@
   - Diese **README**
   - **data**: Enthält Bildersets für die Auswertung.
   - **scripts**: Enthält alles Skripte, die benutzt und benötigt werden.
-  - **docker**: Enhält Dockerfiles die zum Bauen der Umgebungen für einzelnen Detektoren und Deskriptoren.
   - **desc_doap**: Enhält alle benötigten Files für den DOAP Deskriptor.
+  - **det_tilde**: Enhält alle benötigten Files für den TILDE Detektor.
   - **exmaples**: Enthält Beispielcode für die einzelnen Detektoren und Deskriptoren.
   - **extern**: Enthält 3rd-party code der für das Setup des Projektes benötigt wird.
 

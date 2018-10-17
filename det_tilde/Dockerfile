@@ -42,12 +42,12 @@ RUN ["cmake", ".."]
 RUN ["make"]
 
 # Kopiere use_tilde.cpp in das Image und kompiliere es.
-COPY scripts/use_tilde.cpp /home/tilde/TILDE/c++/build/
+COPY det_tilde/use_tilde.cpp /home/tilde/TILDE/c++/build/
 RUN  g++ -std=c++11 -o use_tilde use_tilde.cpp /home/tilde/TILDE/c++/build/Lib/libTILDE_static.a -L/usr/local/lib -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_features2d
 
 # Kopiere "Hello World" test shell Skript und führe es aus.
 # TODO: Change with evaluation script to automatically start evaluation.
-COPY scripts/hello_world.sh /home/tilde/TILDE/c++/build/
+COPY det_tilde/hello_world.sh /home/tilde/TILDE/c++/build/
 RUN ["chmod", "777", "hello_world.sh"]
 CMD ["./hello_world.sh"]
 

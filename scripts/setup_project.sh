@@ -4,7 +4,7 @@ ROOT=$(pwd)
 # TILDE
 echo "Starting setup for TILDE..."
 echo "==========================="
-$ROOT/scripts/create_docker_image_for_tilde.sh $ROOT
+$ROOT/scripts/det_tilde/setup_docker_image_for_tilde.sh $ROOT
 echo "======================"
 echo "Setup for TILDE: done."
 
