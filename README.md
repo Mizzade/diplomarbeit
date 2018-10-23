@@ -23,3 +23,18 @@
 Tippe aus dem Projekt-Root-Verzeichnis (in dem sich diese Readme befindet) in das Terminal:
 
     $ ./scripts/setup_project.sh $(pwd)
+
+## Probleme
+### SuperPoint
+> cuda runtime error (30) : unknown error at /pytorch/aten/src/THC/THCGeneral.cpp:74
+
+Der CUDA Treiber hat aufgehangen. Tippe folgendes in die Konsole:
+
+        $ sudo rmmod nvidia_uvm
+        $ sudo rmmod nvidia_drm
+        $ sudo rmmod nvidia_modeset
+        $ sudo rmmod nvidia
+        $ sudo modprobe nvidia
+        $ sudo modprobe nvidia_modeset
+        $ sudo modprobe nvidia_drm
+        $ sudo modprobe nvidia_uvm
