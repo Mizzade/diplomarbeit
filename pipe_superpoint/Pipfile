@@ -1,0 +1,16 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+numpy = "==1.15.1"
+opencv-python = "==3.4.2.17"
+torch = "==0.4.1"
+jupyter = "==1.0.0"
+matplotlib = "==2.2.3"
+
+[dev-packages]
+
+[requires]
+python_version = "3.6"

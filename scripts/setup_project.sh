@@ -22,3 +22,10 @@ echo "========================"
 $ROOT/scripts/desc_tfeat/setup_tfeat.sh $ROOT
 echo "======================"
 echo "Setup for Tfeat: done."
+
+# SuperPoint
+echo "Start setup for SuperPoint..."
+echo "========================"
+$ROOT/scripts/pipe_superpoint/setup_superpoint.sh $ROOT
+echo "======================"
+echo "Setup for SuperPoint: done."
