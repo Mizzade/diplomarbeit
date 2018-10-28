@@ -37,3 +37,9 @@ $ROOT/scripts/pipe_lift/setup_lift.sh $ROOT
 echo "======================"
 echo "Setup for LIFT: done."
 
+# SIFT
+echo "Start setup for SIFT..."
+echo "========================"
+$ROOT/scripts/pipe_sift/setup_sift.sh $ROOT
+echo "======================"
+echo "Setup for SIFT: done."
