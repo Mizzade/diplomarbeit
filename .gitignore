@@ -3,3 +3,5 @@
 /examples/desc_doap/test_out
 /desc_tfeat/.vscode
 /desc_tfeat/.ipynb_checkpoints/*
+/pipe_lift/outputs
+/pipe_lift/inputs

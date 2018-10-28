@@ -8,6 +8,7 @@
 - wget
 - tar
 - [Matlab](https://de.mathworks.com/products/matlab.html)
+- imagemagick
 
 ## Projektstruktur
 - root

@@ -1,0 +1,3 @@
+tensorflow == 1.4 -- install-options="--ignore_installed" \
+		     install-options="--upgrade"
+opencv-python == 3.4.3.18

@@ -29,3 +29,11 @@ echo "========================"
 $ROOT/scripts/pipe_superpoint/setup_superpoint.sh $ROOT
 echo "======================"
 echo "Setup for SuperPoint: done."
+
+# LIFT
+echo "Start setup for LIFT..."
+echo "========================"
+$ROOT/scripts/pipe_lift/setup_lift.sh $ROOT
+echo "======================"
+echo "Setup for LIFT: done."
+
