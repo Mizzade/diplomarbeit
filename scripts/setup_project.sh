@@ -41,5 +41,6 @@ echo "Setup for LIFT: done."
 echo "Start setup for SIFT..."
 echo "========================"
 $ROOT/scripts/pipe_sift/setup_sift.sh $ROOT
+$ROOT/scripts/misc/copy_io_utils.sh $ROOT pipe_sift
 echo "======================"
 echo "Setup for SIFT: done."

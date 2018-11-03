@@ -5,3 +5,5 @@
 /desc_tfeat/.ipynb_checkpoints/*
 /pipe_lift/outputs
 /pipe_lift/inputs
+/pipe_sift/io_utils.py
+.vscode
