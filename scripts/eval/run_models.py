@@ -9,9 +9,14 @@ import pickle
 
 networks = [
     {
-        'name': 'sift',
+        'name': 'SIFT',
         'dir': 'pipe_sift',
         'main': 'use_sift.py'
+    },
+    {
+        'name': 'SuperPoint',
+        'dir': 'pipe_superpoint',
+        'main': 'use_superpoint.py'
     }
 ]
 
@@ -35,6 +40,7 @@ def run_network(path: str, name: str, main: str, output_dir: str, file_list: Lis
 if __name__ == "__main__":
     argv = sys.argv[1:]
 
+    # First and only argument must be root dir of project
     # TODO catch argv errors
     if len(argv) < 0:
         raise RuntimeError("Missing argument root path. Abort.")

@@ -73,11 +73,11 @@ def save_output(file_list: List[str], output: List[Tuple[List[cv2.KeyPoint], np.
         set_name, file_name, extension = io_utils.get_setName_fileName_extension(file_path)
         dir_path = os.path.join(output_dir, set_name)
 
-        kp_path = io_utils.build_output_name(dir_path, file_name, detector_name=detector_name, prefix='kpts')
-        desc_path = io_utils.build_output_name(dir_path, file_name, descriptor_name=descriptor_name, prefix='desc')
-        kp_img_path = io_utils.build_output_name(dir_path, file_name, detector_name=detector_name, prefix='kpts', file_type='png')
+        kp_path = io_utils.build_output_name(dir_path, file_name, detector_name=detector_name, prefix=os.path.join('keypoints', 'kpts'))
+        desc_path = io_utils.build_output_name(dir_path, file_name, descriptor_name=descriptor_name, prefix=os.path.join('descriptors', 'desc'))
+        kp_img_path = io_utils.build_output_name(dir_path, file_name, detector_name=detector_name, prefix=os.path.join('keypoint_images', 'kpts'), file_type='png')
 
-        io_utils.save_keypoints_list(kpts, kp_path)
+        io_utils.save_keypoints_list(kpts, kp_path, img.shape)
         io_utils.save_descriptors(desc, desc_path)
         io_utils.save_keypoints_image(img, kp_img_path)
 
