@@ -17,35 +17,6 @@ def load_sift() -> cv2.xfeatures2d_SIFT:
 
     return cv2.xfeatures2d.SIFT_create()
 
-def smart_scale(image: np.array, size: int) -> np.array:
-    """Set the max size for the larger dimension of an image and scale the
-    image accordingly. If `size` and the dimension of the image already
-    correspond, return a copy of the image.
-
-    Arguments:
-        image {np.array} -- The image to be rescaled.
-        size {int} -- Maximal size of the larger dimension of the image
-
-    Returns:
-        np.array -- Resized image, such that it's larger dimension is equal to
-        `size`.
-    """
-    height, width = image.shape[:2]     # dimensions of image
-    max_dim = np.max(image.shape[:2])   # max dimension of image
-    interpolation = cv2.INTER_AREA      # Select interpolation algorithm
-    scaling = size / max_dim            # Get scaling factor
-
-    # If the largest iamge dimension already corresponds to the wanted size,
-    # just return a copy of the image.
-    if max_dim == size:
-        return image.copy()
-
-    if max_dim < size:
-        interpolation = cv2.INTER_LINEAR # for upscaling
-
-    return cv2.resize(image, None, fx=scaling, fy=scaling,
-        interpolation=interpolation)
-
 def compute_bundle(
     model: cv2.xfeatures2d_SIFT,
     image_list: List[str],
@@ -90,7 +61,7 @@ def compute(
     """
 
     img = cv2.imread(image, 0)
-    img = smart_scale(img, size) if size is not None else img
+    img = io_utils.smart_scale(img, size) if size is not None else img
     kp, desc = model.detectAndCompute(img, None)
     img_kp = cv2.drawKeypoints(img, kp, None)
     return (kp, desc, img_kp)

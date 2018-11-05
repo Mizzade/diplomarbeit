@@ -66,36 +66,6 @@ def rectify_patches(img: np.array, kpts: List[cv2.KeyPoint], N: int, mag_factor:
         patches.append(patch)
     return patches
 
-def smart_scale(image: np.array, size: int) -> np.array:
-    """Set the max size for the larger dimension of an image and scale the
-    image accordingly. If `size` and the dimension of the image already
-    correspond, return a copy of the image.
-
-    Arguments:
-        image {np.array} -- The image to be rescaled.
-        size {int} -- Maximal size of the larger dimension of the image
-
-    Returns:
-        np.array -- Resized image, such that it's larger dimension is equal to
-        `size`.
-    """
-    height, width = image.shape[:2]     # dimensions of image
-    max_dim = np.max(image.shape[:2])   # max dimension of image
-    interpolation = cv2.INTER_AREA      # Select interpolation algorithm
-    scaling = size / max_dim            # Get scaling factor
-
-    # If the largest iamge dimension already corresponds to the wanted size,
-    # just return a copy of the image.
-    if max_dim == size:
-        return image.copy()
-
-    if max_dim < size:
-        interpolation = cv2.INTER_LINEAR # for upscaling
-
-    return cv2.resize(image, None, fx=scaling, fy=scaling,
-        interpolation=interpolation)
-
-
 def compute_descriptors(model:tfeat_model.TNet, list_of_patches: List[np.array], use_gpu=True) -> np.array:
     """Transforms `list_of_patches` to **torch.tensor** and computes for each patch the corresponding descriptor.
 
@@ -164,7 +134,7 @@ def compute(
     """
 
     img = cv2.imread(image, 0)
-    img = smart_scale(img, size) if size is not None else img
+    img = io_utils.smart_scale(img, size) if size is not None else img
     kp, _ = detector.detectAndCompute(img, None)
     patches = rectify_patches(img, kp, 32, 3)
     desc = compute_descriptors(model, patches, use_gpu=False)
