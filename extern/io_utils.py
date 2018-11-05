@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple, Any
 import cv2
 import sys
 import os
@@ -57,7 +57,6 @@ def smart_scale(image: np.array, size: int) -> np.array:
         np.array -- Resized image, such that it's larger dimension is equal to
         `size`.
     """
-    height, width = image.shape[:2]     # dimensions of image
     max_dim = np.max(image.shape[:2])   # max dimension of image
     interpolation = cv2.INTER_AREA      # Select interpolation algorithm
     scaling = size / max_dim            # Get scaling factor
@@ -72,3 +71,71 @@ def smart_scale(image: np.array, size: int) -> np.array:
 
     return cv2.resize(image, None, fx=scaling, fy=scaling,
         interpolation=interpolation)
+
+def save_output(
+    file_list: List[str],
+    output: List[Tuple[List[cv2.KeyPoint], np.array, np.array, np.array]],
+    output_dir: str,
+    detector_name,
+    descriptor_name,
+    project_name) -> None:
+    """Save the output of this model inside the `output_dir`
+
+    Arguments:
+        file_list {List[str]} -- List of all file paths.
+        output {List[Tuple[List[cv2.KeyPoint], np.array, np.array]]} -- The output of this model.
+        Expects a 4-tuple, containing a list of of keypoints, descriptors,
+        image with keypoints and a heatmap. If a model does not provide one of
+        those four elements, use a list of None instead.
+        output_dir {str} -- Path to the output directory
+        detector_name {str} -- Name of the used detector
+        descriptor_name {str} -- Name of the used descriptor
+        project_name {str} -- Name of project.
+    """
+
+    for file_path, (kpts, desc, img_kp, img_heatmap) in zip (file_list, output):
+        set_name, file_name, _ = get_setName_fileName_extension(file_path)
+        dir_path = os.path.join(output_dir, set_name)
+
+        # Save list of keypoints.
+        if kpts is not None:
+            kp_path = build_output_name(
+                dir_path,
+                file_name,
+                detector_name=detector_name,
+                prefix=os.path.join('keypoints',
+                                    'kpts_{}_'.format(project_name)))
+            save_keypoints_list(kpts, kp_path, img_kp.shape)
+
+        # Save descriptors
+        if desc is not None:
+            desc_path = build_output_name(
+                dir_path,
+                file_name,
+                descriptor_name=descriptor_name,
+                prefix=os.path.join('descriptors',
+                                    'desc_{}_'.format(project_name)))
+            save_descriptors(desc, desc_path)
+
+        # Save keypoint image
+        if img_kp is not None:
+            kp_img_path = build_output_name(
+                dir_path,
+                file_name,
+                detector_name=detector_name,
+                file_type='png',
+                prefix=os.path.join('keypoint_images',
+                                    'kpts_{}_'.format(project_name)))
+            save_keypoints_image(img_kp, kp_img_path)
+
+        # Save heatmap
+        if img_heatmap is not None:
+            heat_img_path = build_output_name(
+                dir_path,
+                file_name,
+                detector_name=detector_name,
+                file_type='png',
+                prefix=os.path.join('heatmap_images',
+                                    'heatmap_{}_'.format(project_name)))
+            save_keypoints_image(img_heatmap, heat_img_path)
+

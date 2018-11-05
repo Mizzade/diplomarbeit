@@ -183,32 +183,6 @@ def scale_kps(model: SuperPointFrontend, image: np.array, kps: np.array) -> np.a
     scaling = np.array([_fx, _fy, 1])
     return scaling * kps
 
-def compute_bundle(
-    model: SuperPointFrontend,
-    image_list: List[str],
-    size: int=None) -> List[Tuple[List[cv2.KeyPoint], np.array]]:
-    """Computes keypoints, descriptors and images with keypoints drawn into it
-    for a list of images. Returns a list of tuples. Each tuple contains
-    the keypoints, the descriptors and the corresponding image with keypoints
-    for each input image.
-
-    Arguments:
-        model {superpoint_frontend.SuperPointFrontend} -- The SuperPoint keypoint detector and descriptor.
-        image_list {List[np.array]} -- A list of image paths
-        size {None} -- Maximal dimension of image. Default: None.
-
-    Returns:
-        List[Tuple[List[cv2.KeyPoint], np.array]] -- List of 3-tuples containing
-        the keypoints, descriptors and the image containing the keypoints.
-    """
-
-    output = []
-
-    for image in image_list:
-        output.append(compute(model, image, size))
-
-    return output
-
 def compute(
     model: SuperPointFrontend,
     image: str,
@@ -223,7 +197,7 @@ def compute(
         size {None} -- Maximal dimension of image. Default: None.
 
     Returns:
-        Tuple[List[cv2.KeyPoint], np.array, np.array, np.array] -- Returns tuple (keypoints, descriptors, image with keypoints, heatmap).
+        Tuple[List[cv2.KeyPoint], np.array, np.array, None] -- Returns tuple (keypoints, descriptors, image with keypoints, image of heatmap).
     """
 
     img = cv2.imread(image, 0)
@@ -237,64 +211,6 @@ def compute(
     kp = kps2KeyPoints(_kp)
     img_kp = cv2.drawKeypoints(img, kp, None)
     return (kp, desc, img_kp, heatmap)
-
-def save_output(
-    file_list: List[str],
-    output: List[Tuple[List[cv2.KeyPoint], np.array, np.array]],
-    output_dir: str,
-    detector_name,
-    descriptor_name,
-    project_name) -> None:
-    """Save the output of this model inside the `output_dir`
-
-    Arguments:
-        file_list {List[str]} -- List of all file paths.
-        output {List[Tuple[List[cv2.KeyPoint], np.array, np.array]]} -- The output of this model. In this case a triple of list of keypoints, descriptors, image with keypoints.
-        output_dir {str} -- Path to the output directory
-        detector_name {str} -- Name of the used detector
-        descriptor_name {str} -- Name of the used descriptor
-        project_name {str} -- Name of project.
-    """
-
-    for file_path, (kpts, desc, img, heatmap) in zip (file_list, output):
-        set_name, file_name, extension = io_utils \
-            .get_setName_fileName_extension(file_path)
-        dir_path = os.path.join(output_dir, set_name)
-
-        kp_path = io_utils.build_output_name(
-            dir_path,
-            file_name,
-            detector_name=detector_name,
-            prefix=os.path.join('keypoints',
-                                'kpts_{}_'.format(project_name)))
-
-        desc_path = io_utils.build_output_name(
-            dir_path,
-            file_name,
-            descriptor_name=descriptor_name,
-            prefix=os.path.join('descriptors',
-                                'desc_{}_'.format(project_name)))
-
-        kp_img_path = io_utils.build_output_name(
-            dir_path,
-            file_name,
-            detector_name=detector_name,
-            file_type='png',
-            prefix=os.path.join('keypoint_images',
-                                'kpts_{}_'.format(project_name)))
-
-        heat_img_path = io_utils.build_output_name(
-            dir_path,
-            file_name,
-            detector_name=detector_name,
-            file_type='png',
-            prefix=os.path.join('heatmap_images',
-                                'heatmap_{}_'.format(project_name)))
-
-        io_utils.save_keypoints_list(kpts, kp_path, img.shape)
-        io_utils.save_descriptors(desc, desc_path)
-        io_utils.save_keypoints_image(img, kp_img_path)
-        io_utils.save_keypoints_image(heatmap, heat_img_path)
 
 def main(argv: List[str]) -> None:
     """Runs the SuperPoint model and saves the results.
@@ -313,11 +229,11 @@ def main(argv: List[str]) -> None:
     output_dir = argv[0]
     file_list = json.loads(argv[1])
     model = load_superpoint()
-    size = 700
+    size = 800
 
-    output = compute_bundle(model, file_list, size)
-    save_output(file_list, output, output_dir, 'SuperPoint', 'SuperPoint',
-        'superpoint')
+    output = [compute(model, file, size) for file in file_list]
+    io_utils.save_output(file_list, output, output_dir, 'SuperPoint',
+        'SuperPoint', 'superpoint')
 
 if __name__ == "__main__":
     argv = sys.argv[1:]
