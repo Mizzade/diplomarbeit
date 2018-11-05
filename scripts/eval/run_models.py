@@ -13,16 +13,16 @@ networks = [
         'dir': 'pipe_sift',
         'main': 'use_sift.py'
     },
-    {
-        'name': 'SuperPoint',
-        'dir': 'pipe_superpoint',
-        'main': 'use_superpoint.py'
-    },
-    {
-        'name': 'Tfeat',
-        'dir': 'desc_tfeat',
-        'main': 'use_tfeat.py'
-    }
+    # {
+    #     'name': 'SuperPoint',
+    #     'dir': 'pipe_superpoint',
+    #     'main': 'use_superpoint.py'
+    # },
+    # {
+    #     'name': 'Tfeat',
+    #     'dir': 'desc_tfeat',
+    #     'main': 'use_tfeat.py'
+    # }
 ]
 
 allowed_extensions = ['.jpg', '.png', '.ppm', '.jpeg', '.tiff']

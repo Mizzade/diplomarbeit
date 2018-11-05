@@ -116,7 +116,11 @@ def compute_descriptors(model:tfeat_model.TNet, list_of_patches: List[np.array],
     descrs = model(patches)
     return descrs.detach().cpu().numpy()
 
-def compute_bundle(detector: Any, model: tfeat_model.TNet, image_list: List[str], size: int=None) -> List[Tuple[List[cv2.KeyPoint], np.array]]:
+def compute_bundle(
+    detector: Any,
+    model: tfeat_model.TNet,
+    image_list: List[str],
+    size: int=None) -> List[Tuple[List[cv2.KeyPoint], np.array]]:
     """Computes keypoints, descriptors and images with keypoints drawn into it
     for a list of images. Returns a list of tuples. Each tuple contains
     the keypoints, the descriptors and the corresponding image with keypoints
@@ -140,7 +144,11 @@ def compute_bundle(detector: Any, model: tfeat_model.TNet, image_list: List[str]
 
     return output
 
-def compute(detector: Any, model: tfeat_model.TNet, image: str, size: int=None) -> Tuple[List[cv2.KeyPoint], np.array, np.array, np.array]:
+def compute(
+    detector: Any,
+    model: tfeat_model.TNet,
+    image: str,
+    size: int=None) -> Tuple[List[cv2.KeyPoint], np.array, np.array, np.array]:
     """Computes the keypoints and descriptors for a given input image.
     Draws keypoints into the image.
     Returns keypoints, descriptors and image with keypoints.
@@ -164,13 +172,22 @@ def compute(detector: Any, model: tfeat_model.TNet, image: str, size: int=None) 
     img_kp = cv2.drawKeypoints(img, kp, None)
     return (kp, desc, img_kp)
 
-def save_output(file_list: List[str], output: List[Tuple[List[cv2.KeyPoint], np.array, np.array]], output_dir: str, detector_name, descriptor_name, project_name) -> None:
+def save_output(
+    file_list: List[str],
+    output: List[Tuple[List[cv2.KeyPoint], np.array, np.array]],
+    output_dir: str,
+    detector_name,
+    descriptor_name,
+    project_name) -> None:
     """Save the output of this model inside the `output_dir`
 
     Arguments:
         file_list {List[str]} -- List of all file paths.
         output {List[Tuple[List[cv2.KeyPoint], np.array, np.array]]} -- The output of this model. In this case a triple of list of keypoints, descriptors, image with keypoints.
         output_dir {str} -- Path to the output directory
+        detector_name {str} -- Name of the used detector
+        descriptor_name {str} -- Name of the used descriptor
+        project_name {str} -- Name of project.
     """
 
     for file_path, (kpts, desc, img) in zip (file_list, output):
@@ -222,7 +239,9 @@ def main(argv: List[str]) -> None:
     file_list = json.loads(argv[1])
     detector = cv2.xfeatures2d.SIFT_create()
     model = load_tfeat()
-    output = compute_bundle(detector, model, file_list, 800)
+    size = 800
+
+    output = compute_bundle(detector, model, file_list, size)
     save_output(file_list, output, output_dir, 'SIFT', 'Tfeat', 'tfeat')
 
 if __name__ == "__main__":
