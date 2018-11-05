@@ -17,6 +17,11 @@ networks = [
         'name': 'SuperPoint',
         'dir': 'pipe_superpoint',
         'main': 'use_superpoint.py'
+    },
+    {
+        'name': 'Tfeat',
+        'dir': 'desc_tfeat',
+        'main': 'use_tfeat.py'
     }
 ]
 

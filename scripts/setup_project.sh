@@ -20,6 +20,7 @@ echo "Setup for DOAP: done."
 echo "Start setup for TFeat..."
 echo "========================"
 $ROOT/scripts/desc_tfeat/setup_tfeat.sh $ROOT
+$ROOT/scripts/misc/copy_io_utils.sh $ROOT desc_tfeat
 echo "======================"
 echo "Setup for Tfeat: done."
 

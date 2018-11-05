@@ -7,4 +7,5 @@
 /pipe_lift/inputs
 /pipe_sift/io_utils.py
 /pipe_superpoint/io_utils.py
+/desc_tfeat/io_utils
 .vscode
