@@ -106,7 +106,7 @@ def compute(
     """
 
     img = cv2.imread(image, 0)
-    img = io_utils.smart_scale(img, size) if size is not None else img
+    img = io_utils.smart_scale(img, size, prevent_upscaling=True) if size is not None else img
     kp, _ = detector.detectAndCompute(img, None)
     patches = rectify_patches(img, kp, 32, 3)
     desc = compute_descriptors(model, patches, use_gpu=False)
@@ -128,15 +128,22 @@ def main(argv: List[str]) -> None:
     assert isinstance(argv[1], str)
     assert isinstance(json.loads(argv[1]), list)
 
+    project_name = 'tfeat'
+    detector_name = 'SIFT'
+    descriptor_name = 'TFeat'
+
     output_dir = argv[0]
     file_list = json.loads(argv[1])
     detector = cv2.xfeatures2d.SIFT_create()
     model = load_tfeat()
     size = 800
 
-    output = [compute(detector, model, file, size) for file in file_list]
-    io_utils.save_output(file_list, output, output_dir, 'SIFT', 'Tfeat',
-        'tfeat')
+    for file in file_list:
+        print('\n', file)
+        io_utils.save_output(file, compute(detector, model, file, size), output_dir,
+            detector_name, descriptor_name, project_name)
+        print('Done.')
+
 
 if __name__ == "__main__":
     argv = sys.argv[1:]

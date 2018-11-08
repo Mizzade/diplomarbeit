@@ -53,7 +53,7 @@ if __name__ == "__main__":
     root_dir = argv[0]
     data_dir = os.path.join(root_dir, 'data')
     output_dir = os.path.join(root_dir, 'outputs')
-    file_list = get_file_list(data_dir)
+    file_list = sorted(get_file_list(data_dir))
 
     for n in networks:
         print('Starting network `{}`.'.format(n['name']))
