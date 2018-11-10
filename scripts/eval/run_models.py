@@ -22,6 +22,11 @@ networks = [
         'name': 'Tfeat',
         'dir': 'desc_tfeat',
         'main': 'use_tfeat.py'
+    },
+    {
+        'name': 'TILDE',
+        'dir': 'det_tilde',
+        'main': 'use_tilde.sh'
     }
 ]
 
@@ -38,25 +43,29 @@ def get_file_list(data_dir: str) -> List[str]:
 
     return file_list
 
-def run_network(path: str, name: str, main: str, output_dir: str, file_list: List[str], **kwargs) -> List[Tuple[Any]]:
-    return subprocess.check_call(['pipenv', 'run', 'python', './{}'.format(main),
-        output_dir, json.dumps(file_list)], cwd=path)
+def run_network(path: str, name: str, main: str, output_dir: str, file_list: List[str], root_dir: str, data_dir: str, **kwargs) -> List[Tuple[Any]]:
+    if name == 'TILDE':
+        subprocess.check_call(['./{}'.format(main), data_dir, output_dir,
+        json.dumps(file_list)], cwd=path)
+    else:
+        return subprocess.check_call(['pipenv', 'run', 'python', './{}'.format(main),
+            output_dir, json.dumps(file_list)], cwd=path)
 
 if __name__ == "__main__":
     argv = sys.argv[1:]
 
     # First and only argument must be root dir of project
     # TODO catch argv errors
-    if len(argv) < 0:
+    if len(argv) <= 0:
         raise RuntimeError("Missing argument root path. Abort.")
 
     root_dir = argv[0]
     data_dir = os.path.join(root_dir, 'data')
     output_dir = os.path.join(root_dir, 'outputs')
-    file_list = sorted(get_file_list(data_dir))
+    file_list = sorted(get_file_list(data_dir))[:1]
 
     for n in networks:
         print('Starting network `{}`.'.format(n['name']))
         network_dir = os.path.join(root_dir, n['dir'])
-        status_code = run_network(network_dir, **n, output_dir=output_dir, file_list=file_list)
+        status_code = run_network(network_dir, **n, output_dir=output_dir, file_list=file_list, root_dir=root_dir, data_dir=data_dir)
         print('Network `{}` done.\n'.format(n['name']))

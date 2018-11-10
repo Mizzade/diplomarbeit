@@ -1,4 +1,10 @@
 
+### Befehle
+Löscht den Container nach Beendigung.
+Macht die Ordner data und outputs sichtbar im Container:
+
+> docker run -it --rm --name TILDE --mount type=bind,source="/home/mizzade/Workspace/diplom/code/data",target="/home/mizzade/Workspace/diplom/code/data" --mount type=bind,source="/home/mizzade/Workspace/diplom/code/outputs",target="/home/mizzade/Workspace/diplom/code/outputs" d16ae1750e27 /bin/bash
+
 #### Upgrade system
 apt-get -y update
 apt-get -y upgrade
@@ -46,6 +52,7 @@ cd Demo
 
 
 #### Create from Dockerfile
+alias nvidia-docker=nocker
 nocker build -t tilde_test_app .
 
 xhost +
@@ -70,10 +77,6 @@ $ g++ -std=c++11 -o use_tilde use_tilde.cpp /home/tilde/TILDE/c++/build/Lib/libT
 
 # how to call use_tilde
 ./use_tilde --imageDir /home/tilde/TILDE/data --outputDir output --fileName testImage.png --filterPath /home/tilde/TILDE/c++/Lib/filters --filterName Mexico.txt
-
-
-
-
 
 #### Copy compiled files from docker to host
 nocker cp tilde_test_01:/home/tilde/TILDE/c++/libTILDE.so .

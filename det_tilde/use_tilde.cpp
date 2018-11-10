@@ -1,10 +1,11 @@
 #include <opencv2/opencv.hpp>
 #include "/home/tilde/TILDE/c++/Lib/src/libTILDE.hpp"
 #include <getopt.h>
+#include <fstream>
 
 /**
  * How to compile inside docker image:
- * g++ -std=c++11 -o use_tilde use_tilde.cpp /home/tilde/TILDE/c++/build/Lib/libTILDE_static.a -L/usr/local/lib -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_features2d
+ * g++ -std=c++11 -o use_tilde use_tilde.cpp /home/tilde/TILDE/c++/build/Lib/libTILDE_static.a -L/usr/local/lib -lopencv_core -lopencv_imgcodecs -lopencv_highgui -lopencv_imgproc -lopencv_features2d
  */
 
 /**
@@ -68,12 +69,29 @@ int main(int argc, char *argv[])
     }
 
     try {
+      size_t lastindex = fileName.find_last_of(".");
+      string rawname = fileName.substr(0, lastindex);
+
       std::string pathToFilter = filterPath + "/" + filterName;
       std::string pathToImage = imageDir + "/" + fileName;
-      std::string pathToOutputFile = outputDir + "/" + fileName + ".yml";
+      std::string pathToOutputFile = outputDir + "/keypoints/kpts_tilde__" + rawname +
+        "_TILDE.csv";
+
+      // Filename for score map.
+      std::string pathToScoreMap = outputDir + "/scores/scores_tilde__" + rawname +
+        "_TILDE.csv";
 
       // Load image
       Mat I = imread(pathToImage);
+
+      // Get width and height of the image
+      int height = I.rows;
+      int width = I.cols;
+
+      // Create Mat for probability scores
+      Mat scores = Mat::zeros(height, width, CV_32FC1);
+
+
       if (I.data == 0) throw std::runtime_error("Image not found!");
 
       /*
@@ -96,26 +114,39 @@ int main(int argc, char *argv[])
       - score: a  pointer to an  openCV Mat  image, if the  pointer is not  null, the
         score map is retuned in addition to the keypoints
       */
-     // If you want the score map as well, you have to create an openCV Mat
-     // mat object for it and pass it as last parameter to the function
-     // as reference: (&score) instead of NULL
-      vector<KeyPoint> kps = getTILDEKeyPoints(I, pathToFilter, false, true, true, NULL);
+      // If you want the score map as well, you have to create an openCV Mat
+      // mat object for it and pass it as last parameter to the function
+      // as reference: (&score) instead of NULL
+      vector<KeyPoint> kpts = getTILDEKeyPoints(I, pathToFilter, false, true, true, &scores);
 
-      // Der Ordner in dem die .yml File gespeichert wird, muss bereits exisiteren.
-      FileStorage fs(pathToOutputFile, FileStorage::WRITE);
+      std::vector<cv::Point2f> point2f_vector; //We define vector of point2f
+      cv::KeyPoint::convert(kpts, point2f_vector, std::vector< int >()); //Then we use this nice function from OpenCV to directly convert from KeyPoint vector to Point2f vector
+      cv::Mat kpts_coordinates(point2f_vector); //We simply cast the Point2f vector into a cv::Mat as Appleman1234 did
 
-      // TODO: Schreibe zusätzlich noch Name des Bildes n die .yaml File
-      // und den Namen des Detektors samt benutzten Filter.
+      cv::Size size_kpts = kpts_coordinates.size();
+      int num_kpts = size_kpts.height;
+      int num_cols = size_kpts.width;
 
-      // A Keypoint has 7 values:
-      // cv.KeyPoint(	x, y, _size[, _angle[, _response[, _octave[, _class_id]]]])
-      // See for more details: https://docs.opencv.org/3.4/d2/d29/classcv_1_1KeyPoint.html
-
-      write(fs, "keypoints", kps);
-      fs.release();
+      std::string meta_text = "# " + std::to_string(height) + ", " +
+        std::to_string(width) + ", " + std::to_string(num_kpts) + ", " +
+        std::to_string(num_cols + 1);
 
 
-      std::cout << "Executed TILDE for file " << pathToImage << ".\nResults are saved in " << pathToOutputFile << std::endl;
+      // Save keypoints
+      ofstream myfile;
+      myfile.open(pathToOutputFile.c_str());
+      myfile << meta_text << std::endl << cv::format(kpts_coordinates, cv::Formatter::FMT_CSV) << std::endl;
+      myfile.close();
+
+      // Save score map
+      // The score map is exaclty as large as the image and contains the probability
+      // value of that pixel to be a keypoint.
+      std::string score_meta_text = "# " + std::to_string(height) + ", " +
+        std::to_string(width);
+      myfile.open(pathToScoreMap.c_str());
+      myfile << score_meta_text << std::endl << cv::format(scores, cv::Formatter::FMT_CSV) << std::endl;
+      myfile.close();
+
     }
     catch (std::exception &e) {
       std::cout << "ERROR: " << e.what() << "\n";

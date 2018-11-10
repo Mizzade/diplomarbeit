@@ -1,4 +1,7 @@
 FROM nvidia/cuda:8.0-cudnn7-devel-ubuntu16.04
+# Main Features:
+# OpenCV 3.4.1
+# Python 3.6.6
 # Update package manager.
 RUN apt-get -y update
 RUN apt-get -y upgrade
@@ -22,13 +25,15 @@ RUN pyenv global 3.6.6
 RUN ["mkdir", "-p", "/home/tilde"]
 WORKDIR /home/tilde
 
-# Download latest OpenCV, revert it to 2.4.9 and install it.
+# Download latest OpenCV, revert it to Version X and install it.
+# 6ffc487 for v3.4.1
+# df8e282 for v.2.4.9
 RUN ["git",  "clone", "https://github.com/opencv/opencv.git"]
 WORKDIR /home/tilde/opencv
-RUN ["git", "reset", "--hard", "df8e282"]
+RUN ["git", "reset", "--hard", "6ffc487"]
 RUN ["mkdir", "build"]
 WORKDIR /home/tilde/opencv/build
-RUN cmake -D WITH_TBB=ON -D BUILD_NEW_PYTHON_SUPPORT=ON -D WITH_V4L=ON -D INSTALL_C_EXAMPLES=OFF -D INSTALL_PYTHON_EXAMPLES=OFF -D BUILD_EXAMPLES=OFF -D WITH_QT=ON -D WITH_OPENGL=ON -D WITH_VTK=ON -D CUDA_GENERATION=Auto -D WITH_CUDA=OFF ..
+RUN cmake -D OPENCV_VERSION=3 -D WITH_TBB=ON -D BUILD_NEW_PYTHON_SUPPORT=ON -D WITH_V4L=ON -D INSTALL_C_EXAMPLES=OFF -D INSTALL_PYTHON_EXAMPLES=OFF -D BUILD_EXAMPLES=OFF -D WITH_QT=ON -D WITH_OPENGL=ON -D WITH_VTK=ON -D CUDA_GENERATION=Auto -D WITH_CUDA=OFF ..
 RUN make
 RUN make install
 
@@ -41,9 +46,21 @@ WORKDIR /home/tilde/TILDE/c++/build
 RUN ["cmake", ".."]
 RUN ["make"]
 
+# Configure opencv correctly to be found by g++
+WORKDIR /etc/ld.so.conf.d
+RUN touch opencv.conf
+RUN echo /usr/local/lib >> opencv.conf
+RUN ldconfig -v
+
+WORKDIR /home/tilde/TILDE/c++/build
+RUN mkdir output
+# COPY extern/io_utils.py /home/tilde/TILDE/c++/build/
+COPY det_tilde/use_tilde.py /home/tilde/TILDE/c++/build/
+RUN chmod +x use_tilde.py
+
 # Kopiere use_tilde.cpp in das Image und kompiliere es.
 COPY det_tilde/use_tilde.cpp /home/tilde/TILDE/c++/build/
-RUN  g++ -std=c++11 -o use_tilde use_tilde.cpp /home/tilde/TILDE/c++/build/Lib/libTILDE_static.a -L/usr/local/lib -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_features2d
+RUN  g++ -std=c++11 -o use_tilde use_tilde.cpp /home/tilde/TILDE/c++/build/Lib/libTILDE_static.a -L/usr/local/lib -lopencv_core -lopencv_imgcodecs -lopencv_highgui -lopencv_imgproc -lopencv_features2d
 
 # Kopiere "Hello World" test shell Skript und führe es aus.
 # TODO: Change with evaluation script to automatically start evaluation.
