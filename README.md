@@ -39,3 +39,17 @@ Der CUDA Treiber hat aufgehangen. Tippe folgendes in die Konsole:
         $ sudo modprobe nvidia_modeset
         $ sudo modprobe nvidia_drm
         $ sudo modprobe nvidia_uvm
+
+
+### Bildgrößen
+Manche Modell können nur Bilder bis zur einer bestimmten Größe handhaben, bevor sie abstürzen. Die folgende Liste fast diese Größen zusammen. Bei der Benutzung der Modell mit größeren Bilder muss daran gedacht werden, die Bilder entsprechend herunter zu skalieren.
+
+| MODEL             | max Size (px) |
+|:------------------|:--------------|
+| SIFT              | no Limit      |
+| LIFT              | ?             |
+| SuperPoint        | 1700          |
+| TILDE             | no Limit      |
+| TConvDet          | ?             |
+| DOAP              | ?             |
+| TFeat             | 1400          |
