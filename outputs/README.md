@@ -7,7 +7,7 @@ Dieser Ordner enhält die Ausgaben der einzelnen Deskriptoren und Detektoren. F�
 
 #### Namensschema
 Die Benennung einzelner Dateien erfolgt mittels folgender Bausteine:
-- TYPE: desc | kpts | heatmap
+- TYPE: desc | kpts | heatmap | scores
 - PROJEKT_NAME: doap | tfeat| tilde | sift | superpoint | lift | tconvdet
 - IMAGE_NAME
 - DETEKTOR_NAME: sift | tilde | tconvdet | superpoint | lift
@@ -19,7 +19,7 @@ Der Name wird wir folge zusammengesetzt:
         <TYPE>_<PROJECT_NAME>__<IMAGE_NAME>_<DETECTOR_NAME>_<DESCRIPTOR_NAME>.<EXTENSION>
 
 
-Dateien die mit `ktps` beginnen, haben keinen `<DESCRIPTOR_NAMEN>` im Namen.
+Dateien die mit `kpts` beginnen, haben keinen `<DESCRIPTOR_NAMEN>` im Namen.
 
 #### Keypoints Schema
 Eine .csv Datei, die Keypunkte enhält, ist wie folgt aufgebaut:
@@ -40,6 +40,17 @@ Im obigen Beispiel hatte das Bild eine Höhe von 800 Pixel und eine Breite von 6
 
 Die ersten beiden Zahlen in jeder Reihe der Keypunkte beschreibt die Position im Bild. Die fünf weiteren Spaltenwerte werden nur benötigt, falls man aus dem Keypunkt eine Instanz von openCVs KeyPoint Klasse erzeugen möchte.
 
+Im Falle des TILDE Detektor gibt es nur eine Metazeile, die die Dimensionen des Eingabebildes beschreibt, sowie die Anzahl der Keypunkte und Anzahl der
+Element pro Zeile, zwei, nähmlich x und y.
+
+Ein Beispiel für den TILDE Detektor:
+```
+# 1024, 768, 1264, 2
+301, 624
+319, 760
+474, 630
+...
+```
 
 #### Descriptor Schema
 Die erste Zeile einer .csv Datei, die Deskriptorwerte beinhaltet, beinhaltet Metainformationen, gefolgt von alle Deskriptoren.
@@ -52,4 +63,14 @@ Beispiel:
 # 243, 128
 0.000000000000000000e+00,...
 ...
+```
+#### Scores Schema
+TILDE liefert außerdem eine .csv Datei pro Bild vom Typ `scores`. Darin befinden sich die Wahrscheinlichkeitswerte für jeden Pixel ein Keypunkt zu sein.
+
+Eine Scores .csv Datei hat genau zwei Zeilen. Die erste ist eine Metazeile, die die Dimensionen `width` und `height` des Bildes beschreibt. Dann folgt eine Zeile von (width * height) Wahrscheinlichkeitswerten zwischen 0 und 1, ein Wert für jeden Pixel des Bildes.
+
+Beispiel:
+```
+# 1024, 768
+-5.208162e-11, -5.2083726e-11, -5.2101056e-11, -5.2157976e-11, ...
 ```
