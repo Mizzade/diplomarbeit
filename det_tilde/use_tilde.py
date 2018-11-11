@@ -17,12 +17,14 @@ if __name__ == '__main__':
     if len(argv) <= 0:
         raise RuntimeError("Missing argument <output_dir> and <file_list>. Abort")
 
+    # NOTE: For some reason, the list will be separated while processed from
+    # Python to Bash to Docker to Python
     assert isinstance(argv[0], str)
     assert isinstance(argv[1], str)
-    assert isinstance(json.loads(argv[1]), list)
+    assert isinstance(json.loads(''.join(argv[1:])), list)
 
     output_dir = argv[0]
-    file_list = json.loads(argv[1])
+    file_list = json.loads(''.join(argv[1:]))
 
     for file in file_list:
         # Build parameters for use_tilde.cpp

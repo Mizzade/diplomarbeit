@@ -54,10 +54,6 @@ RUN ldconfig -v
 
 WORKDIR /home/tilde/TILDE/c++/build
 RUN mkdir output
-# COPY extern/io_utils.py /home/tilde/TILDE/c++/build/
-COPY det_tilde/use_tilde.py /home/tilde/TILDE/c++/build/
-RUN chmod +x use_tilde.py
-
 # Kopiere use_tilde.cpp in das Image und kompiliere es.
 COPY det_tilde/use_tilde.cpp /home/tilde/TILDE/c++/build/
 RUN  g++ -std=c++11 -o use_tilde use_tilde.cpp /home/tilde/TILDE/c++/build/Lib/libTILDE_static.a -L/usr/local/lib -lopencv_core -lopencv_imgcodecs -lopencv_highgui -lopencv_imgproc -lopencv_features2d
@@ -65,6 +61,11 @@ RUN  g++ -std=c++11 -o use_tilde use_tilde.cpp /home/tilde/TILDE/c++/build/Lib/l
 # Kopiere "Hello World" test shell Skript und führe es aus.
 # TODO: Change with evaluation script to automatically start evaluation.
 COPY det_tilde/hello_world.sh /home/tilde/TILDE/c++/build/
-RUN ["chmod", "777", "hello_world.sh"]
+RUN chmod +x hello_world.sh
+
+# COPY extern/io_utils.py /home/tilde/TILDE/c++/build/
+COPY det_tilde/use_tilde.py /home/tilde/TILDE/c++/build/
+RUN chmod +x use_tilde.py
+
 CMD ["./hello_world.sh"]
 
