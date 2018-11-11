@@ -72,7 +72,7 @@ net_arg.add_argument("--module_desc", type=str, default="lift_desc", help="")
 
 # Batch-norm on-off
 net_arg.add_argument("--use_input_batch_norm", type=str2bool, default=False, help="")
-net_arg.add_argument("--use_batch_norm", type=str2bool, default=True, help="")
+net_arg.add_argument("--use_batch_norm", type=str2bool, default=False, help="")
 
 # Data compatibility option
 net_arg.add_argument("--old_data_compat", type=str2bool, default=False, help="Use hard-mined, non-augmented set")
@@ -146,13 +146,13 @@ data_arg.add_argument("--regen_pairs", type=str2bool, default=True, help="")
 # ----------------------------------------
 # Task
 task_arg = add_argument_group("Task")
-task_arg.add_argument("--task", type=str, default="train",
+task_arg.add_argument("--task", type=str, default="test",
                       choices=["train", "test"],
                       help="")
 task_arg.add_argument("--subtask", type=str, default="desc",
                       choices=["kp", "ori", "desc", "joint"],
                       help="")
-task_arg.add_argument("--logdir", type=str, default="", help="")
+task_arg.add_argument("--logdir", type=str, default="../pretrained_models/release-aug", help="Path to pretrained models.")
 task_arg.add_argument("--finetune", type=str, default="kp", help="e.g. 'kp+ori+desc'")
 
 # ----------------------------------------

@@ -152,3 +152,46 @@ Anaconda3-5.2.0 wurde mit Python 3.6 kompiliert, Tensorflow 1.4 jedoch mit Pytho
 Dieser Fehler tritt anscheinend auf tritt auf, wenn das Eingabebild zu groß war. Es werden dann keine Keypunkte erzeugt und folglich kann das Programm die Folgeschritte nicht mehr aufführen.
 Es lohnt sich daher, das Bild eventuell vor Gebrauch zu verkleinern.
 
+
+### Update:  11.11.2018
+Changed to config files to start the pipeline with minimal parameters:
+#### Keypoints:
+- subtask
+- img_file
+- out_file
+
+```python
+python main.py \
+    --subtask=kp \
+    --test_img_file=../../data/v_churchill/1.ppm \
+    --test_out_file=../inter/kpts_lift__1_LIFT.txt
+```
+
+#### Orientation:
+- subtask
+- img_file
+- out_file
+- kp_file
+
+```python
+python main.py \
+    --subtask=ori \
+    --test_img_file=../../data/v_churchill/1.ppm \
+    --test_out_file=../inter/ori_lift__1_LIFT.txt \
+    --test_kp_file=../inter/kpts_lift__1_LIFT.txt
+```
+
+#### Descriptors:
+- subtask
+- img_file
+- out_file
+- kp_file
+
+```python
+python main.py \
+    --subtask=desc \
+    --test_img_file=../../data/v_churchill/1.ppm \
+    --test_out_file=../inter/desc_lift__1_LIFT_LIFT.h5 \
+    --test_kp_file=../inter/kp_lift__1_LIFT.txt
+```
+

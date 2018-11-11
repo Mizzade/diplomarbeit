@@ -47,7 +47,7 @@ Manche Modell können nur Bilder bis zur einer bestimmten Größe handhaben, bev
 | MODEL             | max Size (px) |
 |:------------------|:--------------|
 | SIFT              | no Limit      |
-| LIFT              | ?             |
+| LIFT              | 1400          |
 | SuperPoint        | 1700          |
 | TILDE             | no Limit      |
 | TConvDet          | ?             |
