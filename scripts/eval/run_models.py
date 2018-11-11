@@ -45,7 +45,7 @@ def get_file_list(data_dir: str) -> List[str]:
 
 def run_network(path: str, name: str, main: str, output_dir: str, file_list: List[str], root_dir: str, data_dir: str, **kwargs) -> List[Tuple[Any]]:
     if name == 'TILDE':
-        subprocess.check_call(['./{}'.format(main), data_dir, output_dir,
+        subprocess.check_call(['/bin/bash', './{}'.format(main), data_dir, output_dir,
         json.dumps(file_list)], cwd=path)
     else:
         return subprocess.check_call(['pipenv', 'run', 'python', './{}'.format(main),
@@ -62,7 +62,7 @@ if __name__ == "__main__":
     root_dir = argv[0]
     data_dir = os.path.join(root_dir, 'data')
     output_dir = os.path.join(root_dir, 'outputs')
-    file_list = sorted(get_file_list(data_dir))[:1]
+    file_list = sorted(get_file_list(data_dir))
 
     for n in networks:
         print('Starting network `{}`.'.format(n['name']))
