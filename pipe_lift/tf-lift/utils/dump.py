@@ -86,7 +86,7 @@ def readh5(h5node):
     return dict_from_file
 
 
-def save_network(supervisor, subtask, verbose=True):
+def save_network(supervisor, subtask, verbose=False):
     """Save the current training status"""
 
     # Skip if there's no saver of this subtask
@@ -133,7 +133,7 @@ def save_network(supervisor, subtask, verbose=True):
         os.path.join(cur_logdir, "network.meta"))
 
 
-def restore_network(supervisor, subtask):
+def restore_network(supervisor, subtask, verbose=False):
     """Restore training status"""
 
     # Skip if there's no saver of this subtask
@@ -145,22 +145,23 @@ def restore_network(supervisor, subtask):
     # Check if pretrain weight file is specified
     predir = getattr(supervisor.config, "pretrained_{}".format(subtask))
     # Try loading the old weights
-    is_loaded += load_legacy_network(supervisor, subtask, predir)
+    is_loaded += load_legacy_network(supervisor, subtask, predir, verbose)
     # Try loading the tensorflow weights
-    is_loaded += load_network(supervisor, subtask, predir)
+    is_loaded += load_network(supervisor, subtask, predir, verbose)
 
     # Load network using tensorflow saver
     logdir = os.path.join(supervisor.config.logdir, subtask)
-    is_loaded += load_network(supervisor, subtask, logdir)
+    is_loaded += load_network(supervisor, subtask, logdir, verbose)
 
     return is_loaded
 
 
-def load_network(supervisor, subtask, load_dir):
+def load_network(supervisor, subtask, load_dir, verbose=False):
     """Load function for our new framework"""
 
-    print("[{}] Checking if previous Tensorflow run exists in {}"
-          "".format(subtask, load_dir))
+    if verbose:
+        print("[{}] Checking if previous Tensorflow run exists in {}"
+            "".format(subtask, load_dir))
     latest_checkpoint = tf.train.latest_checkpoint(load_dir)
     if latest_checkpoint is not None:
         # Load parameters
@@ -168,29 +169,35 @@ def load_network(supervisor, subtask, load_dir):
             supervisor.sess,
             latest_checkpoint
         )
-        print("[{}] Loaded previously trained weights".format(subtask))
+        if verbose:
+            print("[{}] Loaded previously trained weights".format(subtask))
         # Save mean std (falls back to default if non-existent)
         if os.path.exists(os.path.join(load_dir, "mean.h5")):
             supervisor.network.mean = loadh5(os.path.join(load_dir, "mean.h5"))
             supervisor.network.std = loadh5(os.path.join(load_dir, "std.h5"))
-            print("[{}] Loaded input normalizers".format(subtask))
+            if verbose:
+                print("[{}] Loaded input normalizers".format(subtask))
         # Load best validation result
         supervisor.best_val_loss[subtask] = loadh5(
             os.path.join(load_dir, best_val_loss_filename)
         )[subtask]
-        print("[{}] Loaded best validation result = {}".format(
-            subtask, supervisor.best_val_loss[subtask]))
+        if verbose:
+            print("[{}] Loaded best validation result = {}".format(
+                subtask, supervisor.best_val_loss[subtask]))
         # Load best validation result
         supervisor.best_step[subtask] = loadh5(
             os.path.join(load_dir, best_step_filename)
         )[subtask]
-        print("[{}] Loaded best step = {}".format(
-            subtask, supervisor.best_step[subtask]))
+
+        if verbose:
+            print("[{}] Loaded best step = {}".format(
+                subtask, supervisor.best_step[subtask]))
 
         return True
 
     else:
-        print("[{}] No previous Tensorflow result".format(subtask))
+        if verbose:
+            print("[{}] No previous Tensorflow result".format(subtask))
 
         return False
 

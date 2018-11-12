@@ -210,9 +210,12 @@ test_arg.add_argument("--test_kp_use_tensorflow",
 test_arg.add_argument("--test_nearby_ratio", type=float, default=1.0, help="")
 test_arg.add_argument("--test_nms_intv", type=int, default=2, help="")
 test_arg.add_argument("--test_edge_th", type=float, default=10.0, help="")
+test_arg.add_argument("--verbose", type=bool, default=False,
+                    help="Turn logging messages on (TRUE) or off (False). Default: False")
 
 train_arg = add_argument_group("Misc")
 loss_arg.add_argument("--usage", type=float, default=0.96, help="Force GPU memory usage")
+
 
 
 def get_config(argv):

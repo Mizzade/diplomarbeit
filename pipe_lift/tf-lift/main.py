@@ -1,34 +1,3 @@
-# main.py ---
-#
-# Filename: main.py
-# Description: WRITEME
-# Author: Kwang Moo Yi, Lin Chen
-# Maintainer: Kwang Moo Yi
-# Created: ???
-# Version:
-# Package-Requires: ()
-# URL:
-# Doc URL:
-# Keywords:
-# Compatibility:
-#
-#
-
-# Commentary:
-#
-#
-#
-#
-
-# Change Log:
-#
-#
-#
-# Copyright (C), EPFL Computer Vision Lab.
-
-# Code:
-
-
 import os
 import sys
 import platform

@@ -142,14 +142,15 @@ def create_feed_dict(model, placeholders, name_map):
     return feed_dict
 
 
-def load_legacy_network(supervisor, subtask, load_dir):
+def load_legacy_network(supervisor, subtask, load_dir, verbose=False):
     """Load function for our old framework"""
 
     # Lazy loading to prevent import issues
     from utils import loadh5
 
-    print("[{}] Checking if old pre-trained weights exists in {}"
-          "".format(subtask, load_dir))
+    if verbose:
+        print("[{}] Checking if old pre-trained weights exists in {}"
+            "".format(subtask, load_dir))
     model_file = os.path.join(load_dir, "model.h5")
     norm_file = os.path.join(load_dir, "norm.h5")
     base_file = os.path.join(load_dir, "base.h5")
@@ -168,13 +169,16 @@ def load_legacy_network(supervisor, subtask, load_dir):
         supervisor.network.std["desc"] = float(base["patch-std"])
         # Load weights for the component
         supervisor.network.legacy_load_func[subtask](supervisor.sess, model)
-        print("[{}] Loaded previously trained weights".format(subtask))
+
+        if verbose:
+            print("[{}] Loaded previously trained weights".format(subtask))
 
         return True
 
     else:
-        print("[{}] No pretrained weights from the old framework"
-              "".format(subtask))
+        if verbose:
+            print("[{}] No pretrained weights from the old framework"
+                  "".format(subtask))
 
         return False
 

@@ -1,32 +1,3 @@
-# lift.py ---
-#
-# Filename: lift.py
-# Description: WRITEME
-# Author: Kwang Moo Yi, Lin Chen
-# Maintainer: Kwang Moo Yi
-# Created: ?????
-# Version:
-# Package-Requires: ()
-# URL:
-# Doc URL:
-# Keywords:
-# Compatibility:
-#
-#
-
-# Commentary:
-#
-#
-#
-#
-
-# Change Log:
-#
-#
-#
-
-# Code:
-
 import importlib
 
 import numpy as np
@@ -148,7 +119,8 @@ class Network(object):
         # build_legacy(self)
 
         # Show all variables in the network
-        show_all_variables()
+        if self.config.verbose:
+            show_all_variables()
 
         # Add all variables into histogram summary
         for _module in ["kp", "ori", "desc"]:
@@ -263,13 +235,7 @@ class Network(object):
                 [res["score{}".format(_i + 1)] for _i in xrange(4)],
                 self.r_base,
             )
-            # prauc = eval_kps(
-            #     [res["xyz{}".format(_i + 1)] for _i in xrange(4)],
-            #     [res["pos{}".format(_i + 1)] * self.scale_aug
-            #         for _i in xrange(4)],
-            #     [res["score{}".format(_i + 1)] for _i in xrange(4)],
-            #     self.r_base,
-            # )
+
 
             return 1.0 - prauc
 
@@ -548,7 +514,7 @@ class Network(object):
 
             # ----------------------------------------
             # The Rot Spatial Transformer.
-            # - No rotation augmentation: 
+            # - No rotation augmentation:
             # Operates over the original patch with the ground truth angle when
             # bypassing. Otherwise, we combine the augmented angle and the
             # output of the orientation module.

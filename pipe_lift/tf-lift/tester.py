@@ -1,34 +1,3 @@
-# tester.py ---
-#
-# Filename: tester.py
-# Description:
-# Author: Kwang Moo Yi
-# Maintainer:
-# Created: Thu Jul  6 13:34:04 2017 (+0200)
-# Version:
-# Package-Requires: ()
-# URL:
-# Doc URL:
-# Keywords:
-# Compatibility:
-#
-#
-
-# Commentary:
-#
-#
-#
-#
-
-# Change Log:
-#
-#
-#
-# Copyright (C), EPFL Computer Vision Lab.
-
-# Code:
-
-
 import time
 import os
 
@@ -71,8 +40,9 @@ class Tester(object):
         if os.path.exists(os.path.join(logdir, "mean.h5")):
             training_mean = loadh5(os.path.join(logdir, "mean.h5"))
             training_std = loadh5(os.path.join(logdir, "std.h5"))
-            print("[{}] Loaded input normalizers for testing".format(
-                self.config.subtask))
+            if self.config.verbose:
+                print("[{}] Loaded input normalizers for testing".format(
+                    self.config.subtask))
 
             # Create the model instance
             self.network = Network(self.sess, self.config, self.dataset, {
@@ -95,9 +65,10 @@ class Tester(object):
         subtask = self.config.subtask
 
         # Load the network weights for the module of interest
-        print("-------------------------------------------------")
-        print(" Loading Trained Network ")
-        print("-------------------------------------------------")
+        if self.config.verbose:
+            print("-------------------------------------------------")
+            print(" Loading Trained Network ")
+            print("-------------------------------------------------")
         # Try loading the joint version, and then fall back to the current task
         # silently if failed.
         try:
@@ -110,10 +81,10 @@ class Tester(object):
             raise RuntimeError("Could not load network weights!")
 
         # Run the appropriate compute function
-        print("-------------------------------------------------")
-        print(" Testing ")
-        print("-------------------------------------------------")
-
+        if self.config.verbose:
+            print("-------------------------------------------------")
+            print(" Testing ")
+            print("-------------------------------------------------")
         eval("self._compute_{}()".format(subtask))
 
     def _compute_kp(self):
@@ -142,7 +113,8 @@ class Tester(object):
         min_hw = np.min(image_gray.shape[:2])
         # for the case of testing on same scale, do not double scale
         if min_hw <= 1600 and min_scale_log2!=max_scale_log2:
-            print("INFO: Testing double scale")
+            if self.config.verbose:
+                print("INFO: Testing double scale")
             min_scale_log2 -= 1
         # range of scales to check
         num_division = (max_scale_log2 - min_scale_log2) * (scl_intv + 1) + 1
@@ -167,8 +139,9 @@ class Tester(object):
             scales_to_test = scales_to_test[:first_invalid]
             resize_to_test = resize_to_test[:first_invalid]
 
-        print('resize to test is {}'.format(resize_to_test))
-        print('scales to test is {}'.format(scales_to_test))
+        if self.config.verbose:
+            print('resize to test is {}'.format(resize_to_test))
+            print('scales to test is {}'.format(scales_to_test))
 
         # Run for each scale
         test_res_list = []
@@ -181,9 +154,11 @@ class Tester(object):
             image = cv2.resize(image_gray, (new_width, new_height))
             end_time = time.clock()
             resize_time = (end_time - start_time) * 1000.0
-            print("Time taken to resize image is {}ms".format(
-                resize_time
-            ))
+
+            if self.config.verbose:
+                print("Time taken to resize image is {}ms".format(
+                    resize_time
+                ))
             total_time += resize_time
 
             # run test
@@ -204,9 +179,11 @@ class Tester(object):
 
             end_time = time.clock()
             compute_time = (end_time - start_time) * 1000.0
-            print("Time taken for image size {}"
-                  " is {} milliseconds".format(
-                      image.shape, compute_time))
+
+            if self.config.verbose:
+                print("Time taken for image size {}"
+                    " is {} milliseconds".format(
+                        image.shape, compute_time))
 
             total_time += compute_time
 
@@ -219,9 +196,11 @@ class Tester(object):
             )
             end_time = time.clock()
             pad_time = (end_time - start_time) * 1000.0
-            print("Time taken for padding and stacking is {} ms".format(
-                pad_time
-            ))
+
+            if self.config.verbose:
+                print("Time taken for padding and stacking is {} ms".format(
+                    pad_time
+                ))
             total_time += pad_time
 
         # ------------------------------------------------------------------------
@@ -246,7 +225,8 @@ class Tester(object):
         nms_intv = self.config.test_nms_intv
         edge_th = self.config.test_edge_th
 
-        print("Performing NMS")
+        if self.config.verbose:
+            print("Performing NMS")
         start_time = time.clock()
         res_list = test_res_list
         # check whether the return result for socre is right
@@ -263,32 +243,17 @@ class Tester(object):
         draw_XYZS_to_img(XYZS, image_color, self.config.test_out_file + '.jpg')
 
         nms_time = (end_time - start_time) * 1000.0
-        print("NMS time is {} ms".format(nms_time))
+        if self.config.verbose:
+            print("NMS time is {} ms".format(nms_time))
         total_time += nms_time
-        print("Total time for detection is {} ms".format(total_time))
-        # if bPrintTime:
-        #     # Also print to a file by appending
-        #     with open("../timing-code/timing.txt", "a") as timing_file:
-        #         print("------ Keypoint Timing ------\n"
-        #               "NMS time is {} ms\n"
-        #               "Total time is {} ms\n".format(
-        #                   nms_time, total_time
-        #               ),
-        #               file=timing_file)
 
-        # # resize score to original image size
-        # res_list = [cv2.resize(score,
-        #                        (image_width, image_height),
-        #                        interpolation=cv2.INTER_NEAREST)
-        #             for score in test_res_list]
-        # # make as np array
-        # res_scores = np.asarray(res_list)
-        # with h5py.File('test/scores.h5', 'w') as score_file:
-        #     score_file['score'] = res_scores
+        if self.config.verbose:
+            print("Total time for detection is {} ms".format(total_time))
 
         # ------------------------------------------------------------------------
         # Save as keypoint file to be used by the oxford thing
-        print("Turning into kp_list")
+        if self.config.verbose:
+            print("Turning into kp_list")
         kp_list = XYZS2kpList(XYZS)  # note that this is already sorted
 
         # ------------------------------------------------------------------------
@@ -299,7 +264,8 @@ class Tester(object):
         # new_kp_list, _ = recomputeOrientation(image_gray, kp_list,
         #                                       bSingleOrientation=True)
 
-        print("Saving to txt")
+        if self.config.verbose:
+            print("Saving to txt")
         saveKpListToTxt(kp_list, None, self.config.test_out_file)
 
     def _compute_ori(self):
@@ -312,9 +278,11 @@ class Tester(object):
         cur_data = self.dataset.load_data()
         end_time = time.clock()
         load_time = (end_time - start_time) * 1000.0
-        print("Time taken to load patches is {} ms".format(
-            load_time
-        ))
+
+        if self.config.verbose:
+            print("Time taken to load patches is {} ms".format(
+                load_time
+            ))
         total_time += load_time
 
         # -------------------------------------------------------------------------
@@ -323,9 +291,11 @@ class Tester(object):
         oris = self._test_multibatch(cur_data)
         end_time = time.clock()
         compute_time = (end_time - start_time) * 1000.0
-        print("Time taken to compute is {} ms".format(
-            compute_time
-        ))
+
+        if self.config.verbose:
+            print("Time taken to compute is {} ms".format(
+                compute_time
+            ))
         total_time += compute_time
 
         # update keypoints and save as new
@@ -336,11 +306,15 @@ class Tester(object):
             kps[idxkp] = update_affine(kps[idxkp])
         end_time = time.clock()
         update_time = (end_time - start_time) * 1000.0
-        print("Time taken to update is {} ms".format(
-            update_time
-        ))
+
+        if self.config.verbose:
+            print("Time taken to update is {} ms".format(
+                update_time
+            ))
         total_time += update_time
-        print("Total time for orientation is {} ms".format(total_time))
+
+        if self.config.verbose:
+            print("Total time for orientation is {} ms".format(total_time))
 
         # save as new keypoints
         saveKpListToTxt(
@@ -356,25 +330,27 @@ class Tester(object):
         cur_data = self.dataset.load_data()
         end_time = time.clock()
         load_time = (end_time - start_time) * 1000.0
-        print("Time taken to load patches is {} ms".format(
-            load_time
-        ))
+
+        if self.config.verbose:
+            print("Time taken to load patches is {} ms".format(
+                load_time
+            ))
         total_time += load_time
 
-        # import IPython
-        # IPython.embed()
-
-        # -------------------------------------------------------------------------
         # Test using the test function
         start_time = time.clock()
         descs = self._test_multibatch(cur_data)
         end_time = time.clock()
         compute_time = (end_time - start_time) * 1000.0
-        print("Time taken to compute is {} ms".format(
-            compute_time
-        ))
+
+        if self.config.verbose:
+            print("Time taken to compute is {} ms".format(
+                compute_time
+            ))
         total_time += compute_time
-        print("Total time for descriptor is {} ms".format(total_time))
+
+        if self.config.verbose:
+            print("Total time for descriptor is {} ms".format(total_time))
 
         # Overwrite angle
         kps = cur_data["kps"].copy()

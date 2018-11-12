@@ -88,9 +88,11 @@ class Dataset(object):
 
         end_time = time.clock()
         load_prep_time = (end_time - start_time) * 1000.0
-        print("Time taken to read and prepare the image is {} ms".format(
-            load_prep_time
-        ))
+
+        if self.config.verbose:
+            print("Time taken to read and prepare the image is {} ms".format(
+                load_prep_time
+            ))
 
         return image_color, image_gray, load_prep_time
 
