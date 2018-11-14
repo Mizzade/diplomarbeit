@@ -1,34 +1,3 @@
-# kp_tools.py ---
-#
-# Filename: kp_tools.py
-# Description:
-# Author: Kwang Moo Yi
-# Maintainer:
-# Created: Sat Feb 20 10:11:28 2016 (+0100)
-# Version:
-# Package-Requires: ()
-# URL:
-# Doc URL:
-# Keywords:
-# Compatibility:
-#
-#
-
-# Commentary:
-#
-#
-#
-#
-
-# Change Log:
-#
-#
-#
-# Copyright (C), EPFL Computer Vision Lab.
-
-# Code:
-
-
 from __future__ import print_function
 
 import cv2

@@ -3,8 +3,6 @@ import cv2
 import numpy as np
 import sys
 import json
-import pickle
-import copyreg
 import os
 import io_utils
 

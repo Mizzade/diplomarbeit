@@ -36,6 +36,7 @@ echo "Setup for SuperPoint: done."
 echo "Start setup for LIFT..."
 echo "========================"
 $ROOT/scripts/pipe_lift/setup_lift.sh $ROOT
+$ROOT/scripts/misc/copy_io_utils.sh $ROOT pipe_lift
 echo "======================"
 echo "Setup for LIFT: done."
 

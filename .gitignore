@@ -5,6 +5,8 @@
 /desc_tfeat/.ipynb_checkpoints/*
 /pipe_lift/outputs
 /pipe_lift/inputs
+/pipe_lift/tmp
+/pipe_lift/io_utils.py
 /pipe_sift/io_utils.py
 /pipe_superpoint/io_utils.py
 /desc_tfeat/io_utils.py

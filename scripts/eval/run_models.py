@@ -24,6 +24,11 @@ networks = [
         'main': 'use_tfeat.py'
     },
     {
+        'name': 'LIFT',
+        'dir': 'pipe_lift',
+        'main': 'use_lift.py'
+    },
+    {
         'name': 'TILDE',
         'dir': 'det_tilde',
         'main': 'use_tilde.sh'

@@ -192,6 +192,6 @@ python main.py \
     --subtask=desc \
     --test_img_file=../../data/v_churchill/1.ppm \
     --test_out_file=../inter/desc_lift__1_LIFT_LIFT.h5 \
-    --test_kp_file=../inter/kpts_lift__1_LIFT.txt
+    --test_kp_file=../inter/ori_lift__1_LIFT.txt
 ```
 
