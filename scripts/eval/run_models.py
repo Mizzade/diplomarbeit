@@ -24,6 +24,11 @@ networks = [
         'main': 'use_tfeat.py'
     },
     {
+        'name': 'DOAP',
+        'dir': 'desc_doap',
+        'main': 'use_doap.py'
+    },
+    {
         'name': 'LIFT',
         'dir': 'pipe_lift',
         'main': 'use_lift.py'

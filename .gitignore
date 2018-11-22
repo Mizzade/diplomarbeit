@@ -10,4 +10,5 @@
 /pipe_sift/io_utils.py
 /pipe_superpoint/io_utils.py
 /desc_tfeat/io_utils.py
+/desc_doap/io_utils.py
 .vscode

@@ -13,6 +13,7 @@ echo "Start setup for DOAP..."
 echo "======================="
 $ROOT/scripts/desc_doap/setup_vlfeat.sh $ROOT
 $ROOT/scripts/desc_doap/setup_matconvnet.sh $ROOT
+$ROOT/scripts/misc/copy_io_utils.sh $ROOT desc_doap
 echo "====================="
 echo "Setup for DOAP: done."
 

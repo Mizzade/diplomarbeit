@@ -37,6 +37,14 @@ def save_keypoints_image(image: np.array, file_name: str) -> None:
         os.makedirs(_dirname, exist_ok=True)
     cv2.imwrite(file_name, image)
 
+def save_patches_list(patches: List[np.array], file_name:str) -> None:
+    _dirname = os.path.dirname(file_name)
+    if not os.path.exists(_dirname):
+        os.makedirs(_dirname, exist_ok=True)
+
+    _a = np.vstack(patches)
+    np.savetxt(file_name, _a, delimiter=',')
+
 def get_setName_fileName_extension(file_path: str) -> (str, str, str):
     # ...foo/bar/<set_name>/<file_name>.<extensions>
     _base_path, extension = os.path.splitext(file_path)
@@ -138,6 +146,7 @@ def save_output(
         desc_path = build_output_name(
             dir_path,
             file_name,
+            detector_name=detector_name,
             descriptor_name=descriptor_name,
             prefix=os.path.join('descriptors',
                                 'desc_{}_'.format(project_name)))

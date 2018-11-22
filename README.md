@@ -7,7 +7,7 @@
 - pip >= 18.0
 - wget
 - tar
-- [Matlab](https://de.mathworks.com/products/matlab.html)
+- [Matlab](https://de.mathworks.com/products/matlab.html) with Image Processing Toolbox
 - imagemagick
 
 ## Projektstruktur
@@ -51,5 +51,5 @@ Manche Modell können nur Bilder bis zur einer bestimmten Größe handhaben, bev
 | SuperPoint        | 1700          |
 | TILDE             | no Limit      |
 | TConvDet          | ?             |
-| DOAP              | ?             |
+| DOAP              | no Limit      |
 | TFeat             | 1400          |
