@@ -10,6 +10,7 @@ import io_utils
 import subprocess
 import h5py
 import shutil
+from tqdm import tqdm
 
 def compute(
     model: Any,
@@ -126,7 +127,7 @@ def main(argv: List[str]) -> None:
     model = None
     size = 800
 
-    for file in file_list:
+    for file in tqdm(file_list):
         io_utils.save_output(file, compute(model, file, size), output_dir,
             detector_name, descriptor_name, project_name)
 
