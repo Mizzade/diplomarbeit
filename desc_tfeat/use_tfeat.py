@@ -115,34 +115,34 @@ def compute(
     img_kp = cv2.drawKeypoints(img, kp, None)
     return (kp, desc, img_kp, None)
 
-def main(argv: List[str]) -> None:
-    """Runs the tfeat model and saves the results.
+def main(argv: Tuple[str, str,str]) -> None:
+    """Runs the TFeat model and saves the results.
 
     Arguments:
-        argv {List[str]} -- List of parameters. The first paramters must be the
-        path to the output directory where the result of this model will be
-        saved. The second argument is a JSON-string, containing the list of all
-        files that the model should work with.
+        argv {Tuple[str, str, str]} -- List of parameters. Expects exactly three
+            parameters. The first one contains json-fied network information,
+            the second contains the json-fied config object and the third is
+            the json-fied file list with all files to be processed.
     """
-
-    assert isinstance(argv[0], str)
-    assert isinstance(argv[1], str)
-    assert isinstance(json.loads(argv[1]), list)
 
     project_name = 'tfeat'
     detector_name = 'SIFT'
     descriptor_name = 'TFeat'
 
-    output_dir = argv[0]
-    file_list = json.loads(argv[1])
-    detector = cv2.xfeatures2d.SIFT_create()
+    network = json.loads(argv[0])
+    config = json.loads(argv[1])
+    file_list = json.loads(argv[2])
     model = load_tfeat()
-    size = 800
+    detector = cv2.xfeatures2d.SIFT_create()
 
     for file in tqdm(file_list):
-        io_utils.save_output(file, compute(detector, model, file, size), output_dir,
-            detector_name, descriptor_name, project_name)
-
+        io_utils.save_output(
+            file,
+            compute(detector, model, file, config['size']),
+            config['output_dir'],
+            detector_name,
+            descriptor_name,
+            project_name)
 
 if __name__ == "__main__":
     argv = sys.argv[1:]
