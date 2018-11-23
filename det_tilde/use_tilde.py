@@ -4,6 +4,7 @@ import subprocess
 import typing
 import os
 import json
+from tqdm import tqdm
 
 def get_setName_fileName_extension(file_path: str) -> (str, str, str):
     base_path, extension = os.path.splitext(file_path)
@@ -26,7 +27,7 @@ if __name__ == '__main__':
     output_dir = argv[0]
     file_list = json.loads(''.join(argv[1:]))
 
-    for file in file_list:
+    for file in tqdm(file_list):
         # Build parameters for use_tilde.cpp
         base_path, set_name, file_name, extension = get_setName_fileName_extension(file)
 

@@ -20,6 +20,10 @@ ENV PYENV_ROOT $HOME/.pyenv
 ENV PATH $PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
 RUN pyenv install 3.6.6
 RUN pyenv global 3.6.6
+# Upgrade Pip3
+RUN pip3 install --upgrade pip
+# Install tqdm
+RUN pip3 install tqdm==4.28.1
 
 # Create dir structure.
 RUN ["mkdir", "-p", "/home/tilde"]
