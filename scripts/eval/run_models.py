@@ -26,9 +26,9 @@ def run_network(network: Any, config: argparse.Namespace):
             cwd=network.dir)
     else:
         return subprocess.check_call(['pipenv', 'run', 'python',
-        './{}'.format(network.main), config.output_dir, json.dumps(file_list)],
+        './{}'.format(network.main), json.dumps(dict(network._asdict())),
+        json.dumps(vars(config)), json.dumps(file_list)],
         cwd=network.dir)
-
 
 def run_network2(path: str, name: str, main: str, output_dir: str, file_list: List[str], root_dir: str, data_dir: str, **kwargs) -> List[Tuple[Any]]:
     if name == 'TILDE':
@@ -48,6 +48,5 @@ if __name__ == "__main__":
 
     for n in networks:
         print('Starting network `{}`.'.format(n.name))
-        network_dir = n.dir
         _ = run_network(n, config)
         print('Network `{}` done.\n'.format(n.name))
