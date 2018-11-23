@@ -7,6 +7,7 @@ import os
 import io_utils
 import subprocess
 import shutil
+from tqdm import tqdm
 
 def create_patches(img: np.array, kpts: List[cv2.KeyPoint], N: int) -> List[np.array]:
     """Creats a csv file containing patches around the keypoints given in `kpts`.
@@ -115,7 +116,7 @@ def main(argv: List[str]) -> None:
     model = None
     size = 800
 
-    for file in file_list:
+    for file in tqdm(file_list):
         io_utils.save_output(file, compute(detector, None, file, size), output_dir,
            detector_name, descriptor_name, project_name)
 

@@ -7,6 +7,7 @@ name = "pypi"
 numpy = "==1.15.4"
 opencv-python = "==3.4.2.17"
 opencv-contrib-python = "==3.4.2.17"
+tqdm = "==4.28.1"
 
 [dev-packages]
 
