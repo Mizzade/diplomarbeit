@@ -92,33 +92,34 @@ def compute(
     return (kp, desc, img_kp, None)
 
 
-def main(argv: List[str]) -> None:
+def main(argv: Tuple[str, str,str]) -> None:
     """Runs the DOAP model and saves the results.
 
     Arguments:
-        argv {List[str]} -- List of parameters. The first paramters must be the
-        path to the output directory where the result of this model will be
-        saved. The second argument is a JSON-string, containing the list of all
-        files that the model should work with.
+        argv {Tuple[str, str, str]} -- List of parameters. Expects exactly three
+            parameters. The first one contains json-fied network information,
+            the second contains the json-fied config object and the third is
+            the json-fied file list with all files to be processed.
     """
-
-    assert isinstance(argv[0], str)
-    assert isinstance(argv[1], str)
-    assert isinstance(json.loads(argv[1]), list)
 
     project_name = 'doap'
     detector_name = 'SIFT'
     descriptor_name = 'DOAP'
 
-    output_dir = argv[0]
-    file_list = json.loads(argv[1])
+    network = json.loads(argv[0])
+    config = json.loads(argv[1])
+    file_list = json.loads(argv[2])
     detector = cv2.xfeatures2d.SIFT_create()
     model = None
-    size = 800
 
     for file in tqdm(file_list):
-        io_utils.save_output(file, compute(detector, None, file, size), output_dir,
-           detector_name, descriptor_name, project_name)
+        io_utils.save_output(
+            file,
+            compute(detector, None, file, config['size']),
+            config['output_dir'],
+            detector_name,
+            descriptor_name,
+            project_name)
 
     # Clean up
     base_path, _ =  os.path.splitext(os.path.abspath(__file__))
