@@ -8,6 +8,7 @@ import math
 import io_utils
 import sys
 import json
+from tqdm import tqdm
 
 
 def load_tfeat(models_path: str='models', net_name: str='tfeat-liberty', use_gpu=False) -> tfeat_model.TNet:
@@ -138,11 +139,9 @@ def main(argv: List[str]) -> None:
     model = load_tfeat()
     size = 800
 
-    for file in file_list:
-        print('\n', file)
+    for file in tqdm(file_list):
         io_utils.save_output(file, compute(detector, model, file, size), output_dir,
             detector_name, descriptor_name, project_name)
-        print('Done.')
 
 
 if __name__ == "__main__":
