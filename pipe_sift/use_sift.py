@@ -4,6 +4,7 @@ import numpy as np
 import sys
 import json
 import os
+from tqdm import tqdm
 import io_utils
 
 def load_sift() -> cv2.xfeatures2d_SIFT:
@@ -61,7 +62,7 @@ def main(argv: List[str]) -> None:
     model = load_sift()
     size = 800
 
-    for file in file_list:
+    for file in tqdm(file_list):
         io_utils.save_output(file, compute(model, file, size), output_dir,
             detector_name, descriptor_name, project_name)
 

@@ -7,6 +7,7 @@ import os
 import io_utils
 import sys
 import json
+from tqdm import tqdm
 
 
 def load_superpoint(\
@@ -235,7 +236,7 @@ def main(argv: List[str]) -> None:
     model = load_superpoint()
     size = 800
 
-    for file in file_list:
+    for file in tqdm(file_list):
         io_utils.save_output(file, compute(model, file, size),
             output_dir, detector_name, descriptor_name, project_name)
 

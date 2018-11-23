@@ -9,6 +9,7 @@ opencv-python = "==3.4.2.17"
 torch = "==0.4.1"
 jupyter = "==1.0.0"
 matplotlib = "==2.2.3"
+tqdm = "==4.28.1"
 
 [dev-packages]
 
