@@ -6,43 +6,9 @@ import sys
 import json
 import argparse
 import pickle
+import config_eval as ce
 
-networks = [
-    {
-        'name': 'SIFT',
-        'dir': 'pipe_sift',
-        'main': 'use_sift.py'
-    },
-    {
-        'name': 'SuperPoint',
-        'dir': 'pipe_superpoint',
-        'main': 'use_superpoint.py'
-    },
-    {
-        'name': 'Tfeat',
-        'dir': 'desc_tfeat',
-        'main': 'use_tfeat.py'
-    },
-    {
-        'name': 'DOAP',
-        'dir': 'desc_doap',
-        'main': 'use_doap.py'
-    },
-    {
-        'name': 'LIFT',
-        'dir': 'pipe_lift',
-        'main': 'use_lift.py'
-    },
-    {
-        'name': 'TILDE',
-        'dir': 'det_tilde',
-        'main': 'use_tilde.sh'
-    }
-]
-
-allowed_extensions = ['.jpg', '.png', '.ppm', '.jpeg', '.tiff']
-
-def get_file_list(data_dir: str) -> List[str]:
+def get_file_list(data_dir: str, allowed_extensions: List[str]) -> List[str]:
     file_list = []
     for image_set in next(os.walk(data_dir))[1]:
         image_set_path = os.path.join(data_dir, image_set)
@@ -53,9 +19,20 @@ def get_file_list(data_dir: str) -> List[str]:
 
     return file_list
 
-def run_network(path: str, name: str, main: str, output_dir: str, file_list: List[str], root_dir: str, data_dir: str, **kwargs) -> List[Tuple[Any]]:
+def run_network(network: Any, config: argparse.Namespace):
+    if network.name == 'TILDE':
+        return subprocess.check_call(['/bin/bash', './{}'.format(network.main),
+            config.data_dir, config.output_dir, json.dumps(file_list)],
+            cwd=network.dir)
+    else:
+        return subprocess.check_call(['pipenv', 'run', 'python',
+        './{}'.format(network.main), config.output_dir, json.dumps(file_list)],
+        cwd=network.dir)
+
+
+def run_network2(path: str, name: str, main: str, output_dir: str, file_list: List[str], root_dir: str, data_dir: str, **kwargs) -> List[Tuple[Any]]:
     if name == 'TILDE':
-        subprocess.check_call(['/bin/bash', './{}'.format(main), data_dir, output_dir,
+        return subprocess.check_call(['/bin/bash', './{}'.format(main), data_dir, output_dir,
         json.dumps(file_list)], cwd=path)
     else:
         return subprocess.check_call(['pipenv', 'run', 'python', './{}'.format(main),
@@ -63,19 +40,14 @@ def run_network(path: str, name: str, main: str, output_dir: str, file_list: Lis
 
 if __name__ == "__main__":
     argv = sys.argv[1:]
+    config, networks = ce.get_config(argv)
+    file_list = sorted(get_file_list(config.data_dir, config.allowed_extensions))
 
-    # First and only argument must be root dir of project
-    # TODO catch argv errors
-    if len(argv) <= 0:
-        raise RuntimeError("Missing argument root path. Abort.")
-
-    root_dir = argv[0]
-    data_dir = os.path.join(root_dir, 'data')
-    output_dir = os.path.join(root_dir, 'outputs')
-    file_list = sorted(get_file_list(data_dir))
+    if config.max_num_images is not None:
+        file_list = file_list[:config.max_num_images]
 
     for n in networks:
-        print('Starting network `{}`.'.format(n['name']))
-        network_dir = os.path.join(root_dir, n['dir'])
-        status_code = run_network(network_dir, **n, output_dir=output_dir, file_list=file_list, root_dir=root_dir, data_dir=data_dir)
-        print('Network `{}` done.\n'.format(n['name']))
+        print('Starting network `{}`.'.format(n.name))
+        network_dir = n.dir
+        _ = run_network(n, config)
+        print('Network `{}` done.\n'.format(n.name))
