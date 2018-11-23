@@ -4,7 +4,7 @@
 #   $1: absolute path of the project's root directory.
 #   $2: target dir name e.g. pipe_sift, desc_doap...
 # @OUTPUT
-#   -
+#   None
 
 ROOT=$1
 TARGET_DIR=$2
