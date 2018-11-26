@@ -1,14 +1,29 @@
-/desc_doap/vlfeat-0.9.21
-/desc_doap/matconvnet-1.0-beta25
-/examples/desc_doap/test_out
+# SIFT
+/pipe_sift/io_utils.py
+
+# SuperPoint
+/pipe_superpoint/io_utils.py
+
+# Tfeat
 /desc_tfeat/.vscode
 /desc_tfeat/.ipynb_checkpoints/*
+/desc_tfeat/io_utils.py
+
+# DOAP
+/desc_doap/io_utils.py
+/desc_doap/vlfeat-0.9.21
+/desc_doap/matconvnet-1.0-beta25
+/desc/doap/tmp
+/examples/desc_doap/test_out
+
+# LIFT
 /pipe_lift/outputs
 /pipe_lift/inputs
 /pipe_lift/tmp
 /pipe_lift/io_utils.py
-/pipe_sift/io_utils.py
-/pipe_superpoint/io_utils.py
-/desc_tfeat/io_utils.py
-/desc_doap/io_utils.py
+
+# TILDE
+/det_tilde/tmp
+
+# MISC
 .vscode
