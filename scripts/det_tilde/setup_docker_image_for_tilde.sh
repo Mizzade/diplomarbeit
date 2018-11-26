@@ -25,7 +25,10 @@ else
   nvidia-docker build -t $DOCKER_IMAGE_NAME -f "$ROOT/det_tilde/Dockerfile" .
 fi
 
-if [ FORCE_BUILD ]; then
+# If FORCE_BUILD parameter is set, rebuild the docker image.
+if test -z $3 ; then
+  echo ''
+else
   echo "Force building of Dockerfile."
   nvidia-docker build -t $DOCKER_IMAGE_NAME -f "$ROOT/det_tilde/Dockerfile" .
 fi
