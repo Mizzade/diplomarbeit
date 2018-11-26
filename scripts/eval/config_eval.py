@@ -43,6 +43,9 @@ parser_sift.add_argument('--dir', type=str, default='pipe_sift',
 parser_sift.add_argument('--main', type=str, default='use_sift.py',
     help='The main file to start the SIFT model.')
 
+parser_sift.add_argument('--tmp_dir', type=str, default=None,
+    help='Path to the temporary dir to save intermediate results. Relative to --dir.')
+
 # SuperPoint
 parser_superpoint = subparsers.add_parser('superpoint', help='Configurations for SuperPoint.')
 parser_superpoint.add_argument('--name', type=str, default='SuperPoint',
@@ -53,6 +56,9 @@ parser_superpoint.add_argument('--dir', type=str, default='pipe_superpoint',
 
 parser_superpoint.add_argument('--main', type=str, default='use_superpoint.py',
     help='The main file to start the SuperPoint model.')
+
+parser_superpoint.add_argument('--tmp_dir', type=str, default=None,
+    help='Path to the temporary dir to save intermediate results. Relative to --dir.')
 
 # Tfeat
 parser_tfeat = subparsers.add_parser('tfeat', help='Configurations for Tfeat.')
@@ -65,6 +71,9 @@ parser_tfeat.add_argument('--dir', type=str, default='desc_tfeat',
 parser_tfeat.add_argument('--main', type=str, default='use_tfeat.py',
     help='The main file to start the Tfeat model.')
 
+parser_tfeat.add_argument('--tmp_dir', type=str, default=None,
+    help='Path to the temporary dir to save intermediate results. Relative to --dir.')
+
 # DOAP
 parser_doap = subparsers.add_parser('doap', help='Configurations for DOAP.')
 parser_doap.add_argument('--name', type=str, default='DOAP',
@@ -75,6 +84,9 @@ parser_doap.add_argument('--dir', type=str, default='desc_doap',
 
 parser_doap.add_argument('--main', type=str, default='use_doap.py',
     help='The main file to start the DOAP model.')
+
+parser_doap.add_argument('--tmp_dir', type=str, default='tmp',
+    help='Path to the temporary dir to save intermediate results. Relative to --dir.')
 
 # LIFT
 parser_lift = subparsers.add_parser('lift', help='Configurations for LIFT.')
@@ -87,6 +99,9 @@ parser_lift.add_argument('--dir', type=str, default='pipe_lift',
 parser_lift.add_argument('--main', type=str, default='use_lift.py',
     help='The main file to start the LIFT model.')
 
+parser_lift.add_argument('--tmp_dir', type=str, default='tmp',
+    help='Path to the temporary dir to save intermediate results. Relative to --dir.')
+
 # TILDE
 parser_tilde = subparsers.add_parser('tilde', help='Configurations for TILDE.')
 parser_tilde.add_argument('--name', type=str, default='TILDE',
@@ -98,6 +113,8 @@ parser_tilde.add_argument('--dir', type=str, default='det_tilde',
 parser_tilde.add_argument('--main', type=str, default='use_tilde.sh',
     help='The main file to start the TILDE model.')
 
+parser_tilde.add_argument('--tmp_dir', type=str, default='tmp',
+    help='Path to the temporary dir to save intermediate results. Relative to --dir.')
 
 subparser_table = {
     'sift': parser_sift,
@@ -109,12 +126,13 @@ subparser_table = {
 
 }
 
-Network = namedtuple('Network', ['name', 'dir', 'main'])
+Network = namedtuple('Network', ['name', 'dir', 'main', 'tmp_dir'])
 
 def get_config(argv):
     config, _ = parser.parse_known_args()
     networks = [vars(subparser_table[x].parse_known_args()[0]) for x in config.networks]
-    networks = [{**x, 'dir': os.path.join(config.root_dir, x['dir'])} for x in networks]
+    networks = [{**x, 'dir': os.path.join(config.root_dir, x['dir']),
+        'tmp_dir': os.path.join(config.root_dir, x['dir'], x['tmp_dir']) if x['tmp_dir'] is not None else None} for x in networks]
     networks = [Network(**x) for x in networks]
 
     config.output_dir = os.path.join(config.root_dir, config.output_dir)
