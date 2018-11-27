@@ -31,6 +31,9 @@ parser.add_argument('--networks', nargs='+',
 parser.add_argument('--max_num_images', type=int, default=None,
     help='Maximum number of images to be used by networks. If not set, take all images found.')
 
+parser.add_argument('--skip_first_n', type=int, default=None,
+    help='Skip the first n images when using a model.')
+
 subparsers = parser.add_subparsers(help='Commands for the different networks.')
 # SIFT
 parser_sift = subparsers.add_parser('sift', help='Configurations for SIFT.')

@@ -25,9 +25,11 @@ def run_network(network: Any, config: argparse.Namespace, file_list: List[str]) 
         config_file = 'tilde_config.pkl'
         path_to_config_file = os.path.join(network.tmp_dir, config_file)
 
+        # Create tmp dir, if it not exists.
         if network.tmp_dir is not None and not os.path.exists(network.tmp_dir):
             os.makedirs(network.tmp_dir, exist_ok=True)
 
+        # Write config file into tmp dir.
         if os.path.exists(network.tmp_dir):
             with open(path_to_config_file, 'wb') as dst:
                 pickle.dump(
@@ -35,6 +37,7 @@ def run_network(network: Any, config: argparse.Namespace, file_list: List[str]) 
                     dst,
                     protocol=pickle.HIGHEST_PROTOCOL)
 
+        # Call shell script to call docker container.
         status_code = subprocess.check_call(['/bin/bash', './{}'.format(network.main),
             config.data_dir, config.output_dir, network.tmp_dir, path_to_config_file],
             cwd=network.dir)
@@ -62,6 +65,9 @@ if __name__ == "__main__":
     argv = sys.argv[1:]
     config, networks = ce.get_config(argv)
     file_list = sorted(get_file_list(config.data_dir, config.allowed_extensions))
+
+    if config.skip_first_n is not None:
+        file_list = file_list[config.skip_first_n:]
 
     if config.max_num_images is not None:
         file_list = file_list[:config.max_num_images]

@@ -47,9 +47,55 @@ Manche Modell können nur Bilder bis zur einer bestimmten Größe handhaben, bev
 | MODEL             | max Size (px) |
 |:------------------|:--------------|
 | SIFT              | no Limit      |
-| LIFT              | 1400          |
+| LIFT              | 1300          |
 | SuperPoint        | 1700          |
 | TILDE             | no Limit      |
 | TConvDet          | ?             |
 | DOAP              | no Limit      |
 | TFeat             | 1400          |
+
+### Starten der Netwzwerke:
+```python
+python ./scripts/eval/run_models.py --root_dir $(pwd)
+```
+
+#### Parameter
+Siehe die File `./scripts/eval/config_eval.py` für alle Paramter oder tippe
+
+    $ python ./scripts/eval/config_eval.py -h
+
+- --root_dir ROOT: Der absolute Pfad zu diesem Repo-Ordner, sodass alle anderen Netzwerke Unterordner von ROOT sind.
+
+#### Beispiel:
+```python
+python ./scripts/eval/run_models.py --root_dir $(pwd)
+```
+
+- --size SIZE: Maximale Dimensionsgröße für Bilder. Die Bilder werden dann so skaliert, dass ihre größte Dimension (Höhe, Breite) diesem Wert entspricht.
+
+#### Beispiel:
+```python
+python ./scripts/eval/run_models.py --root_dir $(pwd) --size 800
+```
+
+- --networks NETWORK [NETWORK, ...]: Standardmäßig werden alle Netzwerke gestartet. Sollen nur bestimmte Netzwerke gestartet werden, gibt man hier ihre Namen hintereinander an. Folgende Werte sind erlaubt: sift, superpoint, tfeat, doap, lift und tilde.
+
+#### Beispiel: Startet nur das TILDE Netzwerk
+```python
+python ./scripts/eval/run_models.py --root_dir $(pwd) --networks tilde
+```
+
+- --max_num_images NUM: Die maximale Anzahl an Bildern, die verarbeitet werden soll. Wenn der Wert nicht gesetzt ist, werden alle Bilder verarbeitetn, ansonsten nur die ersten NUM Bilder.
+
+#### Beispiel: Verarbeite nur die ersten 2 Bilder
+```python
+python ./scripts/eval/run_models.py --root_dir $(pwd) --max_num_images 2
+```
+
+- --skip_first_n N: Überspringt die ersten N Bilder, die es in im data_dir findet.
+
+#### Beispiel: Überspringe die ersten 5 Bilder
+```python
+python ./scripts/eval/run_models.py --root_dir $(pwd) --skip_first_n 5
+```
+
