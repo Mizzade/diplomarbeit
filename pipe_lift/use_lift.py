@@ -35,7 +35,7 @@ def compute(
     1) Create a temporay folder `tmp` to save intermediate output.
     2a) Load and smart scale the image.
     2b) Save the resulting image in `tmp`.
-    3a) Subprocess call to tf-lift für keypoints. Save output in `tmp`.
+    3a) Subprocess call to tf-lift for keypoints. Save output in `tmp`.
     3b) Subprocess call for tf-lift orientation. Save output in `tmp`.
     3c) Subprocess call for tf-lift descriptors Save output in `tmp`.
     4a) Load final .h5 output file from tf-lift, extract keypoints and

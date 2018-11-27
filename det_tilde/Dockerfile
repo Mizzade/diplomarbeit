@@ -24,6 +24,10 @@ RUN pyenv global 3.6.6
 RUN pip3 install --upgrade pip
 # Install tqdm
 RUN pip3 install tqdm==4.28.1
+# install opencv
+RUN pip3 install opencv-python==3.4.2.17
+# install numpy
+RUN pip3 install numpy==1.15.1
 
 # Create dir structure.
 RUN ["mkdir", "-p", "/home/tilde"]
@@ -67,7 +71,8 @@ RUN  g++ -std=c++11 -o use_tilde use_tilde.cpp /home/tilde/TILDE/c++/build/Lib/l
 COPY det_tilde/hello_world.sh /home/tilde/TILDE/c++/build/
 RUN chmod +x hello_world.sh
 
-# COPY extern/io_utils.py /home/tilde/TILDE/c++/build/
+# Copy io_utils.py
+COPY extern/io_utils.py /home/tilde/TILDE/c++/build/
 COPY det_tilde/use_tilde.py /home/tilde/TILDE/c++/build/
 RUN chmod +x use_tilde.py
 

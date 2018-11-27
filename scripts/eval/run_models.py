@@ -7,6 +7,7 @@ import json
 import argparse
 import pickle
 import config_eval as ce
+import shutil
 
 def get_file_list(data_dir: str, allowed_extensions: List[str]) -> List[str]:
     file_list = []
@@ -19,11 +20,30 @@ def get_file_list(data_dir: str, allowed_extensions: List[str]) -> List[str]:
 
     return file_list
 
-def run_network(network: Any, config: argparse.Namespace):
+def run_network(network: Any, config: argparse.Namespace, file_list: List[str]) -> int:
     if network.name == 'TILDE':
-        return subprocess.check_call(['/bin/bash', './{}'.format(network.main),
-            config.data_dir, config.output_dir, json.dumps(file_list)],
+        config_file = 'tilde_config.pkl'
+        path_to_config_file = os.path.join(network.tmp_dir, config_file)
+
+        if network.tmp_dir is not None and not os.path.exists(network.tmp_dir):
+            os.makedirs(network.tmp_dir, exist_ok=True)
+
+        if os.path.exists(network.tmp_dir):
+            with open(path_to_config_file, 'wb') as dst:
+                pickle.dump(
+                    [dict(network._asdict()), vars(config), file_list],
+                    dst,
+                    protocol=pickle.HIGHEST_PROTOCOL)
+
+        status_code = subprocess.check_call(['/bin/bash', './{}'.format(network.main),
+            config.data_dir, config.output_dir, network.tmp_dir, path_to_config_file],
             cwd=network.dir)
+
+        # Remove tmp dir
+        if os.path.exists(network.tmp_dir):
+            shutil.rmtree(network.tmp_dir, ignore_errors=True)
+
+        return status_code
     else:
         return subprocess.check_call(['pipenv', 'run', 'python',
         './{}'.format(network.main), json.dumps(dict(network._asdict())),
@@ -48,5 +68,5 @@ if __name__ == "__main__":
 
     for n in networks:
         print('Starting network `{}`.'.format(n.name))
-        _ = run_network(n, config)
+        _ = run_network(n, config, file_list)
         print('Network `{}` done.\n'.format(n.name))

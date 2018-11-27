@@ -3,6 +3,16 @@ import cv2
 import sys
 import os
 import numpy as np
+import shutil
+
+def create_tmp_dir(path: str):
+    if path is not None:
+        if not os.path.exists(path):
+            os.makedirs(path, exist_ok=True)
+
+def remove_tmp_dir(path: str):
+    if os.path.exists(path):
+        shutil.rmtree(path, ignore_errors=True)
 
 def build_output_name(dir_path: str, image_name: str, detector_name: str='',
     prefix='', descriptor_name: str='', file_type: str='csv') -> str:

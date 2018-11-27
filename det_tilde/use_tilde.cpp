@@ -74,12 +74,8 @@ int main(int argc, char *argv[])
 
       std::string pathToFilter = filterPath + "/" + filterName;
       std::string pathToImage = imageDir + "/" + fileName;
-      std::string pathToOutputFile = outputDir + "/keypoints/kpts_tilde__" + rawname +
-        "_TILDE.csv";
-
-      // Filename for score map.
-      std::string pathToScoreMap = outputDir + "/scores/scores_tilde__" + rawname +
-        "_TILDE.csv";
+      std::string pathToOutputFile = outputDir + "/keypoints.csv";
+      std::string pathToScoreMap = outputDir + "/heatmap.csv";
 
       // Load image
       Mat I = imread(pathToImage);
@@ -139,7 +135,7 @@ int main(int argc, char *argv[])
       myfile.close();
 
       // Save score map
-      // The score map is exaclty as large as the image and contains the probability
+      // The score map is exactly as large as the image and contains the probability
       // value of that pixel to be a keypoint.
       std::string score_meta_text = "# " + std::to_string(height) + ", " +
         std::to_string(width);
