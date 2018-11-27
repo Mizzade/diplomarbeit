@@ -27,4 +27,4 @@ docker run \
 --mount type=bind,source="$MOUNT_OUT",target="$MOUNT_OUT" \
 --mount type=bind,source="$TMP_DIR",target="$TMP_DIR" \
 $(docker images -q $DOCKER_IMAGE_NAME) \
-python use_tilde.py $CONFIG_FILES
+python use_tilde.py $CONFIG_FILE

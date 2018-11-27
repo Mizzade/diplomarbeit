@@ -11,12 +11,6 @@ import cv2
 from typing import Tuple, List, Any
 import numpy as np
 
-def get_setName_fileName_extension(file_path: str) -> (str, str, str, str):
-    base_path, extension = os.path.splitext(file_path)
-    set_name, file_name = base_path.split(os.sep)[-2:]
-
-    return base_path, set_name, file_name, extension
-
 def compute(
     model: Any,
     image: str,
@@ -99,7 +93,6 @@ def main(argv: Tuple[str]) -> None:
             This config file will be used to get all other information and
             process the correct images.
     """
-
     if len(argv) <= 0:
         raise RuntimeError("Missing argument <path_to_config_file>. Abort")
 
