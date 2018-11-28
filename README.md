@@ -54,6 +54,25 @@ Manche Modell können nur Bilder bis zur einer bestimmten Größe handhaben, bev
 | DOAP              | no Limit      |
 | TFeat             | 1400          |
 
+### Bearbeitungsdauer
+Hier sieht man die Zeitdauer, die ein Model benötigt, um X Bilder zu bearbeiten.
+Die Spalte `#Images` gibt dabei die Anzahl der bearbeiteten Bilder an.
+Der Wert `native` in der Spalte `Size` bedeutet, dass die Bilder nicht skaliert
+wurden. Standardmäßig werden die Modell für jedes einzelne Bild aufgerufen.
+Im Falle von DOAP muss jedoch berücksichtigt werden, dass für jedes Bild Matlab
+neu gestartet wird, was auf jeden Fall negativ die Gesamtdauer beeinflusst, da
+Matlab einen recht langen Startvorgang besitzt.
+| MODEL             | Size          | #Images   | Time      |
+|:------------------|:--------------|:----------|:----------|
+| SIFT              | native        | 32        | 00:06:42  |
+| LIFT              | 1300          |           |           |
+| SuperPoint        | 1700          |           |           |
+| TILDE             | native        | 32        | 00:22:56  |
+| TConvDet          | ?             |           |           |
+| DOAP              | native        | 32        | 5:21:44   |
+| TFeat             | 1400          |           |           |
+
+
 ### Starten der Netwzwerke:
 ```python
 python ./scripts/eval/run_models.py --root_dir $(pwd)
