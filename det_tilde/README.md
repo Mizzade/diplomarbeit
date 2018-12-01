@@ -37,5 +37,5 @@ Aus dem Docker Container aus kann die kompilierte `use_tilde` Datei wie folgt be
 Docker und TILDE schreiben in den `output` Ordner als `root` User mit der `root` Gruppe. Damit man später noch die Dateien löschen oder neue Dateien in dem Ordner erzeugen kann, müssen die Rechte für den `output` Ordner neu gesetzt werden:
 
 ```bash
-sudo chown -R $USERS outputs
+sudo chown -R $USER outputs
 ```
