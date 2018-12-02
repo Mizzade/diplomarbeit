@@ -25,5 +25,8 @@
 # TILDE
 /det_tilde/tmp
 
+# Outputs
+/outputs
+
 # MISC
 .vscode
