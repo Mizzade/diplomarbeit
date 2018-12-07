@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from typing import List, Tuple, Any
+from typing import List, Tuple, Dict, Any
 import subprocess
 import os
 import sys
@@ -20,38 +20,38 @@ def get_file_list(data_dir: str, allowed_extensions: List[str]) -> List[str]:
 
     return file_list
 
-def run_network(network: Any, config: argparse.Namespace, file_list: List[str]) -> int:
-    if network.name == 'TILDE':
+def run_network(network: Dict, config: argparse.Namespace, file_list: List[str]) -> int:
+    if network['name'] == 'TILDE':
         config_file = 'tilde_config.pkl'
-        path_to_config_file = os.path.join(network.tmp_dir, config_file)
+        path_to_config_file = os.path.join(network['tmp_dir'], config_file)
 
         # Create tmp dir, if it not exists.
-        if network.tmp_dir is not None and not os.path.exists(network.tmp_dir):
-            os.makedirs(network.tmp_dir, exist_ok=True)
+        if network['tmp_dir'] is not None and not os.path.exists(network['tmp_dir']):
+            os.makedirs(network['tmp_dir'], exist_ok=True)
 
         # Write config file into tmp dir.
-        if os.path.exists(network.tmp_dir):
+        if os.path.exists(network['tmp_dir']):
             with open(path_to_config_file, 'wb') as dst:
                 pickle.dump(
-                    [dict(network._asdict()), vars(config), file_list],
+                    [network, vars(config), file_list],
                     dst,
                     protocol=pickle.HIGHEST_PROTOCOL)
 
         # Call shell script to call docker container.
-        status_code = subprocess.check_call(['/bin/bash', './{}'.format(network.main),
-            config.data_dir, config.output_dir, network.tmp_dir, path_to_config_file],
-            cwd=network.dir)
+        status_code = subprocess.check_call(['/bin/bash', './{}'.format(network['main']),
+            config.data_dir, config.output_dir, network['tmp_dir'], path_to_config_file],
+            cwd=network['dir'])
 
         # Remove tmp dir
-        if os.path.exists(network.tmp_dir):
-            shutil.rmtree(network.tmp_dir, ignore_errors=True)
+        if os.path.exists(network['tmp_dir']):
+            shutil.rmtree(network['tmp_dir'], ignore_errors=True)
 
         return status_code
     else:
         return subprocess.check_call(['pipenv', 'run', 'python',
-        './{}'.format(network.main), json.dumps(dict(network._asdict())),
+        './{}'.format(network['main']), json.dumps(network),
         json.dumps(vars(config)), json.dumps(file_list)],
-        cwd=network.dir)
+        cwd=network['dir'])
 
 if __name__ == "__main__":
     argv = sys.argv[1:]
@@ -65,6 +65,6 @@ if __name__ == "__main__":
         file_list = file_list[:config.max_num_images]
 
     for n in networks:
-        print('Starting network `{}`.'.format(n.name))
+        print('Starting network `{}`.'.format(n['name']))
         _ = run_network(n, config, file_list)
-        print('Network `{}` done.\n'.format(n.name))
+        print('Network `{}` done.\n'.format(n['name']))

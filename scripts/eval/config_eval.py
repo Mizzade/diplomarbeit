@@ -1,7 +1,5 @@
 import argparse
 import os
-from collections import namedtuple
-
 
 # MAIN PARSER
 parser = argparse.ArgumentParser()
@@ -129,14 +127,12 @@ subparser_table = {
 
 }
 
-Network = namedtuple('Network', ['name', 'dir', 'main', 'tmp_dir'])
-
 def get_config(argv):
     config, _ = parser.parse_known_args()
     networks = [vars(subparser_table[x].parse_known_args()[0]) for x in config.networks]
-    networks = [{**x, 'dir': os.path.join(config.root_dir, x['dir']),
+    networks = [{**x,
+        'dir': os.path.join(config.root_dir, x['dir']),
         'tmp_dir': os.path.join(config.root_dir, x['dir'], x['tmp_dir']) if x['tmp_dir'] is not None else None} for x in networks]
-    networks = [Network(**x) for x in networks]
 
     config.output_dir = os.path.join(config.root_dir, config.output_dir)
     config.data_dir = os.path.join(config.root_dir, config.data_dir)
