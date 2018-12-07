@@ -53,14 +53,6 @@ def run_network(network: Any, config: argparse.Namespace, file_list: List[str]) 
         json.dumps(vars(config)), json.dumps(file_list)],
         cwd=network.dir)
 
-def run_network2(path: str, name: str, main: str, output_dir: str, file_list: List[str], root_dir: str, data_dir: str, **kwargs) -> List[Tuple[Any]]:
-    if name == 'TILDE':
-        return subprocess.check_call(['/bin/bash', './{}'.format(main), data_dir, output_dir,
-        json.dumps(file_list)], cwd=path)
-    else:
-        return subprocess.check_call(['pipenv', 'run', 'python', './{}'.format(main),
-            output_dir, json.dumps(file_list)], cwd=path)
-
 if __name__ == "__main__":
     argv = sys.argv[1:]
     config, networks = ce.get_config(argv)
