@@ -4,6 +4,7 @@ import cv2
 import os
 import pickle
 import sys
+import collections
 from tqdm import tqdm
 from typing import List, Tuple, Dict, Any
 import config_repeatability as cfg_rep
@@ -228,9 +229,51 @@ def get_metrics(
             detector_name, collection_name, config)
     return metrics
 
-def save_metrics(obj: Any, file_path: str) -> None:
+def update(d: Dict, u: Dict) -> Dict:
+    """Updates values in dict d with the values in dict u. Returns updated
+    dict d
+
+    Arguments:
+        d {Dict} -- The dictionary to be updated.
+        u {Dict} -- A dictionary with new keys/values to be inserted into d.
+
+    Returns:
+        d {Dict} -- Updated version of d.
+    """
+
+    for k, v in u.items():
+        if isinstance(v, collections.Mapping):
+            d[k] = update(d.get(k, {}), v)
+        else:
+            d[k] = v
+    return d
+
+def save_metrics(obj: Any, file_path: str) -> Dict:
+    """Update and saves metrics. Tries to load an already existing metric object.
+    Use an empty dict if it does not exists. Update new values inside the dict
+    and save the resulting object again.
+
+    Arguments:
+        obj {Dict} -- A dictionary with new value to be updated in an already
+            existing metric pickle file.
+        file_path {str} -- Path to where to load and save metric pickle object.
+
+    Returns:
+        None
+    """
+
+    try:
+        with open(file_path, 'rb') as src:
+            data = pickle.load(src, encoding='utf-8')
+    except FileNotFoundError:
+            data = {}
+
+    update(data, obj)
+
     with open(file_path, 'wb') as dst:
-        pickle.dump(obj, dst, protocol=pickle.HIGHEST_PROTOCOL)
+        pickle.dump(data, dst, protocol=pickle.HIGHEST_PROTOCOL)
+
+    return data
 
 def main(config: Dict):
     for model_name, detector_name in tqdm(list(zip(config['model_names'], config['detector_names']))):
