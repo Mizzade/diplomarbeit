@@ -12,14 +12,25 @@ Die Benennung einzelner Dateien erfolgt mittels folgender Bausteine:
 - IMAGE_NAME
 - DETEKTOR_NAME: sift | tilde | tconvdet | superpoint | lift
 - DESCRIPTOR_NAME: sift | tfeat | doap | superpoint | lift | ''
+- SIZE: <Number> | ''
 - EXTENSION: z.B. .png, .csv etc.
 
 Der Name wird wir folge zusammengesetzt:
 
-        <TYPE>_<PROJECT_NAME>__<IMAGE_NAME>_<DETECTOR_NAME>_<DESCRIPTOR_NAME>.<EXTENSION>
+        <TYPE>_<PROJECT_NAME>__<IMAGE_NAME>_<DETECTOR_NAME>_<DESCRIPTOR_NAME>_<SIZE>.<EXTENSION>
 
 
 Dateien die mit `kpts` beginnen, haben keinen `<DESCRIPTOR_NAMEN>` im Namen.
+
+Beispiel:
+> kpts_tfeat__1_SIFT_1300.csv
+
+Der Name besagt also, dass
+- kpts: in dieser csv Datei Keypunkte gespeichert sind.
+- tfeat: sie zum Projekt TFeat gehören.
+- 1: der Bildename `1` war.
+- SIFT: der Detektor `SIFT` genommen wurde, um die Keypunkte zu finden.
+- 1300: der smart-scale Parameter `size` mit dem Wert 1300 bei der Erstellung übergeben wurde.
 
 #### Keypoints Schema
 Eine .csv Datei, die Keypunkte enhält, ist wie folgt aufgebaut:
