@@ -119,13 +119,12 @@ def main(argv: Tuple[str, str,str]) -> None:
             config['output_dir'],
             detector_name,
             descriptor_name,
-            project_name)
+            project_name,
+            config['size'])
 
     # Clean up
-    base_path, _ =  os.path.splitext(os.path.abspath(__file__))
-    base_path = os.sep.join(base_path.split(os.sep)[:-1])
-    path_tmp = os.path.join(base_path, 'tmp')
-    shutil.rmtree(path_tmp, ignore_errors=True)
+    if network['tmp_dir']:
+        shutil.rmtree(network['tmp_dir'], ignore_errors=True)
 
 if __name__ == '__main__':
     argv = sys.argv[1:]

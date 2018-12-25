@@ -113,7 +113,8 @@ def main(argv: Tuple[str]) -> None:
             config['output_dir'],
             detector_name,
             descriptor_name,
-            project_name)
+            project_name,
+            config['size'])
 
 if __name__ == '__main__':
     argv = sys.argv[1:]

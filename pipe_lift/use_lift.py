@@ -1,4 +1,4 @@
-from typing import List, Tuple, Any
+from typing import List, Tuple, Dict, Any
 import cv2
 import numpy as np
 import sys
@@ -18,6 +18,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 def compute(
     model: Any,
     image: str,
+    network_cfg: Dict,
     size: int=None) -> Tuple[List[cv2.KeyPoint], np.array, np.array]:
     """Computes the keypoints and descriptors for a given input image.
     Draws keypoints into the image.
@@ -44,12 +45,9 @@ def compute(
     4c) Draw list of cv2.KeyPoints into image.
     5) Return KeyPoint list, descriptors and image with KeyPoints.
     """
-
-    base_path, _ =  os.path.splitext(os.path.abspath(__file__))
-    base_path = os.sep.join(base_path.split(os.sep)[:-1])
-    lift_path = os.path.join(base_path, 'tf-lift')
+    lift_path = os.path.join(network_cfg['dir'], 'tf-lift')
     # 1)
-    path_tmp = os.path.join(base_path, 'tmp')
+    path_tmp = network_cfg['tmp_dir']
     if not os.path.exists(path_tmp):
         os.makedirs(path_tmp, exist_ok=True)
 
@@ -129,17 +127,16 @@ def main(argv: Tuple[str, str,str]) -> None:
     for file in tqdm(file_list):
         io_utils.save_output(
             file,
-            compute(model, file, config['size']),
+            compute(model, file, network, config['size']),
             config['output_dir'],
             detector_name,
             descriptor_name,
-            project_name)
+            project_name,
+            config['size'])
 
     # Clean up
-    base_path, _ =  os.path.splitext(os.path.abspath(__file__))
-    base_path = os.sep.join(base_path.split(os.sep)[:-1])
-    path_tmp = os.path.join(base_path, 'tmp')
-    shutil.rmtree(path_tmp, ignore_errors=True)
+    if network['tmp_dir']:
+        shutil.rmtree(network['tmp_dir'], ignore_errors=True)
 
 if __name__ == '__main__':
     argv = sys.argv[1:]

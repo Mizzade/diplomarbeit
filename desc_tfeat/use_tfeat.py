@@ -24,10 +24,13 @@ def load_tfeat(models_path: str='models', net_name: str='tfeat-liberty', use_gpu
 
     #init tfeat and load the trained weights
     tfeat = tfeat_model.TNet()
-    tfeat.load_state_dict(
-        torch.load(os.path.join(models_path,net_name+".params")))
     if use_gpu:
+        tfeat.load_state_dict(
+            torch.load(os.path.join(models_path,net_name+".params")))
         tfeat.cuda()
+    else:
+        tfeat.load_state_dict(
+            torch.load(os.path.join(models_path,net_name+".params"), map_location='cpu'))
     tfeat.eval()
     return tfeat
 
@@ -142,7 +145,8 @@ def main(argv: Tuple[str, str,str]) -> None:
             config['output_dir'],
             detector_name,
             descriptor_name,
-            project_name)
+            project_name,
+            config['size'])
 
 if __name__ == "__main__":
     argv = sys.argv[1:]
