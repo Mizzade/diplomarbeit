@@ -15,12 +15,16 @@ def remove_tmp_dir(path: str):
         shutil.rmtree(path, ignore_errors=True)
 
 def build_output_name(dir_path: str, image_name: str, detector_name: str='',
-    prefix='', descriptor_name: str='', file_type: str='csv') -> str:
+    prefix='', descriptor_name: str='', size: int=None, file_type: str='csv') -> str:
     # TODO assert that at least detector_name or descriptor_name is set
     if not detector_name and not descriptor_name:
         sys.exit('Error: `detector_name` or `descriptor_name` must be set')
 
+
     _list = [x for x in [prefix, image_name, detector_name, descriptor_name] if x]
+
+    if size is not None:
+        _list.append(str(size))
 
     return os.path.join(dir_path, '_'.join(_list) + '.{}'.format(file_type))
 
@@ -96,9 +100,10 @@ def save_outputs(
     file_list: List[str],
     output_list: List[Tuple[List[cv2.KeyPoint], np.array, np.array, np.array]],
     output_dir: str,
-    detector_name,
-    descriptor_name,
-    project_name) -> None:
+    detector_name: str,
+    descriptor_name: str,
+    project_name: str,
+    size: int=None) -> None:
     """Wrapper function for save_output. Saves the outputs of a model for each
     file given in the file_list to `output dir`.
 
@@ -112,6 +117,8 @@ def save_outputs(
         detector_name {str} -- Name of the used detector
         descriptor_name {str} -- Name of the used descriptor
         project_name {str} -- Name of project.
+        size {int} -- Smart scale size paramter used. If None, no size parameter
+        was given when calling run_models. (Default: None)
     """
     for file_path, output in zip(file_path, output_list):
         save_output(file_path, output, output_dir, detector_name, descriptor_name, project_name)
@@ -121,9 +128,10 @@ def save_output(
     file_path: str,
     output: Tuple[List[cv2.KeyPoint], np.array, np.array, np.array],
     output_dir: str,
-    detector_name,
-    descriptor_name,
-    project_name) -> None:
+    detector_name: str,
+    descriptor_name: str,
+    project_name: str,
+    size: int = None) -> None:
     """Save the output of a model inside `output_dir`
 
     Arguments:
@@ -136,6 +144,8 @@ def save_output(
         detector_name {str} -- Name of the used detector
         descriptor_name {str} -- Name of the used descriptor
         project_name {str} -- Name of project.
+        size {int} -- Smart scale size paramter used. If None, no size parameter
+        was given when calling run_models. (Default: None
     """
     kpts, desc, img_kp, img_heatmap = output
     set_name, file_name, _ = get_setName_fileName_extension(file_path)
@@ -146,6 +156,7 @@ def save_output(
         kp_path = build_output_name(
             dir_path,
             file_name,
+            size=size,
             detector_name=detector_name,
             prefix=os.path.join('keypoints',
                                 'kpts_{}_'.format(project_name)))
@@ -156,6 +167,7 @@ def save_output(
         desc_path = build_output_name(
             dir_path,
             file_name,
+            size=size,
             detector_name=detector_name,
             descriptor_name=descriptor_name,
             prefix=os.path.join('descriptors',
@@ -167,6 +179,7 @@ def save_output(
         kp_img_path = build_output_name(
             dir_path,
             file_name,
+            size=size,
             detector_name=detector_name,
             file_type='png',
             prefix=os.path.join('keypoint_images',
@@ -178,6 +191,7 @@ def save_output(
         heat_img_path = build_output_name(
             dir_path,
             file_name,
+            size=size,
             detector_name=detector_name,
             file_type='png',
             prefix=os.path.join('heatmap_images',
