@@ -173,11 +173,19 @@ def get_metrics_for_epsilon(
     print('Get epsilon metric for model: {}, set: {} and eps: {}.'.format(model_name, set_name, epsilon))
     metrics = {}
 
-    df_rkpts = find_repeatable_keypoints(kpts_files, epsilon)
+    if config['eval_set__num_repeatable_kpts'] or \
+        config['eval_set__idx_repeatable_kpts'] or \
+        config['eval_set__cum_repeatable_kpts']:
+        df_rkpts = find_repeatable_keypoints(kpts_files, epsilon)
 
-    metrics['num_repeatable_kpts'] = df_rkpts['repeatable'].sum()
-    metrics['idx_repeatable_kpts'] = list(df_rkpts[df_rkpts['repeatable'] == 1].index)
-    metrics['cum_repeatable_kpts'] = get_repeatability_for_n_images(df_rkpts)
+    if config['eval_set__num_repeatable_kpts']:
+        metrics['num_repeatable_kpts'] = df_rkpts['repeatable'].sum()
+
+    if config['eval_set__idx_repeatable_kpts']:
+        metrics['idx_repeatable_kpts'] = list(df_rkpts[df_rkpts['repeatable'] == 1].index)
+
+    if config['eval_set__idx_repeatable_kpts']:
+        metrics['cum_repeatable_kpts'] = get_repeatability_for_n_images(df_rkpts)
 
     return metrics
 
@@ -196,10 +204,23 @@ def get_metric_for_set(
     kpts_files = get_keypoint_files(model_name, detector_name, collection_name,
         set_name, image_names, config)
 
+    if config['eval_set__image_names']:
+        metrics['image_names'] = image_names
+
     # Number of keypoints found in each image
-    metrics['num_kpts_per_image'] = get_number_of_keypoints_per_image(kpts_files)
-    metrics['num_kpts_per_image_avg'] = metrics['num_kpts_per_image'].mean()
-    metrics['num_kpts_per_image_std'] = metrics['num_kpts_per_image'].std()
+    if config['eval_set__num_kpts_per_image'] or \
+        config['eval_set__num_kpts_per_image_avg'] or \
+        config['eval_set__num_kpts_per_image_std']:
+        num_kpts_per_image = get_number_of_keypoints_per_image(kpts_files)
+
+    if config['eval_set__num_kpts_per_image']:
+        metrics['num_kpts_per_image'] = num_kpts_per_image
+
+    if config['eval_set__num_kpts_per_image_avg']:
+        metrics['num_kpts_per_image_avg'] = num_kpts_per_image.mean()
+
+    if config['eval_set__num_kpts_per_image_std']:
+        metrics['num_kpts_per_image_std'] = num_kpts_per_image.std()
 
     # Get repeatable Keypoints
     for eps in config['epsilons']:
