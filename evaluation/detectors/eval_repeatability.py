@@ -5,6 +5,7 @@ import os
 import pickle
 import sys
 import collections
+from itertools import combinations
 from tqdm import tqdm
 from typing import List, Tuple, Dict, Any
 import config_repeatability as cfg_rep
@@ -90,7 +91,7 @@ def find_repeatable_keypoints(
 
     print('\tstart find_repeatable_keypoints. source is ', kpts_files[0])
 
-    for kp_file in kpts_files[1:]:
+    for kp_file in kpts_files:
         df_query = load_kpts_csv_file(kp_file)
         df_result[kp_file] = df_query \
             .apply(lambda s: (np.abs(df_source.x - s[0]) <= epsilon) &
@@ -122,7 +123,7 @@ def get_repeatability_for_n_images(df_rp_kpts: pd.DataFrame) -> np.array:
 
     return np.array(num_repeatable_keypoints).astype('int')
 
-def get_number_of_keypoints_per_image(kpts_files:List[str], ) -> np.array:
+def get_number_of_keypoints_per_image(kpts_files:List[str]) -> np.array:
     """Returns the number of found keypoints for each keypoint file in `kpts_files`
     as an np.array.
 
@@ -140,6 +141,41 @@ def get_number_of_keypoints_per_image(kpts_files:List[str], ) -> np.array:
         num_kp_per_image.append(kpts.shape[0])
 
     return np.array(num_kp_per_image)
+
+def get_num_repeatable_keypoints_for_epsiolon(df_source: pd.DataFrame, df_query: pd.DataFrame, epsilon:int=0):
+    return df_query \
+        .apply(lambda s: (np.abs(df_source.x - s[0]) <= epsilon) &
+                            (np.abs(df_source.y - s[1]) <= epsilon), axis=1) \
+        .astype('int') \
+        .max(axis=0) \
+        .sum()
+
+def get_number_of_keypoints_for_all_image_pairs(kpts_files:List[str], epsilon:int=0) -> np.array:
+    _i = None
+
+    num_files = len(kpts_files)
+    df_result = pd.DataFrame(np.zeros((num_files, num_files)))
+    df_source = None
+    df_query = None
+
+    for i, j in combinations(range(num_files), 2):
+
+        # Only load source df, if the first element in combination changes.
+        # Prevents reloading the same file multiple times.
+        if _i != i:
+            df_source = load_kpts_csv_file(kpts_files[i])
+            _i = i
+            df_result.iloc[i, i] = df_source.shape[0]
+
+        df_query = load_kpts_csv_file(kpts_files[j])
+
+        df_result.iloc[i ,j] = get_num_repeatable_keypoints_for_epsiolon(df_source, df_query, epsilon=epsilon)
+        df_result.iloc[j ,i] = get_num_repeatable_keypoints_for_epsiolon(df_query, df_source, epsilon=epsilon)
+
+    # Finally add the number of keypoints of the last file.
+    df_result.iloc[num_files - 1, num_files -1] = df_query.shape[0]
+
+    return df_result.values
 
 def get_image_names(
     collection_name:str,
@@ -186,6 +222,10 @@ def get_metrics_for_epsilon(
 
     if config['eval_set__idx_repeatable_kpts']:
         metrics['cum_repeatable_kpts'] = get_repeatability_for_n_images(df_rkpts)
+
+    if config['eval_set__repeatable_kpts_image_pairs']:
+        metrics['repeatable_kpts_image_pairs'] = \
+            get_number_of_keypoints_for_all_image_pairs(kpts_files, epsilon)
 
     return metrics
 
@@ -306,4 +346,7 @@ def main(config: Dict):
 if __name__ == '__main__':
     argv = sys.argv[1:]
     config = cfg_rep.get_config(argv)
-    main(config)
+    if config['dry']:
+        print(config)
+    else:
+        main(config)

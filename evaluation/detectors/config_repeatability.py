@@ -14,9 +14,9 @@ parser.add_argument('--allowed_extensions', nargs='+',
     help='Set the allowed file extensions for the imag directory.',
     default=['.png'])
 
-parser.add_argument('--epsilons', nargs='+',
+parser.add_argument('--epsilons', nargs='+', type=int,
     help='Maximal pixel difference of keypoints to still be considered a match.',
-    default=[1, 3, 7, 10])
+    default=[0, 1, 3, 7, 10])
 
 parser.add_argument('--collection_names', nargs='+',
     help='Names of all collections to use.',
@@ -135,6 +135,18 @@ parser.add_argument('--no-eval_set__cum_repeatable_kpts',
     help='Do not add number of repeatable keypoints up to n-th image for each image in set.',
     default=None)
 
+parser.add_argument('--eval_set__repeatable_kpts_image_pairs',
+    dest='eval_set__repeatable_kpts_image_pairs',
+    action='store_true',
+    help='Add number of repeatable keypoints for each image pair in a set for given epsilon.',
+    default=None)
+
+parser.add_argument('--no-eval_set__repeatable_kpts_image_pairs',
+    dest='eval_set__repeatable_kpts_image_pairs',
+    action='store_false',
+    help='Do not add number of repeatable keypoints for each image pair in a set for given epsilon.',
+    default=None)
+
 # Switch all evaluations ON/OFF:
 parser.add_argument('--eval_set__enable_all',
     dest='eval_set__enable_all',
@@ -146,6 +158,12 @@ parser.add_argument('--eval_set__disable_all',
     dest='eval_set__enable_all',
     action='store_false',
     help='Disable all evaluation tests')
+
+parser.add_argument('--dry',
+    dest='dry',
+    action='store_true',
+    help='If set, only print config, but do not run evaluation.',
+    default=False)
 
 table_detector_names = {
     'sift': 'SIFT',
@@ -161,7 +179,8 @@ table_eval_set = {
     'eval_set__image_names': True,
     'eval_set__num_repeatable_kpts': True,
     'eval_set__idx_repeatable_kpts': True,
-    'eval_set__cum_repeatable_kpts': True
+    'eval_set__cum_repeatable_kpts': True,
+    'eval_set__repeatable_kpts_image_pairs': True
 }
 
 def get_config(argv):
