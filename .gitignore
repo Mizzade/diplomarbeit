@@ -29,7 +29,7 @@
 /outputs
 
 # Evaluation
-/evaluation/detectors/outputs
+# /evaluation/detectors/outputs
 
 # MISC
 .vscode
