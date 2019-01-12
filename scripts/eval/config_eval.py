@@ -32,6 +32,12 @@ parser.add_argument('--max_num_images', type=int, default=None,
 parser.add_argument('--skip_first_n', type=int, default=None,
     help='Skip the first n images when using a model.')
 
+parser.add_argument('--dry',
+    dest='dry',
+    action='store_true',
+    help='If set, only print config, but do not run evaluation.',
+    default=False)
+
 subparsers = parser.add_subparsers(help='Commands for the different networks.')
 # SIFT
 parser_sift = subparsers.add_parser('sift', help='Configurations for SIFT.')
