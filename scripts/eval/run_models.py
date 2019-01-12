@@ -67,7 +67,7 @@ if __name__ == "__main__":
     if config.dry:
         print(config)
     else:
-        # for n in networks:
-        #     print('Starting network `{}`.'.format(n['name']))
-        #     _ = run_network(n, config, file_list)
-        #     print('Network `{}` done.\n'.format(n['name']))
+        for n in networks:
+            print('Starting network `{}`.'.format(n['name']))
+            _ = run_network(n, config, file_list)
+            print('Network `{}` done.\n'.format(n['name']))
