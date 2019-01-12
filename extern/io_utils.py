@@ -60,11 +60,11 @@ def save_patches_list(patches: List[np.array], file_name:str) -> None:
     np.savetxt(file_name, _a, delimiter=',')
 
 def get_setName_fileName_extension(file_path: str) -> (str, str, str):
-    # ...foo/bar/<set_name>/<file_name>.<extensions>
+    # ...foo/<collection_name>/<set_name>/<file_name>.<extensions>
     _base_path, extension = os.path.splitext(file_path)
-    set_name, file_name = _base_path.split(os.sep)[-2:]
+    collection_name, set_name, file_name = _base_path.split(os.sep)[-3:]
 
-    return set_name, file_name, extension
+    return collection_name, set_name, file_name, extension
 
 def smart_scale(image: np.array, size: int, prevent_upscaling: bool=False) -> np.array:
     """Set the max size for the larger dimension of an image and scale the
@@ -148,8 +148,8 @@ def save_output(
         was given when calling run_models. (Default: None
     """
     kpts, desc, img_kp, img_heatmap = output
-    set_name, file_name, _ = get_setName_fileName_extension(file_path)
-    dir_path = os.path.join(output_dir, set_name)
+    collection_name, set_name, file_name, _ = get_setName_fileName_extension(file_path)
+    dir_path = os.path.join(output_dir, collection_name, set_name)
 
     # Save list of keypoints.
     if kpts is not None:

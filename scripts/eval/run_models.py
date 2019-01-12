@@ -9,14 +9,20 @@ import pickle
 import config_eval as ce
 import shutil
 
-def get_file_list(data_dir: str, allowed_extensions: List[str]) -> List[str]:
+def get_file_list(data_dir: str, allowed_extensions: List[str], collection_names: List[str], set_names: List[str]) -> List[str]:
     file_list = []
-    for image_set in next(os.walk(data_dir))[1]:
-        image_set_path = os.path.join(data_dir, image_set)
-        for file in os.listdir(image_set_path):
-            _, f_ext = os.path.splitext(file)
-            if f_ext.lower() in allowed_extensions:
-                file_list.append(os.path.join(image_set_path, file))
+    for collection_name in next(os.walk(data_dir))[1]:
+        if collection_name in collection_names or len(collection_names) == 0:
+            collection_path = os.path.join(data_dir, collection_name)
+
+            for set_name in next(os.walk(collection_path))[1]:
+                if set_name in set_names or len(set_names) == 0:
+                    set_path = os.path.join(collection_path, set_name)
+
+                    for file in os.listdir(set_path):
+                        _, f_ext = os.path.splitext(file)
+                        if f_ext.lower() in allowed_extensions:
+                            file_list.append(os.path.join(set_path, file))
 
     return file_list
 
@@ -56,7 +62,11 @@ def run_network(network: Dict, config: argparse.Namespace, file_list: List[str])
 if __name__ == "__main__":
     argv = sys.argv[1:]
     config, networks = ce.get_config(argv)
-    file_list = sorted(get_file_list(config.data_dir, config.allowed_extensions))
+
+    collection_names = [] if config.collection_names is None else config.collection_names
+    set_names = [] if config.set_names is None else config.set_names
+
+    file_list = sorted(get_file_list(config.data_dir, config.allowed_extensions, collection_names, set_names))
 
     if config.skip_first_n is not None:
         file_list = file_list[config.skip_first_n:]

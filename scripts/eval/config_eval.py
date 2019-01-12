@@ -32,6 +32,14 @@ parser.add_argument('--max_num_images', type=int, default=None,
 parser.add_argument('--skip_first_n', type=int, default=None,
     help='Skip the first n images when using a model.')
 
+parser.add_argument('--collection_names', nargs='+',
+    help='Name of all collections to be processed within the data_dir. Skip collections that are not found. A value of "None" means all collections.',
+    default=['webcam', 'eisert'])
+
+parser.add_argument('--set_names', nargs='+',
+    help='Name of all sets to be processed within a collection. Skip sets that are not found. A value of "None" means all sets.',
+    default=None)
+
 parser.add_argument('--dry',
     dest='dry',
     action='store_true',
