@@ -33,9 +33,11 @@ parser.add_argument('--collection_names', nargs='+',
     help='Names of all collections to use.',
     default=['webcam'])
 
-parser.add_argument('--set_names', nargs='+',
-    help='Names of all sets to be used.',
-    default=['chamonix', 'courbevoie', 'frankfurt', 'mexico', 'panorama', 'stlouis'])
+parser.add_argument('--set_names', nargs='*',
+    help='Names of all sets to be used. If no set name is given, use all sets' +
+    ' found in the directory of the collection.',
+    default=[])
+    #default=['chamonix', 'courbevoie', 'frankfurt', 'mexico', 'panorama', 'stlouis'])
 
 # Directory entries
 parser.add_argument('--images_dir', type=str,

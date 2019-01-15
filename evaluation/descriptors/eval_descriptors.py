@@ -21,7 +21,7 @@ def get_metric_for_set(
     collection_name:str,
     set_name:str,
     config: Dict) -> Dict:
-    print('Get metric for model {} and set {}.'.format(model_name, set_name))
+    print('Get metric for detector {}, descriptor {} and set {}.'.format(detector_name, descriptor_name, set_name))
     metrics = {}
 
 
@@ -44,7 +44,7 @@ def get_metrics_for_collection(
     collection_name:str,
     config:Dict) -> Dict:
     metrics = {}
-    for set_name in config['set_names']:
+    for set_name in esf.get_set_names_for_collection(collection_name, config):
         metrics[set_name] = get_metric_for_set(
             model_name, 
             detector_name,

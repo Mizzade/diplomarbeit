@@ -32,6 +32,20 @@ def get_file_names(data_dir: str, allowed_extensions: List[str], sort_files: boo
 
     return file_names
 
+def get_set_names_for_collection(collection_name:str, config:Dict, sort_sets:bool=True) -> List[str]:
+    set_names = []
+
+    if len(config['set_names']):
+        set_names = config['set_names']
+    else:
+        path_to_data_dir = os.path.join(config['data_dir'], collection_name)
+        set_names = [d for d in os.listdir(path_to_data_dir) if os.path.isdir(os.path.join(path_to_data_dir, d))]
+
+    if sort_sets:
+        set_names = sorted(set_names)
+    
+    return set_names
+
 def get_image_names(
     collection_name:str, 
     set_name:str, 
