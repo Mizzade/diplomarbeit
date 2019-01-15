@@ -27,7 +27,7 @@ parser.add_argument('--output_file_prefix', type=str,
 
 parser.add_argument('--max_size',type=str,
     help='Look for files with this max size postfix.',
-    default='1300')
+    default=None)
 
 parser.add_argument('--collection_names', nargs='+',
     help='Names of all collections to use.',
