@@ -22,12 +22,18 @@ def eval_perc_matches_ratio_test(num_matches:int, num_matches_ratio_test) -> flo
     return num_matches_ratio_test / num_matches
 
 def eval_num_inlier_fmatrix(inlier_mask:np.array) -> int:
-    return np.sum(inlier_mask)
+    if inlier_mask is None:
+        return 0
+    else:
+        return np.sum(inlier_mask)
 
 def eval_perc_inlier_fmatrix(num_inlier:int, num_matches:int) -> float:
     return num_inlier / num_matches
 
 def eval_perc_inlier_ratio_test_fmatrix(num_inlier:int, num_matches_ratio_test:int) -> float:
+    if num_inlier == 0:
+        return 0
+        
     return num_inlier / num_matches_ratio_test
 
 def eval_sum_dist_epilines(distances) -> float:
@@ -89,13 +95,13 @@ def eval_image_pairs(kpts_files:List[str], desc_files:List[str], config:Dict) ->
                 dfs['num_inlier_fmatrix'].iloc[i, j] = num_inlier_fmatrix
             
             if config['eval_image_pair__perc_inlier_fmatrix']:
-                dfs['perc_inlier_fmatrix'].iloc[i, j] =  eval_perc_inlier_fmatrix(num_inlier_fmatrix, num_files)
+                dfs['perc_inlier_fmatrix'].iloc[i, j] =  eval_perc_inlier_fmatrix(num_inlier_fmatrix, num_found_matches)
             
             if config['eval_image_pair__perc_inlier_ratio_test_fmatrix']:
                 dfs['perc_inlier_ratio_test_fmatrix'].iloc[i, j] =  eval_perc_inlier_ratio_test_fmatrix(num_inlier_fmatrix, num_matches_ratio_test)
 
-            inliers_i = np.int32(pts_i)[mask.ravel() == 1]
-            inliers_j = np.int32(pts_j)[mask.ravel() == 1]
+            inliers_i = esf.get_inliers_from_mask(pts_i, mask)
+            inliers_j = esf.get_inliers_from_mask(pts_j, mask)
 
             distances = esf.compute_distances_kpts_to_epilines(inliers_i, inliers_j, F)
 

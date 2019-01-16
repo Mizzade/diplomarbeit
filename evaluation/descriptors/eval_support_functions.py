@@ -141,6 +141,8 @@ def get_flann():
     return flann
 
 def compute_distances_kpts_to_epilines(points_i, points_j, F:np.array) -> np.array:
+    if F is None:
+        return (np.zeros((points_i.shape[0], 2)) + np.inf)
 
     # Epipolar lines in image I of the points in image J
     lines_i = cv2.computeCorrespondEpilines(points_j.reshape(-1, 1, 2), 2, F).reshape(-1, 3)
@@ -184,9 +186,18 @@ def apply_ratio_test_to_matches(matches:List, kpts_i:pd.DataFrame, kpts_j:pd.Dat
 def compute_fundamental_matrix(pts_i:np.array, pts_j:np.array, method=cv2.FM_RANSAC) -> (np.array, np.array):
     pts_i = np.int32(pts_i)
     pts_j = np.int32(pts_j)
+
+    if pts_i.shape[0] == 0 or pts_j.shape[0] == 0:
+        return None, None 
+
     F, mask = cv2.findFundamentalMat(pts_i, pts_j, method)
 
     return F, mask
 
+def get_inliers_from_mask(points:np.array, mask:np.array) -> np.array:
+    if mask is None:
+        return np.int32(points)
+    else:
+        return np.int32(points)[mask.ravel() == 1]
 
 
