@@ -303,7 +303,7 @@ table_descriptor_names = {
     'lift': 'LIFT',
     'superpoint': 'SuperPoint',
     'doap': 'DOAP',
-    'tfeat': 'Tfeat'
+    'tfeat': 'TFeat'
 }
 
 def get_config(argv):
