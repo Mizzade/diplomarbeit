@@ -28,7 +28,7 @@ def build_output_name(dir_path: str, image_name: str, detector_name: str='',
 
     return os.path.join(dir_path, '_'.join(_list) + '.{}'.format(file_type))
 
-def save_keypoints_list(kpts: List[cv2.KeyPoint], file_name: str, image_shape: np.array, verbose:bool=True) -> None:
+def save_keypoints_list(kpts: List[cv2.KeyPoint], file_name: str, image_shape: np.array, verbose:bool=False) -> None:
     _dirname = os.path.dirname(file_name)
     if not os.path.exists(_dirname):
         os.makedirs(_dirname, exist_ok=True)
@@ -41,28 +41,28 @@ def save_keypoints_list(kpts: List[cv2.KeyPoint], file_name: str, image_shape: n
         header='height, width, number of rows, number of columns\n{}, {}, {}, {}\nx, y, size, angle, response, octave, class_id' \
             .format(image_shape[0], image_shape[1], _a.shape[0], _a.shape[1]))
 
-def save_descriptors(desc: np.array, file_name: str, verbose:bool=True) -> None:
+def save_descriptors(desc: np.array, file_name: str, verbose:bool=False) -> None:
     _dirname = os.path.dirname(file_name)
     if not os.path.exists(_dirname):
         os.makedirs(_dirname, exist_ok=True)
-    
+
     if verbose:
         print('Save descriptor list into {}'.format(_dirname))
 
     np.savetxt(file_name, desc, delimiter=',',
         header='{}, {}'.format(desc.shape[0], desc.shape[1]))
 
-def save_keypoints_image(image: np.array, file_name: str, verbose:bool=True) -> None:
+def save_keypoints_image(image: np.array, file_name: str, verbose:bool=False) -> None:
     _dirname = os.path.dirname(file_name)
     if not os.path.exists(_dirname):
         os.makedirs(_dirname, exist_ok=True)
-    
+
     if verbose:
         print('Save keypoint image into {}'.format(_dirname))
 
     cv2.imwrite(file_name, image)
 
-def save_patches_list(patches: List[np.array], file_name:str, verbose:bool=True) -> None:
+def save_patches_list(patches: List[np.array], file_name:str, verbose:bool=False) -> None:
     _dirname = os.path.dirname(file_name)
     if not os.path.exists(_dirname):
         os.makedirs(_dirname, exist_ok=True)
@@ -117,7 +117,8 @@ def save_outputs(
     detector_name: str,
     descriptor_name: str,
     project_name: str,
-    size: int=None) -> None:
+    size: int=None,
+    verbose:bool=False) -> None:
     """Wrapper function for save_output. Saves the outputs of a model for each
     file given in the file_list to `output dir`.
 
@@ -136,7 +137,7 @@ def save_outputs(
 
     """
     for file_path, output in zip(file_path, output_list):
-        save_output(file_path, output, output_dir, detector_name, descriptor_name, project_name)
+        save_output(file_path, output, output_dir, detector_name, descriptor_name, project_name, verbose=verbose)
 
 
 def save_output(
@@ -146,7 +147,8 @@ def save_output(
     detector_name: str,
     descriptor_name: str,
     project_name: str,
-    size: int = None) -> None:
+    size: int = None,
+    verbose:bool=False) -> None:
     """Save the output of a model inside `output_dir`
 
     Arguments:
@@ -160,7 +162,8 @@ def save_output(
         descriptor_name {str} -- Name of the used descriptor
         project_name {str} -- Name of project.
         size {int} -- Smart scale size paramter used. If None, no size parameter
-        was given when calling run_models. (Default: None
+        was given when calling run_models. (Default: None,
+        verbose {bool} -- Make save function more verbose.
     """
     kpts, desc, img_kp, img_heatmap = output
     collection_name, set_name, file_name, _ = get_setName_fileName_extension(file_path)
@@ -175,7 +178,7 @@ def save_output(
             detector_name=detector_name,
             prefix=os.path.join('keypoints',
                                 'kpts_{}_'.format(project_name)))
-        save_keypoints_list(kpts, kp_path, img_kp.shape)
+        save_keypoints_list(kpts, kp_path, img_kp.shape, verbose=verbose)
 
     # Save descriptors
     if desc is not None:
@@ -187,7 +190,7 @@ def save_output(
             descriptor_name=descriptor_name,
             prefix=os.path.join('descriptors',
                                 'desc_{}_'.format(project_name)))
-        save_descriptors(desc, desc_path)
+        save_descriptors(desc, desc_path, verbose=verbose)
 
     # Save keypoint image
     if img_kp is not None:
@@ -199,7 +202,7 @@ def save_output(
             file_type='png',
             prefix=os.path.join('keypoint_images',
                                 'kpts_{}_'.format(project_name)))
-        save_keypoints_image(img_kp, kp_img_path)
+        save_keypoints_image(img_kp, kp_img_path, verbose=verbose)
 
     # Save heatmap
     if img_heatmap is not None:
@@ -211,4 +214,4 @@ def save_output(
             file_type='png',
             prefix=os.path.join('heatmap_images',
                                 'heatmap_{}_'.format(project_name)))
-        save_keypoints_image(img_heatmap, heat_img_path)
+        save_keypoints_image(img_heatmap, heat_img_path, verbose=verbose)
