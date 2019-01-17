@@ -92,7 +92,7 @@ parser_tfeat.add_argument('--tmp_dir', type=str, default=None,
 # DOAP
 parser_doap = subparsers.add_parser('doap', help='Configurations for DOAP.')
 parser_doap.add_argument('--name', type=str, default='DOAP',
-    help='Name of the SuperPoint model.')
+    help='Name of the DOAP model.')
 
 parser_doap.add_argument('--dir', type=str, default='desc_doap',
     help='Path to dir containing the DOAP files relative from root_dir.')
@@ -106,7 +106,7 @@ parser_doap.add_argument('--tmp_dir', type=str, default='tmp',
 # LIFT
 parser_lift = subparsers.add_parser('lift', help='Configurations for LIFT.')
 parser_lift.add_argument('--name', type=str, default='LIFT',
-    help='Name of the SuperPoint model.')
+    help='Name of the LIFT model.')
 
 parser_lift.add_argument('--dir', type=str, default='pipe_lift',
     help='Path to dir containing the LIFT files relative from root_dir.')
@@ -120,7 +120,7 @@ parser_lift.add_argument('--tmp_dir', type=str, default='tmp',
 # TILDE
 parser_tilde = subparsers.add_parser('tilde', help='Configurations for TILDE.')
 parser_tilde.add_argument('--name', type=str, default='TILDE',
-    help='Name of the SuperPoint model.')
+    help='Name of the TILDE model.')
 
 parser_tilde.add_argument('--dir', type=str, default='det_tilde',
     help='Path to dir containing the TILDE files relative from root_dir.')
