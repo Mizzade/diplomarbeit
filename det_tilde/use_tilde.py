@@ -11,23 +11,21 @@ import cv2
 from typing import Tuple, List, Any
 import numpy as np
 
-def compute(
-    model: Any,
-    image: str,
-    network: dict,
+def detect(
+    image_path: str,
     config: dict) -> None:
-    """Computes the keypoints for a given input image.
+    """Detects keypoints for a given input image.
     Draws keypoints into the image.
     Returns keypoints, heatmap and image with keypoints.
 
     Arguments:
-        model {None} -- A model to load in python.
-        image {np.array} -- Path to the image.
-        network {dict} -- Config for this network. See config_eval.py.
-        config {dict} -- General configuations. See config_eval.py.
+        image_path {str} -- Path to the image.
+        config {dict} -- General configuations. See config_run_detectors.py.
 
     Returns:
-        Tuple[List[cv2.KeyPoint], None, np.array, np.array] -- Returns tuple (keypoints, None, image with keypoints, image of heatmap).
+        Tuple[List[cv2.KeyPoint], np.array, (np.array | None) ] -- Returns list
+        of cv2.KeyPoint, an image with the corresponding keypoints, and if
+        available, an heatmap.
 
     1) Create temporary folder `tmp` to save intermediate output.
     2a) Load and smart scale the image
@@ -39,35 +37,34 @@ def compute(
     """
 
     # 1)
-    if not os.path.exists(network['tmp_dir']):
-        os.makedirs(network['tmp_dir'], exist_ok=True)
+    io_utils.create_dir(config['tmp_dir_tilde'])
 
     # 2)
-    img = cv2.imread(image)
-    img = io_utils.smart_scale(img, config['size'], prevent_upscaling=True) if config['size'] is not None else img
+    img = cv2.imread(image_path)
+    img = io_utils.smart_scale(img, config['max_size'], prevent_upscaling=True) if config['max_size'] is not None else img
 
     # 2b)
     tmp_filename = 'tmp_img.png'
     tmp_keypoints = 'keypoints.csv'
     tmp_heatmap = 'heatmap.csv'
 
-    path_tmp_img = os.path.join(network['tmp_dir'], tmp_filename)
-    path_tmp_kpts = os.path.join(network['tmp_dir'], tmp_keypoints)
-    path_tmp_heatmap = os.path.join(network['tmp_dir'], tmp_heatmap)
+    path_tmp_img = os.path.join(config['tmp_dir_tilde'], tmp_filename)
+    path_tmp_kpts = os.path.join(config['tmp_dir_tilde'], tmp_keypoints)
+    path_tmp_heatmap = os.path.join(config['tmp_dir_tilde'], tmp_heatmap)
 
     cv2.imwrite(path_tmp_img, img)
 
     # 3a)
-    imageDir = network['tmp_dir']
-    outputDir = network['tmp_dir']
+    imageDir = config['tmp_dir_tilde']
+    outputDir = config['tmp_dir_tilde']
     fileName = tmp_filename
     filterPath = '/home/tilde/TILDE/c++/Lib/filters'
     filterName = 'Mexico.txt'
 
     # Call use_tilde.cpp
     # The output will be saved into
-    # - config['tmp_dir']/keypoints.csv and
-    # - config['tmp_dir']/heatmap.csv
+    # - config['tmp_dir_tilde']/keypoints.csv and
+    # - config['tmp_dir_tilde']/heatmap.csv
     subprocess.check_call([
         './use_tilde',
         '--imageDir', imageDir,
@@ -82,14 +79,14 @@ def compute(
     heatmap = np.loadtxt(path_tmp_heatmap, dtype=float, comments='# ', delimiter=', ')
     img_kp = cv2.drawKeypoints(img, kpts, None)
 
-    return (kpts, None, img_kp, heatmap)
+    return (kpts, img_kp, heatmap)
 
 def main(argv: Tuple[str]) -> None:
     """Runs the TILDE model and saves the results.
 
     Arguments:
         argv {Tuple[str]} -- List of one parameters. There should be exactly
-            one paramter - the path to the config file inside the tmp dir.
+            one parameter - the path to the config file inside the tmp dir.
             This config file will be used to get all other information and
             process the correct images.
     """
@@ -99,22 +96,12 @@ def main(argv: Tuple[str]) -> None:
     with open(argv[0], 'rb') as src:
         config_file = pickle.load(src, encoding='utf-8')
 
-    network, config, file_list = config_file
-    model = None
-
-    project_name = 'tilde'
-    detector_name = network['name']
-    descriptor_name = None
+    detector_name, config, file_list = config_file
 
     for file in tqdm(file_list):
-        io_utils.save_output(
-            file,
-            compute(model, file, network, config),
-            config['output_dir'],
-            detector_name,
-            descriptor_name,
-            project_name,
-            config['size'])
+        keypoints, keypoints_image, heatmap_image = detect(file, config)
+        io_utils.save_detector_output(file, detector_name, config, keypoints,
+            keypoints_image, heatmap_image)
 
 if __name__ == '__main__':
     argv = sys.argv[1:]

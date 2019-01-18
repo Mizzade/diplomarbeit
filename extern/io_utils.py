@@ -1,40 +1,101 @@
-from typing import List, Tuple, Any
+from typing import List, Tuple, Any, Dict
 import cv2
 import sys
 import os
 import numpy as np
 import shutil
 
-def create_tmp_dir(path: str):
-    if path is not None:
-        if not os.path.exists(path):
-            os.makedirs(path, exist_ok=True)
+def create_dir(path: str):
+    if path is not None and not os.path.exists(path):
+        os.makedirs(path, exist_ok=True)
 
-def remove_tmp_dir(path: str):
+def remove_dir(path: str):
     if os.path.exists(path):
         shutil.rmtree(path, ignore_errors=True)
 
-def build_output_name(dir_path: str, image_name: str, detector_name: str='',
-    prefix='', descriptor_name: str='', size: int=None, file_type: str='csv') -> str:
-    # TODO assert that at least detector_name or descriptor_name is set
-    if not detector_name and not descriptor_name:
-        sys.exit('Error: `detector_name` or `descriptor_name` must be set')
+def build_output_file_name(
+    image_name:str,
+    max_size:int=None,
+    extension:str=None) -> str:
+    """Returns the output file name of a given image.
+    Output format is: <prefix><image_name>_<max_size>.<extension>"""
+    _m = '_' + max_size if max_size else ''
+    _e = 'csv' if extension is None else extension
+    return '{}{}.{}'.format(image_name, _m, _e)
 
+def build_output_dir_path(
+    output_dir:str,
+    collection_name:str,
+    set_name:str,
+    output_type:str,
+    model_name:str) -> str:
+    """Returns the absolute path depending on the used model and type of data
+    that should be saved. OUTPUT_TYPE must be one of
+    Output format is:
+    <output_dir>/<collection_name>/<set_name>/<output_type>/<model_name>"""
 
-    _list = [x for x in [prefix, image_name, detector_name, descriptor_name] if x]
+    assert output_type in ['keypoints', 'descriptors', 'keypoint_images', 'heatmap_images']
+    return os.path.join(output_dir, collection_name, set_name, output_type, model_name)
 
-    if size is not None:
-        _list.append(str(size))
+def build_output_path(
+    output_dir:str,
+    collection_name:str,
+    set_name:str,
+    output_type:str,
+    model_name:str,
+    image_name:str,
+    max_size:int=None,
+    extension:str=None) -> str:
+    _d = build_output_dir_path(output_dir, collection_name, set_name, output_type, model_name)
+    _f = build_output_file_name(image_name, max_size, extension)
 
-    return os.path.join(dir_path, '_'.join(_list) + '.{}'.format(file_type))
+    return os.path.join(_d, _f)
+
+def get_path_components(file_path: str) -> (str, str, str, str):
+    """Returns the collection name, set name , file name and its extension for
+    any given file path. The schema is:
+    file_path = .../<collection_name>/<set_name>/<file_name>.<extensions>
+    """
+    _base_path, extension = os.path.splitext(file_path)
+    collection_name, set_name, file_name = _base_path.split(os.sep)[-3:]
+
+    return collection_name, set_name, file_name, extension
+
+def save_detector_output(
+    file_path:str,
+    model_name:str,
+    config:Dict,
+    keypoints:List[cv2.KeyPoint],
+    keypoints_image:np.array,
+    heatmap_image:np.array=None) -> None:
+    image_shape = keypoints_image.shape
+    collection_name, set_name, file_name, _ = get_path_components(file_path)
+
+    # Keypoints
+    output_keypoints_path = build_output_path(config['output_dir'],
+        collection_name, set_name, 'keypoints', model_name, file_name,
+        max_size=config['max_size'])
+    save_keypoints_list(keypoints, output_keypoints_path, image_shape, verbose=config['verbose'])
+
+    # Image of keypoints
+    output_keypoints_image_path = build_output_path(config['output_dir'],
+        collection_name, set_name, 'keypoint_images', model_name, file_name,
+        max_size=config['max_size'], extension='png')
+    save_keypoints_image(keypoints_image, output_keypoints_image_path, verbose=config['verbose'])
+
+    # Heatmap
+    if heatmap_image is not None:
+        output_heatmap_path = build_output_path(config['output_dir'],
+            collection_name, set_name, 'heatmap_images', model_name, file_name,
+            max_size=config['max_size'], extension='png')
+        save_keypoints_image(heatmap_image, output_heatmap_path, config['verbose'])
 
 def save_keypoints_list(kpts: List[cv2.KeyPoint], file_name: str, image_shape: np.array, verbose:bool=False) -> None:
     _dirname = os.path.dirname(file_name)
-    if not os.path.exists(_dirname):
-        os.makedirs(_dirname, exist_ok=True)
+    create_dir(_dirname)
 
     if verbose:
-        print('Save keypoint list into {}'.format(_dirname))
+        print('Save keypoint list into {}'.format(file_name))
 
     _a = np.array([[*x.pt, x.size, x.angle, x.response, x.octave, x.class_id] for x in kpts])
     np.savetxt(file_name,_a, delimiter=',',
@@ -43,32 +104,29 @@ def save_keypoints_list(kpts: List[cv2.KeyPoint], file_name: str, image_shape: n
 
 def save_descriptors(desc: np.array, file_name: str, verbose:bool=False) -> None:
     _dirname = os.path.dirname(file_name)
-    if not os.path.exists(_dirname):
-        os.makedirs(_dirname, exist_ok=True)
+    create_dir(_dirname)
 
     if verbose:
-        print('Save descriptor list into {}'.format(_dirname))
+        print('Save descriptor list into {}'.format(file_name))
 
     np.savetxt(file_name, desc, delimiter=',',
         header='{}, {}'.format(desc.shape[0], desc.shape[1]))
 
 def save_keypoints_image(image: np.array, file_name: str, verbose:bool=False) -> None:
     _dirname = os.path.dirname(file_name)
-    if not os.path.exists(_dirname):
-        os.makedirs(_dirname, exist_ok=True)
+    create_dir(_dirname)
 
     if verbose:
-        print('Save keypoint image into {}'.format(_dirname))
+        print('Save keypoint image/heatmap image into {}'.format(file_name))
 
     cv2.imwrite(file_name, image)
 
 def save_patches_list(patches: List[np.array], file_name:str, verbose:bool=False) -> None:
     _dirname = os.path.dirname(file_name)
-    if not os.path.exists(_dirname):
-        os.makedirs(_dirname, exist_ok=True)
+    create_dir(_dirname)
 
     if verbose:
-        print('Save patches list into {}'.format(_dirname))
+        print('Save patches list into {}'.format(file_name))
 
     _a = np.vstack(patches)
     np.savetxt(file_name, _a, delimiter=',')
@@ -109,6 +167,20 @@ def smart_scale(image: np.array, size: int, prevent_upscaling: bool=False) -> np
 
     return cv2.resize(image, None, fx=scaling, fy=scaling,
         interpolation=interpolation)
+
+def build_output_name(dir_path: str, image_name: str, detector_name: str='',
+    prefix='', descriptor_name: str='', size: int=None, file_type: str='csv') -> str:
+    # TODO assert that at least detector_name or descriptor_name is set
+    if not detector_name and not descriptor_name:
+        sys.exit('Error: `detector_name` or `descriptor_name` must be set')
+
+
+    _list = [x for x in [prefix, image_name, detector_name, descriptor_name] if x]
+
+    if size is not None:
+        _list.append(str(size))
+
+    return os.path.join(dir_path, '_'.join(_list) + '.{}'.format(file_type))
 
 def save_outputs(
     file_list: List[str],
