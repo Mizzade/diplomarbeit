@@ -9,25 +9,25 @@ import pickle
 import config_run_detectors as ced
 import run_support_functions as rsf
 
-def start_subprocess_for_model(model:str, config:Dict, file_list:List[str]) -> None:
+def start_subprocess(network:Dict, config:Dict, file_list:List[str]) -> None:
     # Build config file
-    config_file = '{}_config.pkl'.format(model)
-    path_to_config_file = os.path.join(config['tmp_dir_{}'.format(model)], config_file)
+    config_file = '{}_config.pkl'.format(network['detector_name'])
+    path_to_config_file = os.path.join(config['tmp_dir_{}'.format(network['detector_name'])], config_file)
 
     # Create tmp dir if it not exists:
-    rsf.create_dir(config['tmp_dir_{}'.format(model)])
+    rsf.create_dir(config['tmp_dir_{}'.format(network['detector_name'])])
 
     # Write config file into tmp dir:
-    rsf.write_config_file(path_to_config_file, [model, config, file_list])
+    rsf.write_config_file(path_to_config_file, [network['detector_name'], config, file_list])
 
-    if model == 'tilde':
+    if network['detector_name'] == 'tilde':
         # Call shell script to call docker container.
-        status_code = subprocess.check_call(['/bin/bash', './{}'.format(config['main_{}'.format(model)]),
+        status_code = subprocess.check_call(['/bin/bash', './{}'.format(config['main_{}'.format(network['detector_name'])]),
             config['data_dir'],
             config['output_dir'],
             config['tmp_dir_tilde'],
             path_to_config_file],
-            cwd=config['root_dir_{}'.format(model)])
+            cwd=config['root_dir_{}'.format(network['detector_name'])])
 
         # You have to give the rights back to USER, since Docker writes to root
         # sudo chown -R $USER outputs
@@ -36,21 +36,22 @@ def start_subprocess_for_model(model:str, config:Dict, file_list:List[str]) -> N
 
     else:
         status_code = subprocess.check_call(['pipenv', 'run', 'python',
-            './{}'.format(config['main_{}'.format(model)]),
+            './{}'.format(config['main_{}'.format(network['detector_name'])]),
             path_to_config_file],
-            cwd=config['root_dir_{}'.format(model)])
+            cwd=config['root_dir_{}'.format(network['detector_name'])])
 
 
     # Remove tmp dir
-    rsf.remove_dir(config['tmp_dir_{}'.format(model)])
+    rsf.remove_dir(config['tmp_dir_{}'.format(network['detector_name'])])
 
 def main(config):
     file_list = rsf.get_file_list(config)
 
-    for d in config['detectors']:
-        print('\nStarting detector `{}`'.format(d))
-        start_subprocess_for_model(d, config, file_list)
-        print(('Model `{}` done.'.format(d)))
+    for detector_name in config['detectors']:
+        print('\nStarting detector `{}`'.format(detector_name))
+        network = {'detector_name': detector_name, 'descriptor_name': None}
+        start_subprocess(network, config, file_list)
+        print(('Detector `{}` done.'.format(detector_name)))
 
 
 if __name__ == "__main__":
