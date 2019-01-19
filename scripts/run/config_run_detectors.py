@@ -49,7 +49,7 @@ parser.add_argument('--max_size',
 parser.add_argument('--detectors',
     nargs='+',
     help='Choose which detectors should be run. Default: (sift, tfeat, tilde)',
-    default=['tilde'])
+    default=['sift', 'tilde'])
     # default=['tilde', 'tcovdet'])
 
 parser.add_argument('--max_num_images',
@@ -86,12 +86,30 @@ parser.add_argument('--dry',
 
 # Arguments for detectors
 
+
+# SIFT
+parser.add_argument('--root_dir_sift',
+    type=str,
+    help='Path to the root folder of the SIFT module relative from ROOT_DIR. ' +
+    'Default: pipe_sift',
+    default='pipe_sift')
+
+parser.add_argument('--tmp_dir_sift',
+    type=str,
+    help='Path to temporary directory to save intermediate results. Relative ' +
+    'to ROOT_DIR_SIFT. Default: tmp',
+    default='tmp')
+
+parser.add_argument('--main_sift',
+    type=str,
+    help='Name of the main python file to start the model. Default: use_sift.py',
+    default='use_sift.py')
+
 # TILDE
 parser.add_argument('--root_dir_tilde',
     type=str,
     help='Path to the root folder of the TILDE module relative from ROOT_DIR. ' +
-    'This folder must include the run_model.py for this model. Default: ' +
-    'det_tilde',
+    'Default: det_tilde',
     default='det_tilde')
 
 parser.add_argument('--tmp_dir_tilde',
@@ -100,12 +118,16 @@ parser.add_argument('--tmp_dir_tilde',
     'to ROOT_DIR_TILDE. Default: tmp',
     default='tmp')
 
+parser.add_argument('--main_tilde',
+    type=str,
+    help='Name of the main python file to start the model. Default: use_tilde.sh',
+    default='use_tilde.sh')
+
 # TCovDet
 parser.add_argument('--root_dir_tcovdet',
     type=str,
     help='Path to the root folder of the TCovDet module relative from ROOT_DIR. ' +
-    'This folder must include the run_model.py for this model. Default: ' +
-    'det_tcovdet',
+    'Default: det_tcovdet',
     default='det_tcovdet')
 
 parser.add_argument('--tmp_dir_tcovdet',
@@ -114,9 +136,16 @@ parser.add_argument('--tmp_dir_tcovdet',
     'to ROOT_DIR_TCOVDET. Default: tmp',
     default='tmp')
 
+parser.add_argument('--main_tcovdet',
+    type=str,
+    help='Name of the main python file to start the model. Default: use_tcovdet.py',
+    default='use_tcofdet.py')
+
 def get_config(argv):
     config, _ = parser.parse_known_args()
     config = vars(config)
+
+    config['task'] = 'keypoints'
 
     config['collection_names'] = rsf.get_collection_names(config)
     config['set_names'] = rsf.get_set_names(config)
@@ -124,6 +153,9 @@ def get_config(argv):
     # Set absolute paths
     config['data_dir'] = os.path.join(config['root_dir'], config['data_dir'])
     config['output_dir'] = os.path.join(config['root_dir'], config['output_dir'])
+
+    config['root_dir_sift'] = os.path.join(config['root_dir'], config['root_dir_sift'])
+    config['tmp_dir_sift'] = os.path.join(config['root_dir_sift'], config['tmp_dir_sift'])
 
     config['root_dir_tilde'] = os.path.join(config['root_dir'], config['root_dir_tilde'])
     config['tmp_dir_tilde'] = os.path.join(config['root_dir_tilde'], config['tmp_dir_tilde'])

@@ -6,43 +6,43 @@ import sys
 import json
 import argparse
 import pickle
-import shutil
 import config_run_detectors as ced
 import run_support_functions as rsf
 
 def start_subprocess_for_model(model:str, config:Dict, file_list:List[str]) -> None:
+    # Build config file
+    config_file = '{}_config.pkl'.format(model)
+    path_to_config_file = os.path.join(config['tmp_dir_{}'.format(model)], config_file)
+
+    # Create tmp dir if it not exists:
+    rsf.create_dir(config['tmp_dir_{}'.format(model)])
+
+    # Write config file into tmp dir:
+    rsf.write_config_file(path_to_config_file, [model, config, file_list])
+
     if model == 'tilde':
-        config_file = 'tilde_config.pkl'
-        path_to_config_file = os.path.join(config['tmp_dir_tilde'], config_file)
-
-        # Create tmp dir if it not exists:
-        if not os.path.exists(config['tmp_dir_tilde']):
-            os.makedirs(config['tmp_dir_tilde'], exist_ok=True)
-
-        # Write config file into tmp dir:
-        with open(path_to_config_file, 'wb') as dst:
-            pickle.dump(
-                [model, config, file_list],
-                dst,
-                protocol=pickle.HIGHEST_PROTOCOL)
-
         # Call shell script to call docker container.
-        status_code = subprocess.check_call(['/bin/bash', './{}'.format('use_tilde.sh'),
+        status_code = subprocess.check_call(['/bin/bash', './{}'.format(config['main_{}'.format(model)]),
             config['data_dir'],
             config['output_dir'],
             config['tmp_dir_tilde'],
             path_to_config_file],
-            cwd=config['root_dir_tilde'])
+            cwd=config['root_dir_{}'.format(model)])
 
-        # Remove tmp dir
-        if os.path.exists(config['tmp_dir_tilde']):
-            shutil.rmtree(config['tmp_dir_tilde'], ignore_errors=True)
-
-        return status_code
+        # You have to give the rights back to USER, since Docker writes to root
+        # sudo chown -R $USER outputs
+        env = os.environ.copy()
+        subprocess.check_call(['sudo', 'chown', '-R', env['USER'], config['output_dir']])
 
     else:
-        # TODO: Handle tcovdet later.
-        pass
+        status_code = subprocess.check_call(['pipenv', 'run', 'python',
+            './{}'.format(config['main_{}'.format(model)]),
+            path_to_config_file],
+            cwd=config['root_dir_{}'.format(model)])
+
+
+    # Remove tmp dir
+    rsf.remove_dir(config['tmp_dir_{}'.format(model)])
 
 def main(config):
     file_list = rsf.get_file_list(config)

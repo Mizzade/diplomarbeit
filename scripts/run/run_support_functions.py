@@ -1,5 +1,7 @@
 import os
 from typing import List, Dict, Tuple, Any
+import pickle
+import shutil
 
 def get_collection_names(config:Dict, sorted_output:bool=True) -> List[str]:
     """Given the config object, return all collection names set by the user.
@@ -79,6 +81,22 @@ def print_configuration(config:Dict) -> None:
     for k,v in config.items():
         print('{}: {}'.format(k, v))
     print('------\n')
+
+def create_dir(path: str):
+    if path is not None and not os.path.exists(path):
+        os.makedirs(path, exist_ok=True)
+
+def remove_dir(path: str):
+    if os.path.exists(path):
+        shutil.rmtree(path, ignore_errors=True)
+
+def write_config_file(path_to_config_file:str, data_list: List[Any]) -> None:
+
+   with open(path_to_config_file, 'wb') as dst:
+        pickle.dump(
+            data_list,
+            dst,
+            protocol=pickle.HIGHEST_PROTOCOL)
 
 
 
