@@ -22,7 +22,7 @@ def compute(image_file_path:str, config:Dict, model:Any) -> np.array:
     """
 
     # Load image
-    img = cv2.imread(image_file_path)
+    img = io_utils.smart_scale(img, config['max_size'], prevent_upscaling=True) if config['max_size'] is not None else img
 
     # Infer the path to the corresponding csv file for the keypoints.
     collection_name, set_name, image_name, _ = io_utils.get_path_components(image_file_path)
@@ -35,8 +35,8 @@ def compute(image_file_path:str, config:Dict, model:Any) -> np.array:
         'keypoints',
         config['detector_name'],
         image_name,
-        config['max_size']
-    )
+        config['max_size'])
+
     # Load keypoints from csv file as numpy array.
     kpts_numpy = io_utils.get_keypoints_from_csv(keypoints_file_path)
 
