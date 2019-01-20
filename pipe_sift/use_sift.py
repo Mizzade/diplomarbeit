@@ -17,29 +17,6 @@ def load_sift() -> cv2.xfeatures2d_SIFT:
 
     return cv2.xfeatures2d.SIFT_create()
 
-# def compute(
-#     model: cv2.xfeatures2d_SIFT,
-#     image: str,
-#     size: int=None) -> Tuple[List[cv2.KeyPoint], np.array, np.array]:
-#     """Computes the keypoints and descriptors for a given input image.
-#     Draws keypoints into the image.
-#     Returns keypoints, descriptors and image with keypoints.
-
-#     Arguments:
-#         model {cv2.xfeatures2d_SIFT} -- The sift keypoint detector and descriptor.
-#         image {np.array} -- Path to the image.
-#         size {None} -- Maximal dimension of image. Default: None.
-
-#     Returns:
-#         Tuple[List[cv2.KeyPoint], np.array, np.array, None] -- Returns tuple (keypoints, descriptors, image with keypoints, image of heatmap).
-#     """
-
-#     img = cv2.imread(image, 0)
-#     img = io_utils.smart_scale(img, size, prevent_upscaling=True) if size is not None else img
-#     kp, desc = model.detectAndCompute(img, None)
-#     img_kp = cv2.drawKeypoints(img, kp, None)
-#     return (kp, desc, img_kp, None)
-
 def compute(image_file_path:str, config:Dict, model:Any) -> np.array:
     """Computes descriptors from keypoints saved in a file.
     """
