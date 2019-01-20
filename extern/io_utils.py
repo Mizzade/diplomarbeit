@@ -28,25 +28,28 @@ def build_output_dir_path(
     collection_name:str,
     set_name:str,
     output_type:str,
-    model_name:str) -> str:
+    detector_name:str,
+    descriptor_name:str=None) -> str:
     """Returns the absolute path depending on the used model and type of data
     that should be saved. OUTPUT_TYPE must be one of
     Output format is:
     <output_dir>/<collection_name>/<set_name>/<output_type>/<model_name>"""
 
     assert output_type in ['keypoints', 'descriptors', 'keypoint_images', 'heatmap_images']
-    return os.path.join(output_dir, collection_name, set_name, output_type, model_name)
+    _l = [x for x in [output_dir, collection_name, set_name, output_type, descriptor_name, detector_name] if x is not None]
+    return os.path.join(*_l)
 
 def build_output_path(
     output_dir:str,
     collection_name:str,
     set_name:str,
     output_type:str,
-    model_name:str,
+    detector_name:str,
     image_name:str,
+    descriptor_name:str=None,
     max_size:int=None,
     extension:str=None) -> str:
-    _d = build_output_dir_path(output_dir, collection_name, set_name, output_type, model_name)
+    _d = build_output_dir_path(output_dir, collection_name, set_name, output_type, detector_name, descriptor_name=descriptor_name)
     _f = build_output_file_name(image_name, max_size, extension)
 
     return os.path.join(_d, _f)
@@ -60,6 +63,17 @@ def get_path_components(file_path: str) -> (str, str, str, str):
     collection_name, set_name, file_name = _base_path.split(os.sep)[-3:]
 
     return collection_name, set_name, file_name, extension
+
+def get_keypoints_from_csv(
+    file_path:str,
+    dtype:Any=int,
+    comments:str='#',
+    delimiter:str=',') -> np.array:
+    """Loads a .csv file containing keypoints and returns the corresponding
+    numpy array."""
+    #return np.loadtxt(file_path, dtype=dtype, comments=comments, delimiter=delimiter)
+    return np.loadtxt(open(file_path, 'rb'), delimiter=delimiter, comments=comments)
+    #return pd.read_csv('file_path', comment=comment, delimiter=delimiter)
 
 def save_detector_output(
     file_path:str,
@@ -89,6 +103,19 @@ def save_detector_output(
             collection_name, set_name, 'heatmap_images', model_name, file_name,
             max_size=config['max_size'], extension='png')
         save_keypoints_image(heatmap_image, output_heatmap_path, config['verbose'])
+
+def save_descriptor_output( file_path:str, config:Dict, descriptors:np.array) -> None:
+    collection_name, set_name, image_name, _ = get_path_components(file_path)
+    output_descriptor_path = build_output_path(
+        config['output_dir'],
+        collection_name,
+        set_name,
+        'descriptors',
+        config['detector_name'],
+        image_name,
+        descriptor_name=config['descriptor_name'],
+        max_size=config['max_size'])
+    save_descriptors(descriptors, output_descriptor_path, verbose=config['verbose'])
 
 def save_keypoints_list(kpts: List[cv2.KeyPoint], file_name: str, image_shape: np.array, verbose:bool=False) -> None:
     _dirname = os.path.dirname(file_name)

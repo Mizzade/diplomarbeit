@@ -96,11 +96,11 @@ def main(argv: Tuple[str]) -> None:
     with open(argv[0], 'rb') as src:
         config_file = pickle.load(src, encoding='utf-8')
 
-    detector_name, config, file_list = config_file
+    config, file_list = config_file
 
     for file in tqdm(file_list):
         keypoints, keypoints_image, heatmap_image = detect(file, config)
-        io_utils.save_detector_output(file, detector_name, config, keypoints,
+        io_utils.save_detector_output(file, config['detector_name'], config, keypoints,
             keypoints_image, heatmap_image)
 
 if __name__ == '__main__':

@@ -7,7 +7,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--configuration_name',
     type=str,
     help='Name of this configiration. This will be the title if DRY is set.',
-    default='Configuration: run_detectors.py')
+    default='Configuration: run_descriptors.py')
 
 parser.add_argument('--verbose',
     dest='verbose',
@@ -46,11 +46,15 @@ parser.add_argument('--max_size',
     'means to take the image with its original size. Default: None',
     default=None)
 
+parser.add_argument('--descriptors',
+    nargs='+',
+    help='Choose which descriptors should be run. Default: (sift, tfeat, doap)',
+    default=['sift', 'tfeat', 'doap'])
+
 parser.add_argument('--detectors',
     nargs='+',
     help='Choose which detectors should be run. Default: (sift, tilde)',
     default=['sift', 'tilde'])
-    # default=['tilde', 'tcovdet'])
 
 parser.add_argument('--max_num_images',
     type=int,
@@ -84,9 +88,7 @@ parser.add_argument('--dry',
     help='If set, only print config, but do not run models. Default: False',
     default=False)
 
-# Arguments for detectors
-
-
+# Arguments for descriptors
 # SIFT
 parser.add_argument('--root_dir_sift',
     type=str,
@@ -105,47 +107,47 @@ parser.add_argument('--main_sift',
     help='Name of the main python file to start the model. Default: use_sift.py',
     default='use_sift.py')
 
-# TILDE
-parser.add_argument('--root_dir_tilde',
+# TFeat
+parser.add_argument('--root_dir_tfeat',
     type=str,
-    help='Path to the root folder of the TILDE module relative from ROOT_DIR. ' +
-    'Default: det_tilde',
-    default='det_tilde')
+    help='Path to the root folder of the TFeat module relative from ROOT_DIR. ' +
+    'Default: desc_tfeat',
+    default='desc_tfeat')
 
-parser.add_argument('--tmp_dir_tilde',
+parser.add_argument('--tmp_dir_tfeat',
     type=str,
     help='Path to temporary directory to save intermediate results. Relative ' +
-    'to ROOT_DIR_TILDE. Default: tmp',
+    'to ROOT_DIR_TFEAT. Default: tmp',
     default='tmp')
 
-parser.add_argument('--main_tilde',
+parser.add_argument('--main_tfeat',
     type=str,
-    help='Name of the main python file to start the model. Default: use_tilde.sh',
-    default='use_tilde.sh')
+    help='Name of the main python file to start the model. Default: use_tfeat.py',
+    default='use_tfeat.py')
 
-# TCovDet
-parser.add_argument('--root_dir_tcovdet',
+# DOAP
+parser.add_argument('--root_dir_doap',
     type=str,
-    help='Path to the root folder of the TCovDet module relative from ROOT_DIR. ' +
-    'Default: det_tcovdet',
-    default='det_tcovdet')
+    help='Path to the root folder of the TFeat module relative from ROOT_DIR. ' +
+    'Default: desc_doap',
+    default='desc_doap')
 
-parser.add_argument('--tmp_dir_tcovdet',
+parser.add_argument('--tmp_dir_doap',
     type=str,
     help='Path to temporary directory to save intermediate results. Relative ' +
-    'to ROOT_DIR_TCOVDET. Default: tmp',
+    'to ROOT_DIR_DOAP. Default: tmp',
     default='tmp')
 
-parser.add_argument('--main_tcovdet',
+parser.add_argument('--main_doap',
     type=str,
-    help='Name of the main python file to start the model. Default: use_tcovdet.py',
-    default='use_tcofdet.py')
+    help='Name of the main python file to start the model. Default: use_doap.py',
+    default='use_doap.py')
 
 def get_config(argv):
     config, _ = parser.parse_known_args()
     config = vars(config)
 
-    config['task'] = 'keypoints'
+    config['task'] = 'descriptors'
 
     config['collection_names'] = rsf.get_collection_names(config)
     config['set_names'] = rsf.get_set_names(config)
@@ -157,11 +159,11 @@ def get_config(argv):
     config['root_dir_sift'] = os.path.join(config['root_dir'], config['root_dir_sift'])
     config['tmp_dir_sift'] = os.path.join(config['root_dir_sift'], config['tmp_dir_sift'])
 
-    config['root_dir_tilde'] = os.path.join(config['root_dir'], config['root_dir_tilde'])
-    config['tmp_dir_tilde'] = os.path.join(config['root_dir_tilde'], config['tmp_dir_tilde'])
+    config['root_dir_tfeat'] = os.path.join(config['root_dir'], config['root_dir_tfeat'])
+    config['tmp_dir_tfeat'] = os.path.join(config['root_dir_tfeat'], config['tmp_dir_tfeat'])
 
-    config['root_dir_tcovdet'] = os.path.join(config['root_dir'], config['root_dir_tcovdet'])
-    config['tmp_dir_tcovdet'] = os.path.join(config['root_dir_tcovdet'], config['tmp_dir_tcovdet'])
+    config['root_dir_doap'] = os.path.join(config['root_dir'], config['root_dir_doap'])
+    config['tmp_dir_doap'] = os.path.join(config['root_dir_doap'], config['tmp_dir_doap'])
 
     return config
 
