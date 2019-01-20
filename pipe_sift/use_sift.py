@@ -40,15 +40,8 @@ def compute(image_file_path:str, config:Dict, model:Any) -> np.array:
     # Load keypoints from csv file as numpy array.
     kpts_numpy = io_utils.get_keypoints_from_csv(keypoints_file_path)
 
-
     # Convert numpy array to List of cv2.KeyPoint list
-    kpts_cv2 = []
-    for kp in kpts_numpy:
-        x, y, _size, _angle, _response, _octave, _class_id = kp
-        x, y, _size, _angle, _response, _octave, _class_id = \
-            x, y, _size, _angle, _response, int(_octave), int(_class_id)
-
-        kpts_cv2.append(cv2.KeyPoint(x, y, _size, _angle, _response, _octave, _class_id))
+    kpts_cv2 = io_utils.numpy_to_cv2_kp(kpts_numpy)
 
     # Compute descriptors
     _, desc = model.compute(img, kpts_cv2)

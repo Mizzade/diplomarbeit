@@ -117,6 +117,19 @@ def save_descriptor_output( file_path:str, config:Dict, descriptors:np.array) ->
         max_size=config['max_size'])
     save_descriptors(descriptors, output_descriptor_path, verbose=config['verbose'])
 
+def numpy_to_cv2_kp(kpts_numpy:np.array) -> List[cv2.KeyPoint]:
+    """Converts a numpy array containing keypoints to a list of cv2.KeyPoint
+    elements."""
+    kpts_cv2 = []
+    for kp in kpts_numpy:
+        x, y, _size, _angle, _response, _octave, _class_id = kp
+        x, y, _size, _angle, _response, _octave, _class_id = \
+            x, y, _size, _angle, _response, int(_octave), int(_class_id)
+
+        kpts_cv2.append(cv2.KeyPoint(x, y, _size, _angle, _response, _octave, _class_id))
+
+    return kpts_cv2
+
 def save_keypoints_list(kpts: List[cv2.KeyPoint], file_name: str, image_shape: np.array, verbose:bool=False) -> None:
     _dirname = os.path.dirname(file_name)
     create_dir(_dirname)
