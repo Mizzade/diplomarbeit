@@ -91,34 +91,6 @@ def compute_descriptors(model:tfeat_model.TNet, list_of_patches: List[np.array],
     descrs = model(patches)
     return descrs.detach().cpu().numpy()
 
-# def compute(
-#     detector: Any,
-#     model: tfeat_model.TNet,
-#     image: str,
-#     size: int=None) -> Tuple[List[cv2.KeyPoint], np.array, np.array, np.array]:
-#     """Computes the keypoints and descriptors for a given input image.
-#     Draws keypoints into the image.
-#     Returns keypoints, descriptors and image with keypoints.
-
-#     Arguments:
-#         detector {Any} -- A keypoint detector.
-#         model {tfeat_model.TNet} -- The keypoint detector and descriptor.
-#         image {np.array} -- Path to the image.
-#         size {None} -- Maximal dimension of image. Default: None.
-
-#     Returns:
-#         Tuple[List[cv2.KeyPoint], np.array, np.array, None] -- Returns tuple (keypoints, descriptors, image with keypoints, image of heatmap).
-#     """
-
-#     img = cv2.imread(image, 0)
-#     img = io_utils.smart_scale(img, size, prevent_upscaling=True) if size is not None else img
-#     kp, _ = detector.detectAndCompute(img, None)
-#     patches = rectify_patches(img, kp, 32, 3)
-#     desc = compute_descriptors(model, patches, use_gpu=False)
-
-#     img_kp = cv2.drawKeypoints(img, kp, None)
-#     return (kp, desc, img_kp, None)
-
 def compute(image_file_path:str, config:Dict, model:Any) -> np.array:
     """Computes descriptors from keypoints saved in a file."""
     # Load image and scale appropiately. Image is later used to create patch,
@@ -175,36 +147,6 @@ def main(argv: Tuple[str]) -> None:
         for file in tqdm(file_list):
             descriptors = compute(file, config, model)
             io_utils.save_descriptor_output(file, config, descriptors)
-
-# def main(argv: Tuple[str, str,str]) -> None:
-#     """Runs the TFeat model and saves the results.
-
-#     Arguments:
-#         argv {Tuple[str, str, str]} -- List of parameters. Expects exactly three
-#             parameters. The first one contains json-fied network information,
-#             the second contains the json-fied config object and the third is
-#             the json-fied file list with all files to be processed.
-#     """
-
-#     project_name = 'tfeat'
-#     detector_name = 'SIFT'
-#     descriptor_name = 'TFeat'
-
-#     network = json.loads(argv[0])
-#     config = json.loads(argv[1])
-#     file_list = json.loads(argv[2])
-#     model = load_tfeat()
-#     detector = cv2.xfeatures2d.SIFT_create()
-
-#     for file in tqdm(file_list):
-#         io_utils.save_output(
-#             file,
-#             compute(detector, model, file, config['size']),
-#             config['output_dir'],
-#             detector_name,
-#             descriptor_name,
-#             project_name,
-#             config['size'])
 
 if __name__ == "__main__":
     argv = sys.argv[1:]
