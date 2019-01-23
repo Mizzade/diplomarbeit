@@ -109,7 +109,11 @@ def compute(image_file_path:str, config:Dict, model:Any) -> np.array:
         'keypoints',
         config['detector_name'],
         image_name,
-        config['max_size'])
+        max_size=config['max_size'])
+
+    if not os.path.isfile(keypoints_file_path):
+        print('Could not find keypoints in path: {}\n.Skip'.format(keypoints_file_path))
+        return None
 
     # Load keypoints from csv file as numpy array.
     kpts_numpy = io_utils.get_keypoints_from_csv(keypoints_file_path)
@@ -146,7 +150,8 @@ def main(argv: Tuple[str]) -> None:
     if config['task'] == 'descriptors':
         for file in tqdm(file_list):
             descriptors = compute(file, config, model)
-            io_utils.save_descriptor_output(file, config, descriptors)
+            if descriptors is not None:
+                io_utils.save_descriptor_output(file, config, descriptors)
 
 if __name__ == "__main__":
     argv = sys.argv[1:]
