@@ -19,7 +19,7 @@ def build_output_file_name(
     extension:str=None) -> str:
     """Returns the output file name of a given image.
     Output format is: <prefix><image_name>_<max_size>.<extension>"""
-    _m = '_' + max_size if max_size else ''
+    _m = '_' + str(max_size) if max_size else ''
     _e = 'csv' if extension is None else extension
     return '{}{}.{}'.format(image_name, _m, _e)
 
