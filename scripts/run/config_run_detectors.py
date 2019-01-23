@@ -48,8 +48,8 @@ parser.add_argument('--max_size',
 
 parser.add_argument('--detectors',
     nargs='+',
-    help='Choose which detectors should be run. Default: (sift, tilde)',
-    default=['sift', 'tilde'])
+    help='Choose which detectors should be run. Default: (sift, tilde, lift)',
+    default=['sift', 'tilde', 'lift'])
     # default=['tilde', 'tcovdet'])
 
 parser.add_argument('--max_num_images',
@@ -123,6 +123,24 @@ parser.add_argument('--main_tilde',
     help='Name of the main python file to start the model. Default: use_tilde.sh',
     default='use_tilde.sh')
 
+# LIFT
+parser.add_argument('--root_dir_lift',
+    type=str,
+    help='Path to the root folder of the TCovDet module relative from ROOT_DIR. ' +
+    'Default: det_lift',
+    default='pipe_lift')
+
+parser.add_argument('--tmp_dir_lift',
+    type=str,
+    help='Path to temporary directory to save intermediate results. Relative ' +
+    'to ROOT_DIR_LIFT. Default: tmp',
+    default='tmp')
+
+parser.add_argument('--main_lift',
+    type=str,
+    help='Name of the main python file to start the model. Default: use_lift.py',
+    default='use_lift.py')
+
 # TCovDet
 parser.add_argument('--root_dir_tcovdet',
     type=str,
@@ -159,6 +177,9 @@ def get_config(argv):
 
     config['root_dir_tilde'] = os.path.join(config['root_dir'], config['root_dir_tilde'])
     config['tmp_dir_tilde'] = os.path.join(config['root_dir_tilde'], config['tmp_dir_tilde'])
+
+    config['root_dir_lift'] = os.path.join(config['root_dir'], config['root_dir_lift'])
+    config['tmp_dir_lift'] = os.path.join(config['root_dir_lift'], config['tmp_dir_lift'])
 
     config['root_dir_tcovdet'] = os.path.join(config['root_dir'], config['root_dir_tcovdet'])
     config['tmp_dir_tcovdet'] = os.path.join(config['root_dir_tcovdet'], config['tmp_dir_tcovdet'])

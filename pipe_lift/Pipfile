@@ -8,6 +8,8 @@ tensorflow = "==1.4"
 opencv-python = "==3.4.3.18"
 "h5py" = "*"
 tqdm = "==4.28.1"
+scipy = "*"
+six = "*"
 
 [dev-packages]
 
