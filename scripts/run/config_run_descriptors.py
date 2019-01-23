@@ -143,6 +143,26 @@ parser.add_argument('--main_doap',
     help='Name of the main python file to start the model. Default: use_doap.py',
     default='use_doap.py')
 
+# LIFT
+parser.add_argument('--root_dir_lift',
+    type=str,
+    help='Path to the root folder of the TFeat module relative from ROOT_DIR. ' +
+    'Default: pipe_lift',
+    default='pipe_lift')
+
+parser.add_argument('--tmp_dir_lift',
+    type=str,
+    help='Path to temporary directory to save intermediate results. Relative ' +
+    'to ROOT_DIR_LIFT. Default: tmp',
+    default='tmp')
+
+parser.add_argument('--main_lift',
+    type=str,
+    help='Name of the main python file to start the model. Default: use_lift.py',
+    default='use_lift.py')
+
+
+
 def get_config(argv):
     config, _ = parser.parse_known_args()
     config = vars(config)
@@ -164,6 +184,9 @@ def get_config(argv):
 
     config['root_dir_doap'] = os.path.join(config['root_dir'], config['root_dir_doap'])
     config['tmp_dir_doap'] = os.path.join(config['root_dir_doap'], config['tmp_dir_doap'])
+
+    config['root_dir_lift'] = os.path.join(config['root_dir'], config['root_dir_lift'])
+    config['tmp_dir_lift'] = os.path.join(config['root_dir_lift'], config['tmp_dir_lift'])
 
     return config
 

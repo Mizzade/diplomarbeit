@@ -208,122 +208,90 @@ def saveKpListToTxt(kp_list, orig_kp_file_name, kp_file_name):
 # Deactivates compiler warnings for tensorflow cpu
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-# def compute(
-#     model: Any,
-#     image: str,
-#     network_cfg: Dict,
-#     size: int=None) -> Tuple[List[cv2.KeyPoint], np.array, np.array]:
-#     """Computes the keypoints and descriptors for a given input image.
-#     Draws keypoints into the image.
-#     Returns keypoints, descriptors and image with keypoints.
-
-#     Arguments:
-#         model Any | None -- The lift keypoint detector and descriptor.
-#         image {np.array} -- Path to the image.
-#         size {None} -- Maximal dimension of image. Default: None.
-
-#     Returns:
-#         Tuple[List[cv2.KeyPoint], np.array, np.array, None] -- Returns tuple (keypoints, descriptors, image with keypoints, image of heatmap).
-#     """
-#     """Wrapper function for tf-lift.
-#     1) Create a temporay folder `tmp` to save intermediate output.
-#     2a) Load and smart scale the image.
-#     2b) Save the resulting image in `tmp`.
-#     3a) Subprocess call to tf-lift for keypoints. Save output in `tmp`.
-#     3b) Subprocess call for tf-lift orientation. Save output in `tmp`.
-#     3c) Subprocess call for tf-lift descriptors Save output in `tmp`.
-#     4a) Load final .h5 output file from tf-lift, extract keypoints and
-#         descriptors.
-#     4b) Convert keypoints to list of cv2.Keypoint.
-#     4c) Draw list of cv2.KeyPoints into image.
-#     5) Return KeyPoint list, descriptors and image with KeyPoints.
-#     """
-#     lift_path = os.path.join(network_cfg['dir'], 'tf-lift')
-#     # 1)
-#     path_tmp = network_cfg['tmp_dir']
-#     if not os.path.exists(path_tmp):
-#         os.makedirs(path_tmp, exist_ok=True)
-
-#     # 2a) tf-lift wants a colored image.
-#     img = cv2.imread(image)
-#     img = io_utils.smart_scale(img, size, prevent_upscaling=True) if size is not None else img
-
-#     # Build paths
-#     path_tmp_img = os.path.join(path_tmp, 'tmp_img.png')
-#     path_tmp_kpts = os.path.join(path_tmp, 'tmp_kpts.txt')
-#     path_tmp_ori = os.path.join(path_tmp, 'tmp_ori.txt')
-#     path_tmp_desc = os.path.join(path_tmp, 'tmp_desc.h5')
-
-#     # 2b)
-#     cv2.imwrite(path_tmp_img, img)
-
-#     # 3a) Keypoints
-#     subprocess.check_call(['python',
-#         'main.py',
-#         '--subtask=kp',
-#         '--test_img_file={}'.format(path_tmp_img),
-#         '--test_out_file={}'.format(path_tmp_kpts)],
-#         cwd=lift_path)
-
-#     # 3b) Orientation
-#     subprocess.check_call(['python',
-#         'main.py',
-#         '--subtask=ori',
-#         '--test_img_file={}'.format(path_tmp_img),
-#         '--test_out_file={}'.format(path_tmp_ori),
-#         '--test_kp_file={}'.format(path_tmp_kpts)],
-#         cwd=lift_path)
-
-#     # 3c) Descriptors
-#     subprocess.check_call(['python',
-#         'main.py',
-#         '--subtask=desc',
-#         '--test_img_file={}'.format(path_tmp_img),
-#         '--test_out_file={}'.format(path_tmp_desc),
-#         '--test_kp_file={}'.format(path_tmp_ori)],
-#         cwd=lift_path)
-#     # 4a)
-#     #filename = os.path.join('tmp', 'desc.h5')
-#     f = h5py.File(path_tmp_desc, 'r')
-#     desc = np.array(list(f['descriptors']))
-#     keyp = np.array(list(f['keypoints']))
-
-#     # 4b)
-#     kp = [cv2.KeyPoint(x=x[0], y=x[1], _size=2*x[2], _angle=x[3],
-#         _response=x[4], _octave=np.int32(x[5]), _class_id=-1) for x in keyp]
-
-#     # 4c)
-#     img_kp = cv2.drawKeypoints(img, kp, None)
-
-#     # 5)
-#     return (kp, desc, img_kp, None)
-
-def compute():
+def compute(image_file_path:str, config:Dict, model:Any) -> np.array:
     """
-    1) Load .csv file mit keypoints as cv2.KeyPoint list.
-    2) Save keypoint list to text in `tmp` dir.
-    3) Compute orientation
-    4) compute descriptors
-    5) Load descriptors as numpy
+    Computes the descriptors for all keypoints in a keypoint .csv file.
+    1) Check if keypoint file exisits.
+    2) Load and scale image.
+    2b) Save image in tmp dir.
+    3) Load .csv file mit keypoints as cv2.KeyPoint list.
+    4) ...and convert  it with correct format for LIFT.
+    5) Save keypoint list to text in `tmp` dir as .txt
+    6) Compute orientation
+    7) compute descriptors
+    8) Load descriptors as numpy
     """
+    # Build paths
+    lift_path = os.path.join(config['root_dir_lift'], 'tf-lift')
+    path_tmp_img = os.path.join(config['tmp_dir_lift'], 'tmp_img.png')
+    path_tmp_kpts = os.path.join(config['tmp_dir_lift'], 'tmp_kpts.txt')
+    path_tmp_ori = os.path.join(config['tmp_dir_lift'], 'tmp_ori.txt')
+    path_tmp_desc = os.path.join(config['tmp_dir_lift'], 'tmp_desc.h5')
 
-     # 3b) Orientation
-    subprocess.check_call(['python',
-        'main.py',
-        '--subtask=ori',
-        '--test_img_file={}'.format(path_tmp_img),
-        '--test_out_file={}'.format(path_tmp_ori),
-        '--test_kp_file={}'.format(path_tmp_kpts)],
-        cwd=lift_path)
+    # Infer the path to the corresponding csv file for the keypoints.
+    collection_name, set_name, image_name, _ = io_utils.get_path_components(image_file_path)
 
-    # 3c) Descriptors
-    subprocess.check_call(['python',
-        'main.py',
-        '--subtask=desc',
-        '--test_img_file={}'.format(path_tmp_img),
-        '--test_out_file={}'.format(path_tmp_desc),
-        '--test_kp_file={}'.format(path_tmp_ori)],
-        cwd=lift_path)
+    # find path to keypoints file
+    keypoints_file_path = io_utils.build_output_path(
+        config['output_dir'],
+        collection_name,
+        set_name,
+        'keypoints',
+        config['detector_name'],
+        image_name,
+        max_size=config['max_size'])
+
+    # 1) Check if keypoint file exists.
+    if not os.path.isfile(keypoints_file_path):
+        print('Could not find keypoints in path: {}\n.Skip'.format(keypoints_file_path))
+        return None
+
+    # 2) Load and scale image
+    img = cv2.imread(image_file_path, 0)
+    img = io_utils.smart_scale(img, config['max_size'], prevent_upscaling=True) if config['max_size'] is not None else img
+
+    # 2b) Write image in tmp dir
+    cv2.imwrite(path_tmp_img, img)
+
+    # 3) Load .csv file mit keypoints as cv2.KeyPoint list.
+    kpts_numpy = io_utils.get_keypoints_from_csv(keypoints_file_path)
+
+    # Convert numpy array to List of cv2.KeyPoint list
+    kpts_cv2 = io_utils.numpy_to_cv2_kp(kpts_numpy)
+
+    # 4) Convert to LIFT format
+    kpts_lift = opencv_kp_list_2_kp_list(kpts_cv2)
+
+    # 5) Save keypoint list as .txt file for LIFT
+    saveKpListToTxt(kpts_lift, None, path_tmp_kpts)
+
+    try:
+        # 6) Orientation
+        subprocess.check_call(['python',
+            'main.py',
+            '--subtask=ori',
+            '--test_img_file={}'.format(path_tmp_img),
+            '--test_out_file={}'.format(path_tmp_ori),
+            '--test_kp_file={}'.format(path_tmp_kpts)],
+            cwd=lift_path)
+
+        # 7) Descriptors
+        subprocess.check_call(['python',
+            'main.py',
+            '--subtask=desc',
+            '--test_img_file={}'.format(path_tmp_img),
+            '--test_out_file={}'.format(path_tmp_desc),
+            '--test_kp_file={}'.format(path_tmp_ori)],
+            cwd=lift_path)
+    except Exception:
+        print('Could not compute descriptros for image {} at max_size {}. Skip.'.format(image_file_path, config['max_size']))
+        return None
+
+    # 8)
+    f = h5py.File(path_tmp_desc, 'r')
+    descriptors = np.array(list(f['descriptors']))
+
+    return descriptors
 
 
 
@@ -404,11 +372,11 @@ def main(argv: Tuple[str]) -> None:
                 io_utils.save_detector_output(file, config['detector_name'], config, keypoints,
                     keypoints_image, heatmap_image)
 
-    # elif config['task'] == 'descriptors':
-    #     for file in tqdm(file_list):
-    #         descriptors = compute(file, config, model)
-    #         io_utils.save_descriptor_output(file, config, descriptors)
-
+    elif config['task'] == 'descriptors':
+        for file in tqdm(file_list):
+            descriptors = compute(file, config, model)
+            if descriptors is not None:
+                io_utils.save_descriptor_output(file, config, descriptors)
 
 if __name__ == '__main__':
     argv = sys.argv[1:]
