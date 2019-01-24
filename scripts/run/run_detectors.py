@@ -36,8 +36,8 @@ def start_subprocess(config:Dict, file_list:List[str]) -> None:
             print('Reason:\n', e)
             # You have to give the rights back to USER, since Docker writes to root
             # sudo chown -R $USER outputs
-            env = os.environ.copy()
-            subprocess.check_call(['sudo', 'chown', '-R', env['USER'], config['output_dir']])
+        env = os.environ.copy()
+        subprocess.check_call(['sudo', 'chown', '-R', env['USER'], config['output_dir']])
 
     else:
         try:

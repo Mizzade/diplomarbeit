@@ -127,7 +127,7 @@ parser.add_argument('--main_tilde',
 parser.add_argument('--root_dir_lift',
     type=str,
     help='Path to the root folder of the TCovDet module relative from ROOT_DIR. ' +
-    'Default: det_lift',
+    'Default: pipe_lift',
     default='pipe_lift')
 
 parser.add_argument('--tmp_dir_lift',
