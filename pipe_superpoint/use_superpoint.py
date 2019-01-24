@@ -166,7 +166,7 @@ def kps2KeyPoints(kps: np.array) -> List[cv2.KeyPoint]:
         List[cv2.KeyPoint] -- List of N openCV's KeyPoint objects.
     """
 
-    return [cv2.KeyPoint(x[0], x[1], x[2]) for x in kps]
+    return [cv2.KeyPoint(x[0], x[1], 1) for x in kps]
 
 def scale_kps(model: SuperPointFrontend, image: np.array, kps: np.array) -> np.array:
     """Scales keypoints `kps` up to match the image's dimensions.
@@ -186,64 +186,6 @@ def scale_kps(model: SuperPointFrontend, image: np.array, kps: np.array) -> np.a
 
     scaling = np.array([_fx, _fy, 1])
     return scaling * kps
-
-# def compute(
-#     model: SuperPointFrontend,
-#     image: str,
-#     size: int=None) -> Tuple[List[cv2.KeyPoint], np.array, np.array, np.array]:
-#     """Computes the keypoints and descriptors for a given input image.
-#     Draws keypoints into the image.
-#     Returns keypoints, descriptors and image with keypoints.
-
-#     Arguments:
-#         model {superpoint_frontend.SuperPointFrontend} -- The sift keypoint detector and descriptor.
-#         image {np.array} -- Path to the image.
-#         size {None} -- Maximal dimension of image. Default: None.
-
-#     Returns:
-#         Tuple[List[cv2.KeyPoint], np.array, np.array, None] -- Returns tuple (keypoints, descriptors, image with keypoints, image of heatmap).
-#     """
-
-#     img = cv2.imread(image, 0)
-#     img = io_utils.smart_scale(img, size, prevent_upscaling=True) if size is not None else img
-
-#     # Adjust values on the fly.
-#     model.height = img.shape[0]
-#     model.width = img.shape[1]
-
-#     _kp, desc, heatmap = detectAndCompute(model, img)
-#     kp = kps2KeyPoints(_kp)
-#     img_kp = cv2.drawKeypoints(img, kp, None)
-#     return (kp, desc, img_kp, heatmap)
-
-# def main(argv: Tuple[str, str,str]) -> None:
-#     """Runs the SuperPoint model and saves the results.
-
-#     Arguments:
-#         argv {Tuple[str, str, str]} -- List of parameters. Expects exactly three
-#             parameters. The first one contains json-fied network information,
-#             the second contains the json-fied config object and the third is
-#             the json-fied file list with all files to be processed.
-#     """
-
-#     project_name = 'superpoint'
-#     detector_name = 'SuperPoint'
-#     descriptor_name = 'SuperPoint'
-
-#     network = json.loads(argv[0])
-#     config = json.loads(argv[1])
-#     file_list = json.loads(argv[2])
-#     model = load_superpoint()
-
-#     for file in tqdm(file_list):
-#         io_utils.save_output(
-#             file,
-#             compute(model, file, config['size']),
-#             config['output_dir'],
-#             detector_name,
-#             descriptor_name,
-#             project_name,
-#             config['size'])
 
 def detect(
     image_path:str,
