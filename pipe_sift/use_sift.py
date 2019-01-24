@@ -52,7 +52,7 @@ def compute(image_file_path:str, config:Dict, model:Any) -> np.array:
 
     return desc
 
-def detect(image_path:str, config:Dict, detector:Any) -> None:
+def detect(image_path:str, config:Dict, detector:Any) -> Tuple[List, np.array, None]:
     """Detects keypoints for a given input image.
     Draws keypoints into the image.
     Returns keypoints, heatmap and image with keypoints.
