@@ -2,12 +2,14 @@ from superpoint_frontend import SuperPointFrontend
 import numpy as np
 import torch
 import cv2
-from typing import List, Tuple
+from typing import List, Tuple, Dict, Any
 import os
 import io_utils
 import sys
 import json
 from tqdm import tqdm
+import copy
+import pickle
 
 
 def load_superpoint(\
@@ -85,8 +87,9 @@ def detectAndCompute(model: SuperPointFrontend, image: np.array):
     img = normalize_image(img)
 
     # pts: [3 x N] = [x, y, heatmap[x, y]]^T
+    # heatmap[x, y] is superpoint's confidence of this keypoint.
     # desc = [256 x N]
-    # heatmpa = [width x height]
+    # heatmap = [width x height]
     pts, desc, heatmap = model.run(img)
 
     return pts.T, desc.T, heatmap
@@ -184,25 +187,84 @@ def scale_kps(model: SuperPointFrontend, image: np.array, kps: np.array) -> np.a
     scaling = np.array([_fx, _fy, 1])
     return scaling * kps
 
-def compute(
+# def compute(
+#     model: SuperPointFrontend,
+#     image: str,
+#     size: int=None) -> Tuple[List[cv2.KeyPoint], np.array, np.array, np.array]:
+#     """Computes the keypoints and descriptors for a given input image.
+#     Draws keypoints into the image.
+#     Returns keypoints, descriptors and image with keypoints.
+
+#     Arguments:
+#         model {superpoint_frontend.SuperPointFrontend} -- The sift keypoint detector and descriptor.
+#         image {np.array} -- Path to the image.
+#         size {None} -- Maximal dimension of image. Default: None.
+
+#     Returns:
+#         Tuple[List[cv2.KeyPoint], np.array, np.array, None] -- Returns tuple (keypoints, descriptors, image with keypoints, image of heatmap).
+#     """
+
+#     img = cv2.imread(image, 0)
+#     img = io_utils.smart_scale(img, size, prevent_upscaling=True) if size is not None else img
+
+#     # Adjust values on the fly.
+#     model.height = img.shape[0]
+#     model.width = img.shape[1]
+
+#     _kp, desc, heatmap = detectAndCompute(model, img)
+#     kp = kps2KeyPoints(_kp)
+#     img_kp = cv2.drawKeypoints(img, kp, None)
+#     return (kp, desc, img_kp, heatmap)
+
+# def main(argv: Tuple[str, str,str]) -> None:
+#     """Runs the SuperPoint model and saves the results.
+
+#     Arguments:
+#         argv {Tuple[str, str, str]} -- List of parameters. Expects exactly three
+#             parameters. The first one contains json-fied network information,
+#             the second contains the json-fied config object and the third is
+#             the json-fied file list with all files to be processed.
+#     """
+
+#     project_name = 'superpoint'
+#     detector_name = 'SuperPoint'
+#     descriptor_name = 'SuperPoint'
+
+#     network = json.loads(argv[0])
+#     config = json.loads(argv[1])
+#     file_list = json.loads(argv[2])
+#     model = load_superpoint()
+
+#     for file in tqdm(file_list):
+#         io_utils.save_output(
+#             file,
+#             compute(model, file, config['size']),
+#             config['output_dir'],
+#             detector_name,
+#             descriptor_name,
+#             project_name,
+#             config['size'])
+
+def detect(
+    image_path:str,
+    config:Dict,
     model: SuperPointFrontend,
-    image: str,
     size: int=None) -> Tuple[List[cv2.KeyPoint], np.array, np.array, np.array]:
     """Computes the keypoints and descriptors for a given input image.
     Draws keypoints into the image.
     Returns keypoints, descriptors and image with keypoints.
 
     Arguments:
-        model {superpoint_frontend.SuperPointFrontend} -- The sift keypoint detector and descriptor.
-        image {np.array} -- Path to the image.
-        size {None} -- Maximal dimension of image. Default: None.
+        image_path {np.array} -- Path to the image.
+        model {superpoint_frontend.SuperPointFrontend} -- The SuperPoint keypoint detector and descriptor.
+        config {Dict} -- Configuration object. See config_run_detector.py
 
     Returns:
         Tuple[List[cv2.KeyPoint], np.array, np.array, None] -- Returns tuple (keypoints, descriptors, image with keypoints, image of heatmap).
     """
 
-    img = cv2.imread(image, 0)
-    img = io_utils.smart_scale(img, size, prevent_upscaling=True) if size is not None else img
+    img = cv2.imread(image_path, 0)
+    img = io_utils.smart_scale(img, config['max_size'], prevent_upscaling=True) if config['max_size'] is not None else img
 
     # Adjust values on the fly.
     model.height = img.shape[0]
@@ -213,34 +275,41 @@ def compute(
     img_kp = cv2.drawKeypoints(img, kp, None)
     return (kp, desc, img_kp, heatmap)
 
-def main(argv: Tuple[str, str,str]) -> None:
-    """Runs the SuperPoint model and saves the results.
+def main(argv: Tuple[str]) -> None:
+    """Runs the TILDE model and saves the results.
 
     Arguments:
-        argv {Tuple[str, str, str]} -- List of parameters. Expects exactly three
-            parameters. The first one contains json-fied network information,
-            the second contains the json-fied config object and the third is
-            the json-fied file list with all files to be processed.
+        argv {Tuple[str]} -- List of one parameters. There should be exactly
+            one parameter - the path to the config file inside the tmp dir.
+            This config file will be used to get all other information and
     """
+    if len(argv) <= 0:
+        raise RuntimeError("Missing argument <path_to_config_file>. Abort")
 
-    project_name = 'superpoint'
-    detector_name = 'SuperPoint'
-    descriptor_name = 'SuperPoint'
+    with open(argv[0], 'rb') as src:
+        config_file = pickle.load(src, encoding='utf-8')
 
-    network = json.loads(argv[0])
-    config = json.loads(argv[1])
-    file_list = json.loads(argv[2])
+    _config, file_list = config_file
+
+    # Since we cannot split detector and descriptor in the superpoint model,
+    # we handle SuperPoint as a detector and add the property `descriptor_name`
+    # with value 'superpoint' to be able to save the descriptors.
+    # Note, that superpoint can only handle superpoint keypoints to generate
+    # descriptors, but the found keypoints can still be used by other descriptors.
+    config = copy.deepcopy(_config)
+    config['descriptor_name'] = 'superpoint'
     model = load_superpoint()
 
-    for file in tqdm(file_list):
-        io_utils.save_output(
-            file,
-            compute(model, file, config['size']),
-            config['output_dir'],
-            detector_name,
-            descriptor_name,
-            project_name,
-            config['size'])
+    if config['task'] == 'keypoints':
+        for file in tqdm(file_list):
+            keypoints, descriptors, keypoints_image, heatmap_image = detect(file, config, model)
+
+            # Save detector output
+            io_utils.save_detector_output(file, config['detector_name'], config, keypoints,
+                keypoints_image, heatmap_image)
+
+            # Save descriptor output
+            io_utils.save_descriptor_output(file, config, descriptors)
 
 if __name__ == "__main__":
     argv = sys.argv[1:]

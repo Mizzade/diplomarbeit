@@ -49,7 +49,7 @@ parser.add_argument('--max_size',
 parser.add_argument('--detectors',
     nargs='+',
     help='Choose which detectors should be run. Default: (sift, tilde, lift)',
-    default=['sift', 'tilde', 'lift'])
+    default=['sift', 'tilde', 'lift', 'superpoint'])
     # default=['tilde', 'tcovdet'])
 
 parser.add_argument('--max_num_images',
@@ -157,7 +157,25 @@ parser.add_argument('--tmp_dir_tcovdet',
 parser.add_argument('--main_tcovdet',
     type=str,
     help='Name of the main python file to start the model. Default: use_tcovdet.py',
-    default='use_tcofdet.py')
+    default='use_tcovdet.py')
+
+# SuperPoint
+parser.add_argument('--root_dir_superpoint',
+    type=str,
+    help='Path to the root folder of the TCovDet module relative from ROOT_DIR. ' +
+    'Default: pipe_superpoint',
+    default='pipe_superpoint')
+
+parser.add_argument('--tmp_dir_superpoint',
+    type=str,
+    help='Path to temporary directory to save intermediate results. Relative ' +
+    'to ROOT_DIR_SUPERPOINT. Default: tmp',
+    default='tmp')
+
+parser.add_argument('--main_superpoint',
+    type=str,
+    help='Name of the main python file to start the model. Default: use_superpoint.py',
+    default='use_superpoint.py')
 
 def get_config(argv):
     config, _ = parser.parse_known_args()
@@ -183,6 +201,9 @@ def get_config(argv):
 
     config['root_dir_tcovdet'] = os.path.join(config['root_dir'], config['root_dir_tcovdet'])
     config['tmp_dir_tcovdet'] = os.path.join(config['root_dir_tcovdet'], config['tmp_dir_tcovdet'])
+
+    config['root_dir_superpoint'] = os.path.join(config['root_dir'], config['root_dir_superpoint'])
+    config['tmp_dir_superpoint'] = os.path.join(config['root_dir_superpoint'], config['tmp_dir_superpoint'])
 
     return config
 
