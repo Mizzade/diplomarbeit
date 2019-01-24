@@ -22,6 +22,7 @@ def compute(image_file_path:str, config:Dict, model:Any) -> np.array:
     """
 
     # Load image
+    img = cv2.imread(image_file_path, 0)
     img = io_utils.smart_scale(img, config['max_size'], prevent_upscaling=True) if config['max_size'] is not None else img
 
     # Infer the path to the corresponding csv file for the keypoints.
@@ -35,7 +36,7 @@ def compute(image_file_path:str, config:Dict, model:Any) -> np.array:
         'keypoints',
         config['detector_name'],
         image_name,
-        config['max_size'])
+        max_size=config['max_size'])
 
     if not os.path.isfile(keypoints_file_path):
         print('Could not find keypoints in path: {}\n.Skip'.format(keypoints_file_path))
