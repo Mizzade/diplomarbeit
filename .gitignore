@@ -26,7 +26,11 @@
 /det_tilde/tmp
 
 # Outputs
-/outputs
+/outputs/eisert
+/outputs/webcam
+/outputs/example
+/outputs_old
+/outputs_test
 
 # Evaluation
 # /evaluation/detectors/outputs
