@@ -58,3 +58,6 @@ Manche Modell können nur Bilder bis zur einer bestimmten Größe handhaben, bev
 ### Starten der Detektoren und Deskriptoren
 Siehe dazu [hier](./scripts/run/README.md)
 
+### Ausgabe der Detektoren und Deskriptoren
+Siehe dazu [hier](./outputs/README.md)
+
