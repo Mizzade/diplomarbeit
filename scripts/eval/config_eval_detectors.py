@@ -84,6 +84,11 @@ parser.add_argument('--dry',
     help='If set, only print config, but do not run models. Default: False',
     default=False)
 
+parser.add_argument('--epsilons',
+    nargs='+',
+    help='Set the maximal distance in pixels for two keypoints in an image ' +
+    'pair in the webcam set to be treatet as equal. Default: [1]',
+    default=[1])
 
 def get_config(argv):
     config, _ = parser.parse_known_args()
