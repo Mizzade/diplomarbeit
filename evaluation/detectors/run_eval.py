@@ -31,6 +31,7 @@ def build_list_of_evaluations(config:Dict, file_system:Dict) -> None:
 
 
     for collection_name in config['collection_names']:
+        set_names = [s for s in file_system[collection_name] if not s.startswith('_')]
 
         # Find number of found keypoints for each file in collection.
         list_of_evaluations.append(Evaluater(
@@ -38,27 +39,42 @@ def build_list_of_evaluations(config:Dict, file_system:Dict) -> None:
             config,
             file_system,
             efunc.eval__num_kpts,
-            collection_name=collection_name))
+            eval_config={
+                'collection_name': collection_name
+            }))
 
         # Find number of maximal possible equal keypoints
-        for set_name in [s for s in file_system[collection_name] if not s.startswith('_')]:
+        for set_name in set_names:
             list_of_evaluations.append(Evaluater(
-                [collection_name, set_name, 'max_num_equal_kpts'],
+                [collection_name, set_name, 'max_num_matching_kpts'],
                 config,
                 file_system,
                 efunc.eval__num_max_equal_kpts,
-                collection_name=collection_name,
-                set_name=set_name
-            ))
+                eval_config={
+                    'collection_name': collection_name,
+                    'set_name': set_name
+                }))
 
-
-
+        # Find number of equal kpts for all image pairs in each set.
+        for set_name in set_names:
+            for epsilon in config['epsilons']:
+                list_of_evaluations.append(Evaluater(
+                    [collection_name, set_name, 'num_matching_kpts_with_e_{}'.format(epsilon)],
+                    config,
+                    file_system,
+                    efunc.eval__num_matching_kpts_with_e,
+                    eval_config={
+                        'collection_name': collection_name,
+                        'set_name': set_name,
+                        'epsilon': epsilon
+                    }
+                ))
 
     return list_of_evaluations
 
 
 def run_evaluations(list_of_evaluations:List[Evaluater]) -> None:
-    for e in list_of_evaluations:
+    for e in tqdm(list_of_evaluations):
         e.run()
 
 

@@ -16,15 +16,13 @@ class Evaluater():
         config:Dict,
         file_system: Dict,
         eval_func:Callable,
-        collection_name:str=None,
-        set_name:str=None,
+        eval_config:Dict=None,
         requirements:Dict=None) -> None:
 
         self.config = config
         self.file_system = file_system
         self.eval_func = eval_func
-        self.collection_name = collection_name
-        self.set_name = set_name
+        self.eval_config = eval_config
         self.requirements = requirements
         self.target_keypath = target_keypath # Where to save the data in target dict.
 
