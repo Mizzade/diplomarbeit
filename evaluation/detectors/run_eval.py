@@ -29,14 +29,28 @@ def eval__num_kpts(ev:Evaluater) -> pd.DataFrame:
 def build_list_of_evaluations(config:Dict, file_system:Dict) -> None:
     list_of_evaluations = []
 
-    # Find number of found keypoints for each file in collection.
+
     for collection_name in config['collection_names']:
+
+        # Find number of found keypoints for each file in collection.
         list_of_evaluations.append(Evaluater(
             [collection_name, 'num_kpts'],
             config,
             file_system,
             efunc.eval__num_kpts,
             collection_name=collection_name))
+
+        # Find number of maximal possible equal keypoints
+        for set_name in [s for s in file_system[collection_name] if not s.startswith('_')]:
+            list_of_evaluations.append(Evaluater(
+                [collection_name, set_name, 'max_num_equal_kpts'],
+                config,
+                file_system,
+                efunc.eval__num_max_equal_kpts,
+                collection_name=collection_name,
+                set_name=set_name
+            ))
+
 
 
 

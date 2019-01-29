@@ -10,12 +10,14 @@ import pickle
 import util_functions as util
 from Evaluater import Evaluater
 
-def eval__num_kpts(ev:Evaluater) -> pd.DataFrame:
+def eval__num_kpts(ev:Evaluater, obj:Dict) -> pd.DataFrame:
     """Returns pandas dataframe containing the number of found keypoints for
     each file in ev.file_list
 
     Arguments:
         ev {Evaluater} -- Evaluater object
+        obj {Dict} -- The target object, where the output of this function will
+        be saved to.
 
     Returns:
         pd.DataFrame -- DataFrame with keypoint list as index, and number of
@@ -35,4 +37,23 @@ def eval__num_kpts(ev:Evaluater) -> pd.DataFrame:
         output.loc[file_path][0] = df.shape[0]
 
     return output
+
+def eval__num_max_equal_kpts(ev:Evaluater, obj:Dict) -> pd.DataFrame:
+    file_list = ev.file_system[ev.collection_name][ev.set_name]
+
+    output = pd.DataFrame(
+        data=np.zeros((len(file_list), len(file_list)), dtype='int32'),
+        index=file_list,
+        columns=file_list
+    )
+
+    df_num_kpts = obj[ev.collection_name]['num_kpts']
+
+    for i in file_list:
+        for j in file_list:
+            output.loc[i][j] = np.min([df_num_kpts.loc[i][0], df_num_kpts.loc[j][0]])
+
+    return output
+
+
 

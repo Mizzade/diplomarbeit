@@ -33,7 +33,7 @@ class Evaluater():
 
     def run(self):
         obj = self._load_data()
-        data = self.eval_func(self)
+        data = self.eval_func(self, obj)
         self._insert_key_and_value(obj, data)
         self._save_data(obj)
 
@@ -81,7 +81,7 @@ class Evaluater():
                 _target =_target[key]
             except KeyError:
                     _target[key] = {}
-                    _target = target[key]
+                    _target = _target[key]
 
         _target[self.target_keypath[-1]] = value
 
