@@ -58,17 +58,21 @@ def build_list_of_evaluations(config:Dict, file_system:Dict) -> None:
         # Find number of equal kpts for all image pairs in each set.
         for set_name in set_names:
             for epsilon in config['epsilons']:
-                list_of_evaluations.append(Evaluater(
-                    [collection_name, set_name, 'num_matching_kpts_with_e_{}'.format(epsilon)],
-                    config,
-                    file_system,
-                    efunc.eval__num_matching_kpts_with_e,
-                    eval_config={
-                        'collection_name': collection_name,
-                        'set_name': set_name,
-                        'epsilon': epsilon
-                    }
-                ))
+                for i in file_system[collection_name][set_name]:
+                    for j in file_system[collection_name][set_name]:
+                        list_of_evaluations.append(Evaluater(
+                            [collection_name, set_name, 'num_matching_kpts_with_e_{}'.format(epsilon)],
+                            config,
+                            file_system,
+                            efunc.eval__num_matching_kpts_with_e,
+                            eval_config={
+                                'collection_name': collection_name,
+                                'set_name': set_name,
+                                'epsilon': epsilon,
+                                'i': i,
+                                'j': j
+                            }
+                        ))
 
     return list_of_evaluations
 

@@ -63,29 +63,28 @@ def eval__num_matching_kpts_with_e(ev:Evaluater, obj:Dict) -> pd.DataFrame:
     set_name = ev.eval_config['set_name']
     file_list = ev.file_system[collection_name][set_name]
     epsilon = ev.eval_config['epsilon']
+    i = ev.eval_config['i']
+    j = ev.eval_config['j']
 
-    output = pd.DataFrame(
-        data=np.zeros((len(file_list), len(file_list)), dtype='int32'),
-        index=file_list,
-        columns=file_list)
+    try:
+        output = obj[collection_name][set_name]['num_matching_kpts_with_e_{}'.format(epsilon)]
+    except KeyError:
+        output = pd.DataFrame(
+            data=np.zeros((len(file_list), len(file_list)), dtype='int32'),
+            index=file_list,
+            columns=file_list)
 
-    eps = np.sqrt(2 * epsilon * epsilone)
+    eps = np.sqrt(2 * epsilon * epsilon)
 
-    for i in file_list:
-        kpts_1 = pd.read_csv(i, sep=',', comment='#').values
-        for j in file_list:
-            max_num_equal_kpts = obj[collection_name][set_name]['max_num_matching_kpts'].loc[i][j]
-            kpts_2 = pd.read_csv(j, sep=',', comment='#').values
+    kpts_1 = pd.read_csv(i, sep=',', comment='#').values
+    kpts_2 = pd.read_csv(j, sep=',', comment='#').values
+    max_num_equal_kpts = obj[collection_name][set_name]['max_num_matching_kpts'].loc[i][j]
 
-            distance = np.sqrt(np.sum((kpts_1[:, np.newaxis] - kpts_2) ** 2, axis=2))
-            distance[distance <= eps] = 1
-            distance[distance > eps] = 0
-            num_kpts = np.clip(np.sum(np.max(distance, axis=1)), 0, max_num_equal_kpts)
+    distance = np.sqrt(np.sum((kpts_1[:, np.newaxis] - kpts_2) ** 2, axis=2))
+    distance[distance <= eps] = 1
+    distance[distance > eps] = 0
+    num_kpts = np.clip(np.sum(np.max(distance, axis=1)), 0, max_num_equal_kpts)
 
-            output.loc[i][j] = num_kpts
+    output.loc[i][j] = num_kpts
 
     return output
-
-
-
-
