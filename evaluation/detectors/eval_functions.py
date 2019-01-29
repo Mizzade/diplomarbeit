@@ -78,13 +78,31 @@ def eval__num_matching_kpts_with_e(ev:Evaluater, obj:Dict) -> pd.DataFrame:
 
     kpts_1 = pd.read_csv(i, sep=',', comment='#').values
     kpts_2 = pd.read_csv(j, sep=',', comment='#').values
-    max_num_equal_kpts = obj[collection_name][set_name]['max_num_matching_kpts'].loc[i][j]
+    max_num_matching_kpts = obj[collection_name][set_name]['max_num_matching_kpts'].loc[i][j]
 
     distance = np.sqrt(np.sum((kpts_1[:, np.newaxis] - kpts_2) ** 2, axis=2))
     distance[distance <= eps] = 1
     distance[distance > eps] = 0
-    num_kpts = np.clip(np.sum(np.max(distance, axis=1)), 0, max_num_equal_kpts)
+    num_kpts = np.clip(np.sum(np.max(distance, axis=1)), 0, max_num_matching_kpts)
 
     output.loc[i][j] = num_kpts
 
     return output
+
+def eval__perc_repeatability_for_image_pairs_with_e(ev:Evaluater, obj:Dict) -> pd.DataFrame:
+    collection_name = ev.eval_config['collection_name']
+    set_name = ev.eval_config['set_name']
+    epsilon = ev.eval_config['epsilon']
+
+    max_num_matching_kpts = obj[collection_name][set_name]['max_num_matching_kpts'].values
+    num_matching_kpts = obj[collection_name][set_name]['num_matching_kpts_with_e_{}'.format(epsilon)]
+
+    output = np.divide(
+        num_matching_kpts,
+        max_num_matching_kpts,
+        out=np.zeros_like(num_matching_kpts).astype('float32'),
+        where=max_num_matching_kpts!=0)
+
+    return output
+
+

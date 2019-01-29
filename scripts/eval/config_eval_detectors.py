@@ -90,6 +90,80 @@ parser.add_argument('--epsilons',
     'pair in the webcam set to be treatet as equal. Default: [1]',
     default=[1])
 
+# parser arguments for evaluation settings
+# Switch all evaluations ON/OFF:
+parser.add_argument('--eval__enable_all',
+    dest='eval__enable_all',
+    action='store_true',
+    help='Enable all evaluation tests. Default: True.',
+    default=True)
+
+parser.add_argument('--eval__disable_all',
+    dest='eval__enable_all',
+    action='store_false',
+    help='Disable all evaluation tests')
+
+
+# Number of found keypoints
+parser.add_argument('--eval__num_kpts_per_image',
+    dest='eval__num_kpts_per_image',
+    action='store_true',
+    help='Get the number of found keypoints for each image.',
+    default=None)
+
+parser.add_argument('--no-eval__num_kpts_per_image',
+    dest='eval__num_kpts_per_image',
+    action='store_false',
+    help='Do not get the number of found keypoints for each image.',
+    default=None)
+
+# maximal number of matching keypoints
+parser.add_argument('--eval__max_num_matching_kpts',
+    dest='eval__max_num_matching_kpts',
+    action='store_true',
+    help='Get the maximal possible number of matching keypoints between image pairs.',
+    default=None)
+
+parser.add_argument('--no-eval__max_num_matching_kpts',
+    dest='eval__max_num_matching_kpts',
+    action='store_false',
+    help='Do not get the maximal possible number of matching keypoints between image pairs',
+    default=None)
+
+# Actual number of matching keypoints for image pairs
+parser.add_argument('--eval__num_matching_kpts',
+    dest='eval__num_matching_kpts',
+    action='store_true',
+    help='Get the actual number of matching keypoints between image pairs.',
+    default=None)
+
+parser.add_argument('--no-eval__num_matching_kpts',
+    dest='eval__num_matching_kpts',
+    action='store_false',
+    help='Do not get the actual number of matching keypoints between image pairs',
+    default=None)
+
+# Percent of all possible matching keypoints, that are in fact matching.
+parser.add_argument('--eval__perc_matching_kpts',
+    dest='eval__perc_matching_kpts',
+    action='store_true',
+    help='Get the percent of matching keypoints between image pairs.',
+    default=None)
+
+parser.add_argument('--no-eval__perc_matching_kpts',
+    dest='eval__perc_matching_kpts',
+    action='store_false',
+    help='Do not get the percent of matching keypoints between image pairs',
+    default=None)
+
+
+table_eval_plan = {
+    'eval__num_kpts_per_image': True,
+    'eval__max_num_matching_kpts': True,
+    'eval__num_matching_kpts': True,
+    'eval__perc_matching_kpts': True
+}
+
 def get_config(argv):
     config, _ = parser.parse_known_args()
     config = vars(config)
@@ -104,5 +178,19 @@ def get_config(argv):
     config['tmp_dir_detector'] = os.path.join(config['root_dir_detector'], config['tmp_dir_detector'])
 
     config['kpts_file_format'] = '{}.csv' if config['max_size'] is None else '{}_{}.csv'
+
+    # If enable_all is not true, only take the evaluation tests, that have
+    # specifically been activated.
+    if not config['eval__enable_all']:
+        for key in list(table_eval_plan.keys()):
+            table_eval_plan[key] = config[key] if config[key] else False
+
+    if config['eval__enable_all']:
+        for key in list(table_eval_plan.keys()):
+            table_eval_plan[key] = False if config[key] == False else True
+
+    # Finally update the config object.
+    for key in list(table_eval_plan.keys()):
+        config[key] = table_eval_plan[key]
 
     return config

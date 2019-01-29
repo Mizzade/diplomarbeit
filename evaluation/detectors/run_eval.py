@@ -34,45 +34,65 @@ def build_list_of_evaluations(config:Dict, file_system:Dict) -> None:
         set_names = [s for s in file_system[collection_name] if not s.startswith('_')]
 
         # Find number of found keypoints for each file in collection.
-        list_of_evaluations.append(Evaluater(
-            [collection_name, 'num_kpts'],
-            config,
-            file_system,
-            efunc.eval__num_kpts,
-            eval_config={
-                'collection_name': collection_name
-            }))
-
-        # Find number of maximal possible equal keypoints
-        for set_name in set_names:
+        if config['eval__num_kpts_per_image']:
             list_of_evaluations.append(Evaluater(
-                [collection_name, set_name, 'max_num_matching_kpts'],
+                [collection_name, 'num_kpts'],
                 config,
                 file_system,
-                efunc.eval__num_max_equal_kpts,
+                efunc.eval__num_kpts,
                 eval_config={
-                    'collection_name': collection_name,
-                    'set_name': set_name
+                    'collection_name': collection_name
                 }))
 
+        # Find number of maximal possible equal keypoints
+        if config['eval__max_num_matching_kpts']:
+            for set_name in set_names:
+                list_of_evaluations.append(Evaluater(
+                    [collection_name, set_name, 'max_num_matching_kpts'],
+                    config,
+                    file_system,
+                    efunc.eval__num_max_equal_kpts,
+                    eval_config={
+                        'collection_name': collection_name,
+                        'set_name': set_name
+                    }))
+
         # Find number of equal kpts for all image pairs in each set.
-        for set_name in set_names:
-            for epsilon in config['epsilons']:
-                for i in file_system[collection_name][set_name]:
-                    for j in file_system[collection_name][set_name]:
-                        list_of_evaluations.append(Evaluater(
-                            [collection_name, set_name, 'num_matching_kpts_with_e_{}'.format(epsilon)],
-                            config,
-                            file_system,
-                            efunc.eval__num_matching_kpts_with_e,
-                            eval_config={
-                                'collection_name': collection_name,
-                                'set_name': set_name,
-                                'epsilon': epsilon,
-                                'i': i,
-                                'j': j
-                            }
-                        ))
+        if config['eval__max_num_matching_kpts']:
+            for set_name in set_names:
+                for epsilon in config['epsilons']:
+                    for i in file_system[collection_name][set_name]:
+                        for j in file_system[collection_name][set_name]:
+                            list_of_evaluations.append(Evaluater(
+                                [collection_name, set_name, 'num_matching_kpts_with_e_{}'.format(epsilon)],
+                                config,
+                                file_system,
+                                efunc.eval__num_matching_kpts_with_e,
+                                eval_config={
+                                    'collection_name': collection_name,
+                                    'set_name': set_name,
+                                    'epsilon': epsilon,
+                                    'i': i,
+                                    'j': j
+                                }
+                            ))
+
+        if config['eval__perc_matching_kpts']:
+            for set_name in set_names:
+                for epsilon in config['epsilons']:
+                    list_of_evaluations.append(Evaluater(
+                        [collection_name, set_name, 'perc_matching_kpts_for_e_{}'.format(epsilon)],
+                        config,
+                        file_system,
+                        efunc.eval__perc_repeatability_for_image_pairs_with_e,
+                        eval_config={
+                            'collection_name': collection_name,
+                            'set_name': set_name,
+                            'epsilon': epsilon,
+                        }
+                    ))
+
+
 
     return list_of_evaluations
 
