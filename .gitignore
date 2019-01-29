@@ -25,6 +25,9 @@
 # TILDE
 /det_tilde/tmp
 
+# Evaluation
+/evaluation/detectors/tmp
+
 # Outputs
 /outputs/eisert
 /outputs/webcam

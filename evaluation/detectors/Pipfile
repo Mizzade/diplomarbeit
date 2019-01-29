@@ -1,0 +1,16 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+opencv-python = "==3.4.2.17"
+opencv-contrib-python = "==3.4.2.17"
+tqdm = "==4.28.1"
+numpy = "==1.15.4"
+pandas = "==0.24.0"
+
+[dev-packages]
+
+[requires]
+python_version = "3.6"
