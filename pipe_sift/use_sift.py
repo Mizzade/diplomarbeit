@@ -68,7 +68,7 @@ def main(argv: Tuple[str]) -> None:
     """Runs the TILDE model and saves the results.
 
     Arguments:
-        argv {Tuple[str]} -- List of one parameters. There should be exactly
+        argv {Tuple[str]} -- List of one parameter. There should be exactly
             one parameter - the path to the config file inside the tmp dir.
             This config file will be used to get all other information and
     """
