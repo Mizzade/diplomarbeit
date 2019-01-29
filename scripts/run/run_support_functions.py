@@ -26,7 +26,7 @@ def get_collection_names(config:Dict, sorted_output:bool=True) -> List[str]:
     return collection_names
 
 def get_set_names(config:Dict, sorted_output:bool=True) -> List[str]:
-    """Given a list on collection within the config object, return all set names
+    """Given a list of collections within the config object, return all set names
     set by the user. If no set name was given, find all set names
     for all collections and return them as a list of strings.
     """
