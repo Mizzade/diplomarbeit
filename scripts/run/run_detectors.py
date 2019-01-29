@@ -6,7 +6,7 @@ import sys
 import json
 import argparse
 import pickle
-import config_run_detectors as ced
+import config_run_detectors as crd
 import run_support_functions as rsf
 
 def start_subprocess(config:Dict, file_list:List[str]) -> None:
@@ -53,7 +53,7 @@ def start_subprocess(config:Dict, file_list:List[str]) -> None:
     # Remove tmp dir
     rsf.remove_dir(config['tmp_dir_{}'.format(config['detector_name'])])
 
-def main(config):
+def main(config:Dict) -> None:
     file_list = rsf.get_file_list(config)
 
     for detector_name in config['detectors']:
@@ -66,7 +66,7 @@ def main(config):
 
 if __name__ == "__main__":
     argv = sys.argv[1:]
-    config = ced.get_config(argv)
+    config = crd.get_config(argv)
 
     if config['dry']:
         rsf.print_configuration(config)
