@@ -151,12 +151,30 @@ def build_list_of_evaluations(config:Dict, file_system:Dict) -> None:
 
 
         if config['eval__avg_max_num_matching_kpts_in_set']:
-            # TODO
-            pass
+            for set in set_names:
+                list_of_evaluations.append(Evaluater(
+                    [collection_name, set_name, 'avg_max_num_matching_kpts'],
+                    config,
+                    file_system,
+                    efunc.eval__avg_max_num_matching_kpts_in_set,
+                    eval_config={
+                        'collection_name': collection_name,
+                        'set_name': set_name
+                    }
+                ))
 
         if config['eval__std_max_num_matching_kpts_in_set']:
-            # TODO
-            pass
+            for set in set_names:
+                list_of_evaluations.append(Evaluater(
+                    [collection_name, set_name, 'std_max_num_matching_kpts'],
+                    config,
+                    file_system,
+                    efunc.eval__std_max_num_matching_kpts_in_set,
+                    eval_config={
+                        'collection_name': collection_name,
+                        'set_name': set_name
+                    }
+                ))
 
         if config['eval_avg_perc_matchting_kpts_in_set']:
             # TODO
