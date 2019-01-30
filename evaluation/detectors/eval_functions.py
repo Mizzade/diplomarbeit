@@ -93,16 +93,105 @@ def eval__perc_repeatability_for_image_pairs_with_e(ev:Evaluater, obj:Dict) -> p
     collection_name = ev.eval_config['collection_name']
     set_name = ev.eval_config['set_name']
     epsilon = ev.eval_config['epsilon']
+    file_list = ev.file_system[collection_name][set_name]
 
     max_num_matching_kpts = obj[collection_name][set_name]['max_num_matching_kpts'].values
     num_matching_kpts = obj[collection_name][set_name]['num_matching_kpts_with_e_{}'.format(epsilon)]
 
-    output = np.divide(
+    data = np.divide(
         num_matching_kpts,
         max_num_matching_kpts,
         out=np.zeros_like(num_matching_kpts).astype('float32'),
         where=max_num_matching_kpts!=0)
 
+    output = pd.DataFrame(
+        data=data,
+        index=file_list,
+        columns=file_list)
+
+    return output
+
+def eval__avg_number_kpts_in_set(ev:Evaluater, obj:Dict) -> pd.DataFrame:
+    collection_name = ev.eval_config['collection_name']
+    set_name = ev.eval_config['set_name']
+    file_list = ev.file_system[collection_name][set_name]
+
+    num_kpts = obj[collection_name]['num_kpts'].loc[file_list].values
+    output = np.mean(num_kpts)
+
     return output
 
 
+def eval__std_number_kpts_in_set(ev:Evaluater, obj:Dict) -> pd.DataFrame:
+    collection_name = ev.eval_config['collection_name']
+    set_name = ev.eval_config['set_name']
+    file_list = ev.file_system[collection_name][set_name]
+
+
+    num_kpts = obj[collection_name]['num_kpts'].loc[file_list].values
+    output = np.std(num_kpts)
+
+    return output
+
+
+def eval__avg_num_matching_kpts_in_set(ev:Evaluater, obj:Dict) -> pd.DataFrame:
+    collection_name = ev.eval_config['collection_name']
+    set_name = ev.eval_config['set_name']
+    epsilon = ev.eval_config['epsilon']
+
+    num_matching_kpts = obj[collection_name][set_name]['num_matching_kpts_with_e_{}'.fomrat(epsilon)]
+    output = np.mean(num_matching_kpts)
+
+    return output
+
+
+def eval__std_num_matching_kpts_in_set(ev:Evaluater, obj:Dict) -> pd.DataFrame:
+    collection_name = ev.eval_config['collection_name']
+    set_name = ev.eval_config['set_name']
+    epsilon = ev.eval_config['epsilon']
+
+    num_matching_kpts = obj[collection_name][set_name]['num_matching_kpts_with_e_{}'.fomrat(epsilon)]
+    output = np.std(num_matching_kpts)
+
+    return output
+
+
+def eval__avg_max_num_matching_kpts_in_set(ev:Evaluater, obj:Dict) -> pd.DataFrame:
+    collection_name = ev.eval_config['collection_name']
+    set_name = ev.eval_config['set_name']
+
+    max_num_matching_kpts = obj[collection_name][set_name]['max_num_matching_kpts']
+    output = np.mean(max_num_matching_kpts)
+
+    return output
+
+
+def eval__std_max_num_matching_kpts_in_set(ev:Evaluater, obj:Dict) -> pd.DataFrame:
+    collection_name = ev.eval_config['collection_name']
+    set_name = ev.eval_config['set_name']
+
+    max_num_matching_kpts = obj[collection_name][set_name]['max_num_matching_kpts']
+    output = np.std(max_num_matching_kpts)
+
+    return output
+
+
+def eval_avg_perc_matchting_kpts_in_set(ev:Evaluater, obj:Dict) -> pd.DataFrame:
+    collection_name = ev.eval_config['collection_name']
+    set_name = ev.eval_config['set_name']
+    epsilon = ev.eval_config['epsilon']
+
+    perc_matching_kpts = obj[collection_name][set_name]['perc_matching_kpts_for_e_{}'.format(epsilon)]
+    output = np.mean(perc_matching_kpts)
+
+    return output
+
+def eval_std_perc_matchting_kpts_in_set(ev:Evaluater, obj:Dict) -> pd.DataFrame:
+    collection_name = ev.eval_config['collection_name']
+    set_name = ev.eval_config['set_name']
+    epsilon = ev.eval_config['epsilon']
+
+    perc_matching_kpts = obj[collection_name][set_name]['perc_matching_kpts_for_e_{}'.format(epsilon)]
+    output = np.std(perc_matching_kpts)
+
+    return output

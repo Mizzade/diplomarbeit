@@ -57,7 +57,7 @@ def build_list_of_evaluations(config:Dict, file_system:Dict) -> None:
                         'set_name': set_name
                     }))
 
-        # Find number of equal kpts for all image pairs in each set.
+        # Find number of matching kpts for all image pairs in each set.
         if config['eval__max_num_matching_kpts']:
             for set_name in set_names:
                 for epsilon in config['epsilons']:
@@ -91,13 +91,33 @@ def build_list_of_evaluations(config:Dict, file_system:Dict) -> None:
                             'epsilon': epsilon,
                         }
                     ))
+
+        # Average number of keypoints of all images in set.
         if config['eval__avg_number_kpts_in_set']:
-            # TODO
-            pass
+            for set_name in set_names:
+                list_of_evaluations.append(Evaluater(
+                    [collection_name, set_name, 'avg_number_kpts'],
+                    config,
+                    file_system,
+                    efunc.eval__avg_number_kpts_in_set,
+                    eval_config={
+                        'collection_name': collection_name,
+                        'set_name': set_name
+                    }
+                ))
 
         if config['eval__std_number_kpts_in_set']:
-            # TODO
-            pass
+            for set_name in set_names:
+                list_of_evaluations.append(Evaluater(
+                    [collection_name, set_name, 'std_number_kpts'],
+                    config,
+                    file_system,
+                    efunc.eval__std_number_kpts_in_set,
+                    eval_config={
+                        'collection_name': collection_name,
+                        'set_name': set_name
+                    }
+                ))
 
         if config['eval__avg_num_matching_kpts_in_set']:
             # TODO
