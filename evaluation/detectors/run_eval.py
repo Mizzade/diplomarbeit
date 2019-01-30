@@ -120,12 +120,35 @@ def build_list_of_evaluations(config:Dict, file_system:Dict) -> None:
                 ))
 
         if config['eval__avg_num_matching_kpts_in_set']:
-            # TODO
-            pass
+            for set_name in set_names:
+                for epsilon in config['epsilons']:
+                    list_of_evaluations.append(Evaluater(
+                        [collection_name, set_name, 'avg_num_matching_kpts_for_e_{}'.format(epsilon)],
+                        config,
+                        file_system,
+                        efunc.eval__avg_num_matching_kpts_in_set,
+                        eval_config={
+                            'collection_name': collection_name,
+                            'set_name': set_name,
+                            'epsilon': epsilon
+                        }
+                    ))
 
         if config['eval__std_num_matching_kpts_in_set']:
-            # TODO
-            pass
+            for set_name in set_names:
+                for epsilon in config['epsilons']:
+                    list_of_evaluations.append(Evaluater(
+                        [collection_name, set_name, 'std_num_matching_kpts_for_e_{}'.format(epsilon)],
+                        config,
+                        file_system,
+                        efunc.eval__std_num_matching_kpts_in_set,
+                        eval_config={
+                            'collection_name': collection_name,
+                            'set_name': set_name,
+                            'epsilon': epsilon
+                        }
+                    ))
+
 
         if config['eval__avg_max_num_matching_kpts_in_set']:
             # TODO

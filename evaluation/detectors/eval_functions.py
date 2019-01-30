@@ -139,7 +139,7 @@ def eval__avg_num_matching_kpts_in_set(ev:Evaluater, obj:Dict) -> pd.DataFrame:
     set_name = ev.eval_config['set_name']
     epsilon = ev.eval_config['epsilon']
 
-    num_matching_kpts = obj[collection_name][set_name]['num_matching_kpts_with_e_{}'.fomrat(epsilon)]
+    num_matching_kpts = obj[collection_name][set_name]['num_matching_kpts_with_e_{}'.format(epsilon)]
     output = np.mean(num_matching_kpts)
 
     return output
@@ -150,7 +150,7 @@ def eval__std_num_matching_kpts_in_set(ev:Evaluater, obj:Dict) -> pd.DataFrame:
     set_name = ev.eval_config['set_name']
     epsilon = ev.eval_config['epsilon']
 
-    num_matching_kpts = obj[collection_name][set_name]['num_matching_kpts_with_e_{}'.fomrat(epsilon)]
+    num_matching_kpts = obj[collection_name][set_name]['num_matching_kpts_with_e_{}'.format(epsilon)]
     output = np.std(num_matching_kpts)
 
     return output
