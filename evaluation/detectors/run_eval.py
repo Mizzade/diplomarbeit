@@ -78,10 +78,10 @@ def build_list_of_evaluations(config:Dict, file_system:Dict) -> None:
                     ))
 
         # Average number of keypoints of all images in set.
-        if config['eval__avg_number_kpts_in_set']:
+        if config['eval__avg_num_kpts_in_set']:
             for set_name in set_names:
                 list_of_evaluations.append(Evaluater(
-                    [collection_name, set_name, 'avg_number_kpts'],
+                    [collection_name, set_name, 'avg_num_kpts'],
                     config,
                     file_system,
                     efunc.eval__avg_number_kpts_in_set,
@@ -91,10 +91,10 @@ def build_list_of_evaluations(config:Dict, file_system:Dict) -> None:
                     }
                 ))
 
-        if config['eval__std_number_kpts_in_set']:
+        if config['eval__std_num_kpts_in_set']:
             for set_name in set_names:
                 list_of_evaluations.append(Evaluater(
-                    [collection_name, set_name, 'std_number_kpts'],
+                    [collection_name, set_name, 'std_num_kpts'],
                     config,
                     file_system,
                     efunc.eval__std_number_kpts_in_set,
@@ -161,7 +161,7 @@ def build_list_of_evaluations(config:Dict, file_system:Dict) -> None:
                     }
                 ))
 
-        if config['eval_avg_perc_matchting_kpts_in_set']:
+        if config['eval__avg_perc_matchting_kpts_in_set']:
             for set_name in set_names:
                 for epsilon in config['epsilons']:
                     list_of_evaluations.append(Evaluater(
@@ -176,7 +176,7 @@ def build_list_of_evaluations(config:Dict, file_system:Dict) -> None:
                         }
                     ))
 
-        if config['eval_std_perc_matchting_kpts_in_set']:
+        if config['eval__std_perc_matchting_kpts_in_set']:
             for set_name in set_names:
                 for epsilon in config['epsilons']:
                     list_of_evaluations.append(Evaluater(
@@ -190,6 +190,58 @@ def build_list_of_evaluations(config:Dict, file_system:Dict) -> None:
                             'epsilon': epsilon
                         }
                     ))
+
+        if config['eval__avg_num_kpts_in_collection']:
+            list_of_evaluations.append(Evaluater(
+                [collection_name, 'avg_num_kpts'],
+                config,
+                file_system,
+                efunc.eval__avg_num_kpts_in_collection,
+                eval_config={
+                    'collection_name': collection_name,
+                    'set_names': set_names
+                }
+            ))
+
+        if config['eval__std_num_kpts_in_collection']:
+            list_of_evaluations.append(Evaluater(
+                [collection_name, 'std_num_kpts'],
+                config,
+                file_system,
+                efunc.eval__avg_num_kpts_in_collection,
+                eval_config={
+                    'collection_name': collection_name,
+                    'set_names': set_names
+                }
+            ))
+
+        if config['eval__avg_num_matching_kpts_in_collection']:
+            for epsilon in config['epsilons']:
+                list_of_evaluations.append(Evaluater(
+                    [collection_name, 'avg_num_matching_kpts_for_e_{}'.format(epsilon)],
+                    config,
+                    file_system,
+                    efunc.eval__avg_num_matching_kpts_in_collection,
+                    eval_config={
+                        'collection_name': collection_name,
+                        'set_names': set_names,
+                        'epsilon': epsilon
+                    }
+                ))
+
+        if config['eval__std_num_matching_kpts_in_collection']:
+             for epsilon in config['epsilons']:
+                list_of_evaluations.append(Evaluater(
+                    [collection_name, 'std_num_matching_kpts_for_e_{}'.format(epsilon)],
+                    config,
+                    file_system,
+                    efunc.eval__std_num_matching_kpts_in_collection,
+                    eval_config={
+                        'collection_name': collection_name,
+                        'set_names': set_names,
+                        'epsilon': epsilon
+                    }
+                ))
 
     return list_of_evaluations
 

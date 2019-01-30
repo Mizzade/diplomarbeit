@@ -111,7 +111,7 @@ def eval__perc_repeatability_for_image_pairs_with_e(ev:Evaluater, obj:Dict) -> p
 
     return output
 
-def eval__avg_number_kpts_in_set(ev:Evaluater, obj:Dict) -> pd.DataFrame:
+def eval__avg_number_kpts_in_set(ev:Evaluater, obj:Dict) -> float:
     collection_name = ev.eval_config['collection_name']
     set_name = ev.eval_config['set_name']
     file_list = ev.file_system[collection_name][set_name]
@@ -122,7 +122,7 @@ def eval__avg_number_kpts_in_set(ev:Evaluater, obj:Dict) -> pd.DataFrame:
     return output
 
 
-def eval__std_number_kpts_in_set(ev:Evaluater, obj:Dict) -> pd.DataFrame:
+def eval__std_number_kpts_in_set(ev:Evaluater, obj:Dict) -> float:
     collection_name = ev.eval_config['collection_name']
     set_name = ev.eval_config['set_name']
     file_list = ev.file_system[collection_name][set_name]
@@ -134,7 +134,7 @@ def eval__std_number_kpts_in_set(ev:Evaluater, obj:Dict) -> pd.DataFrame:
     return output
 
 
-def eval__avg_num_matching_kpts_in_set(ev:Evaluater, obj:Dict) -> pd.DataFrame:
+def eval__avg_num_matching_kpts_in_set(ev:Evaluater, obj:Dict) -> float:
     collection_name = ev.eval_config['collection_name']
     set_name = ev.eval_config['set_name']
     epsilon = ev.eval_config['epsilon']
@@ -145,7 +145,7 @@ def eval__avg_num_matching_kpts_in_set(ev:Evaluater, obj:Dict) -> pd.DataFrame:
     return output
 
 
-def eval__std_num_matching_kpts_in_set(ev:Evaluater, obj:Dict) -> pd.DataFrame:
+def eval__std_num_matching_kpts_in_set(ev:Evaluater, obj:Dict) -> float:
     collection_name = ev.eval_config['collection_name']
     set_name = ev.eval_config['set_name']
     epsilon = ev.eval_config['epsilon']
@@ -156,7 +156,7 @@ def eval__std_num_matching_kpts_in_set(ev:Evaluater, obj:Dict) -> pd.DataFrame:
     return output
 
 
-def eval__avg_max_num_matching_kpts_in_set(ev:Evaluater, obj:Dict) -> pd.DataFrame:
+def eval__avg_max_num_matching_kpts_in_set(ev:Evaluater, obj:Dict) -> float:
     collection_name = ev.eval_config['collection_name']
     set_name = ev.eval_config['set_name']
 
@@ -166,7 +166,7 @@ def eval__avg_max_num_matching_kpts_in_set(ev:Evaluater, obj:Dict) -> pd.DataFra
     return output
 
 
-def eval__std_max_num_matching_kpts_in_set(ev:Evaluater, obj:Dict) -> pd.DataFrame:
+def eval__std_max_num_matching_kpts_in_set(ev:Evaluater, obj:Dict) -> float:
     collection_name = ev.eval_config['collection_name']
     set_name = ev.eval_config['set_name']
 
@@ -176,7 +176,7 @@ def eval__std_max_num_matching_kpts_in_set(ev:Evaluater, obj:Dict) -> pd.DataFra
     return output
 
 
-def eval__avg_perc_matchting_kpts_in_set(ev:Evaluater, obj:Dict) -> pd.DataFrame:
+def eval__avg_perc_matchting_kpts_in_set(ev:Evaluater, obj:Dict) -> float:
     collection_name = ev.eval_config['collection_name']
     set_name = ev.eval_config['set_name']
     epsilon = ev.eval_config['epsilon']
@@ -186,12 +186,86 @@ def eval__avg_perc_matchting_kpts_in_set(ev:Evaluater, obj:Dict) -> pd.DataFrame
 
     return output
 
-def eval__std_perc_matchting_kpts_in_set(ev:Evaluater, obj:Dict) -> pd.DataFrame:
+def eval__std_perc_matchting_kpts_in_set(ev:Evaluater, obj:Dict) -> float:
     collection_name = ev.eval_config['collection_name']
     set_name = ev.eval_config['set_name']
     epsilon = ev.eval_config['epsilon']
 
     perc_matching_kpts = obj[collection_name][set_name]['perc_matching_kpts_for_e_{}'.format(epsilon)]
     output = np.std(perc_matching_kpts)
+
+    return output
+
+def eval__avg_num_kpts_in_collection(ev:Evaluater, obj:Dict) -> float:
+    collection_name = ev.eval_config['collection_name']
+    set_names = ev.eval_config['set_names']
+    file_system = ev.file_system
+
+    avgs = []
+    weights = []
+    for set_name in set_names:
+        avgs.append(obj[collection_name][set_name]['avg_num_kpts'])
+        weights.append(len(file_system[collection_name][set_name]))
+
+    avgs = np.array(avgs).astype('float32')
+    weights = np.array(weights).astype('float32')
+    total = np.sum(weights)
+    output = np.mean((avgs * weights) / total)
+
+    return output
+
+def eval__std_num_kpts_in_collection(ev:Evaluater, obj:Dict) -> float:
+    collection_name = ev.eval_config['collection_name']
+    set_names = ev.eval_config['set_names']
+    file_system = ev.file_system
+
+    avgs = []
+    weights = []
+    for set_name in set_names:
+        avgs.append(obj[collection_name][set_name]['avg_num_kpts'])
+        weights.append(len(file_system[collection_name][set_name]))
+
+    avgs = np.array(avgs).astype('float32')
+    weights = np.array(weights).astype('float32')
+    total = np.sum(weights)
+    output = np.std((avgs * weights) / total)
+
+    return output
+
+def eval__avg_num_matching_kpts_in_collection(ev:Evaluater, obj:Dict) -> float:
+    collection_name = ev.eval_config['collection_name']
+    set_names = ev.eval_config['set_names']
+    epsilon = ev.eval_config['epsilon']
+    file_system = ev.file_system
+
+    avgs = []
+    weights = []
+    for set_name in set_names:
+        avgs.append(obj[collection_name][set_name]['avg_num_matching_kpts_for_e_{}'.format(epsilon)])
+        weights.append(len(file_system[collection_name][set_name]))
+
+    avgs = np.array(avgs).astype('float32')
+    weights = np.array(weights).astype('float32')
+    total = np.sum(weights)
+    output = np.mean((avgs * weights) / total)
+
+    return output
+
+def eval__std_num_matching_kpts_in_collection(ev:Evaluater, obj:Dict) -> float:
+    collection_name = ev.eval_config['collection_name']
+    set_names = ev.eval_config['set_names']
+    epsilon = ev.eval_config['epsilon']
+    file_system = ev.file_system
+
+    avgs = []
+    weights = []
+    for set_name in set_names:
+        avgs.append(obj[collection_name][set_name]['avg_num_matching_kpts_for_e_{}'.format(epsilon)])
+        weights.append(len(file_system[collection_name][set_name]))
+
+    avgs = np.array(avgs).astype('float32')
+    weights = np.array(weights).astype('float32')
+    total = np.sum(weights)
+    output = np.std((avgs * weights) / total)
 
     return output
