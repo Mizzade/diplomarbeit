@@ -91,8 +91,37 @@ def build_list_of_evaluations(config:Dict, file_system:Dict) -> None:
                             'epsilon': epsilon,
                         }
                     ))
+        if config['eval__avg_number_kpts_in_set']:
+            # TODO
+            pass
 
+        if config['eval__std_number_kpts_in_set']:
+            # TODO
+            pass
 
+        if config['eval__avg_num_matching_kpts_in_set']:
+            # TODO
+            pass
+
+        if config['eval__std_num_matching_kpts_in_set']:
+            # TODO
+            pass
+
+        if config['eval__avg_max_num_matching_kpts_in_set']:
+            # TODO
+            pass
+
+        if config['eval__std_max_num_matching_kpts_in_set']:
+            # TODO
+            pass
+
+        if config['eval_avg_perc_matchting_kpts_in_set']:
+            # TODO
+            pass
+
+        if config['eval_std_perc_matchting_kpts_in_set']:
+            # TODO
+            pass
 
     return list_of_evaluations
 
