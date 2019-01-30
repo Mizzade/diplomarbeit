@@ -312,9 +312,34 @@ parser.add_argument('--no-eval__std_num_matching_kpts_in_collection',
     help='Do not get standard deviaton of the average number of matching keypoints found for an image collection',
     default=None)
 
+# Average percentage of matching keypoints in collection for epsilon e.
+parser.add_argument('--eval__avg_perc_matching_kpts_in_collection',
+    dest='eval__avg_perc_matching_kpts_in_collection',
+    action='store_true',
+    help='Get average percentage of matching keypoints found for an image collection.',
+    default=None)
 
+parser.add_argument('--no-eval__avg_perc_matching_kpts_in_collection',
+    dest='eval__avg_perc_matching_kpts_in_collection',
+    action='store_false',
+    help='Do not get the average percentage of matching keypoints found for an image collection',
+    default=None)
 
-table_eval_plan = {
+# Standard deviation of average percentage of matching keypoints in collection for epsilon e.
+parser.add_argument('--eval__std_perc_matching_kpts_in_collection',
+    dest='eval__std_perc_matching_kpts_in_collection',
+    action='store_true',
+    help='Get standard deviation of the average percentage of matching keypoints found for an image collection.',
+    default=None)
+
+parser.add_argument('--no-eval__std_perc_matching_kpts_in_collection',
+    dest='eval__std_perc_matching_kpts_in_collection',
+    action='store_false',
+    help='Do not get standard deviaton of the average percentage of matching keypoints found for an image collection',
+    default=None)
+
+# evaluation plan
+eval_plan = {
     'eval__num_kpts_per_image': True,
     'eval__max_num_matching_kpts': True,
     'eval__num_matching_kpts': True,
@@ -330,7 +355,9 @@ table_eval_plan = {
     'eval__avg_num_kpts_in_collection': True,
     'eval__std_num_kpts_in_collection': True,
     'eval__avg_num_matching_kpts_in_collection': True,
-    'eval__std_num_matching_kpts_in_collection': True
+    'eval__std_num_matching_kpts_in_collection': True,
+    'eval__avg_perc_matching_kpts_in_collection': True,
+    'eval__std_perc_matching_kpts_in_collection': True
 }
 
 def get_config(argv):
@@ -351,15 +378,15 @@ def get_config(argv):
     # If enable_all is not true, only take the evaluation tests, that have
     # specifically been activated.
     if not config['eval__enable_all']:
-        for key in list(table_eval_plan.keys()):
-            table_eval_plan[key] = config[key] if config[key] else False
+        for key in list(eval_plan.keys()):
+            eval_plan[key] = config[key] if config[key] else False
 
     if config['eval__enable_all']:
-        for key in list(table_eval_plan.keys()):
-            table_eval_plan[key] = False if config[key] == False else True
+        for key in list(eval_plan.keys()):
+            eval_plan[key] = False if config[key] == False else True
 
     # Finally update the config object.
-    for key in list(table_eval_plan.keys()):
-        config[key] = table_eval_plan[key]
+    for key in list(eval_plan.keys()):
+        config[key] = eval_plan[key]
 
     return config
