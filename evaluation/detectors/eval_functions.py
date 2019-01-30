@@ -176,7 +176,7 @@ def eval__std_max_num_matching_kpts_in_set(ev:Evaluater, obj:Dict) -> pd.DataFra
     return output
 
 
-def eval_avg_perc_matchting_kpts_in_set(ev:Evaluater, obj:Dict) -> pd.DataFrame:
+def eval__avg_perc_matchting_kpts_in_set(ev:Evaluater, obj:Dict) -> pd.DataFrame:
     collection_name = ev.eval_config['collection_name']
     set_name = ev.eval_config['set_name']
     epsilon = ev.eval_config['epsilon']
@@ -186,7 +186,7 @@ def eval_avg_perc_matchting_kpts_in_set(ev:Evaluater, obj:Dict) -> pd.DataFrame:
 
     return output
 
-def eval_std_perc_matchting_kpts_in_set(ev:Evaluater, obj:Dict) -> pd.DataFrame:
+def eval__std_perc_matchting_kpts_in_set(ev:Evaluater, obj:Dict) -> pd.DataFrame:
     collection_name = ev.eval_config['collection_name']
     set_name = ev.eval_config['set_name']
     epsilon = ev.eval_config['epsilon']
