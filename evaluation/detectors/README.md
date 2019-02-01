@@ -1,28 +1,92 @@
-# Evaluierung von Keypunkt Detektoren
+### Aufbau der Pickle Datei
 
-# Wiederholbarkeitsevaluierung
-Für jedes Model (sift, lift, tilde, superpoint) werdne die Ergebnisse in einer Pickle-Datei (repeatability_sift.pkl, repeatability_tilde.pkl, ...) abgespeichert. Weleche Werte gespeichert werden, hängt von den aktivierten Parameter ab, siehe dazu `Evalutionsanmerkungen`. Die Pickle-Dateien landen standardmäßig im `outputs` Ordner, der sich im selben Ordner befindet wie diese README.
+- [collection_name]
+  - num_kpts
+    - Typ: pd.DataFrame
+    - Index: Name aller Bilder in der Kollektion als absoluter Pfad
+    - Column: 0
+    - Beschreibung: Index sind die Namen von jedem Bild in der Kollektion. Das Dataframe hat nur eine Spalte und die enthält die Anzahl der gefundenen Keypunkte für das jeweilige Bild.
 
-### Hilfe
-Für eine Auflistung von Paramter benutze das Kommando
+  - avg_num_kpts
+    - Typ: float
+    - Beschreibung: Die durchschnittliche Anzahl an gefundenen Keypunkten in jedem Set dieser Kollektion.
 
-     $ python evalution.py -h
+  - std_num_kpts
+    -Typ: float
+    - Beschreibung: Die Standardabweichung der durchschnittlichen Anzahl der gefundenen Keypunkte in jedem Set dieser Kollektion
 
-Alle Parameter können in der Datei `config_repeatability.py` gefunden wernden.
+  - avg_num_matching_kpts_for_e_X
+    - X: Ein Integer. Stammt vom config Wert: `epsilons`.
+    - Typ: float
+    - Beschreibung: Gewichteter Durchschnitt der durchschnittlichen Anzahl an gematchten Keypunkten der Sets.
 
-### Parameteranmerkungen
-- MODEL_NAMES: sift, lift, tilde, superpoint
-- MAX_SIZE: Je nachdem, mit welchem `max_size` Paramter Keypunkte und Deskriptoren erzeugt wurde, ändert sich der Name der Ausgabedatei. Wenn die File für die Keypunkte also mit 1300.csv endet, so muss `1300` als MAX_SIZE Wert eingetragen werden.
-- allowed_extensions: Besteht immer aus einem Punkt und dem Extensionnamen, z.B. `.png` oder `.jpg`.
-- COLLECTION_NAMES: Beinhaltet bis jetzt nur die Kollektion `webcam`.
-- SET_NAMES: chamonix, courbevoie, frankfurt, mexico, panorama, stlouis
+  - std_num_matching_kpts_for_e_X
+    - X: Ein Integer. Stammt vom config Wert: `epsilons`.
+    - Typ: float
+    - Beschreibung: Gewichteter Durchschnitt der durchschnittlichen Anzahl an gematchten Keypunkten der Sets.
 
-### Evalutionsanmerkungen
-- eval_set__num_kpts_per_image: Zählt die Anzahl an Keypunkten, die das Model in jedem Bild inerhalb eines Sets gefunden hat. Typ: np.array[int].
-- eval_set__num_kpts_per_image_avg: Gibt die durchschnittliche Anzahl an Keypunkten in allen Bildern in einem Set für ein Model wieder. Typ: float.
-- eval_set__num_kpts_per_image_std: Gibt die Standardabweichung der durchschnittlichen Anzahl an Keypunkten in allen Bildern in einem Set wieder. Typ: float.
-- eval_set__image_names: Gibt die Namen der Bilder innerhalb eines Sets wieder. Typ: List[str].
-- eval_set__num_repeatable_kpts: Gibt die Anzahl der wiederholbaren Keypunkte aus dem ersten Bild im Set wieder, die in allen anderen Bildern des Sets ebenfalls gefunden wurden. Typ: int.
-- eval_set__idx_repeatable_kpts: Gibt die Indizes der oben gefundenen Keypunkte wieder. Typ: array[int].
-- eval_set__cum_repeatable_kpts: Startend mit dem ersten Bild in dem Set (sortiert nach Namen), zähle die Anzahl der Keypunkte aus dem ersten Bild, die bis zum i-ten Bild wiedergefunden wurden. Typ: np.array[int].
-- eval_set__repeatable_kpts_image_pairs: Vergleicht jede Bilderpaar-Kombination innerhalb eines Sets und speichert die Anzahl der gleichen Keypunkte in einer 2-dimensionalen Matrix. Typ: array[array[int]].
+  - avg_perc_matching_kpts_for_e_X
+    - X: Ein Integer. Stammt vom config Wert: `epsilons`.
+    - Typ: float
+    - Beschreibung: Durchschnittlicher Prozentsatz an gematchten Keypunkten über alle Set der Kollektion.
+
+  - std_perc_matching_kpts_for_e_X
+    - X: Ein Integer. Stammt vom config Wert: `epsilons`.
+    - Typ: float
+    - Beschreibung: Standardabweichung des durchschnittlichen Prozentsatzes an gematchten Keypunkten über alle Set der Kollektion.
+
+  - [set_name]
+    - max_num_matching_kpts
+      - Typ: pd.DataFrame
+      - Index: Name der Bilder im Set als absoluter Pfad
+      - Column: Name der Bilder im Set als absoluter Pfad
+      - Beschreibung: Die maximal Anzahl an Keypunkten, die in den beiden Bildern gematcht werden können. Dies ist entspricht dem Minimum der Anzahl der Keypunkte in beiden Bildern.
+
+    - num_matching_kpts_for_e_X
+      - X: Ein Integer. Stammt vom config Wert: `epsilons`.
+      - Typ: pd.DataFrame
+      - Index: Name der Bilder im Set als absoluter Pfad
+      - Column: Name der Bilder im Set als absoluter Pfad
+      - Beschreibung: Tatsächliche Anzahl an Keypunkten, die einem Bilderpaar gematcht werden konnten. Der Wert kann nicht größer sein als `max_num_matching_kpts` für das entsprechende Bilderpaar.
+
+    - perc_matching_kpts_for_e_X
+      - X: Ein Integer. Stammt vom config Wert: `epsilons`.
+      - Typ: pd.DataFrame
+      - Index: Name der Bilder im Set als absoluter Pfad
+      - Column: Name der Bilder im Set als absoluter Pfad
+      - Beschreibung: Verhältnis der Anzahl von Keypunkten, die tatsächlich im Bilderpaar gematcht werden konnten zu der Anzahl maximal möglicher Matches. Werte liegen zwischen 0 und 1.
+
+    - avg_num_kpts
+      - Typ: float
+      - Beschreibung: Durchschnittliche Anzahl gefundener Keypunkte in allen Bildern eines Sets.
+
+    - std_num_kpts
+      - Typ: float
+      - Beschreibung: Standardabweichung der durchschnittlichen Anzahl der Keypunkte in allen Bildern des Sets.
+
+    - avg_num_matching_kpts_for_e_X
+      - X: Ein Integer. Stammt vom config Wert: `epsilons`.
+      - Typ: float
+      - Beschreibung: Die durchschnittliche Anzahl gematchter Keypunkte für jedes Bilderpaar in einem Set.
+
+    - std_num_matching_kpts_for_e_X
+      - X: Ein Integer. Stammt vom config Wert: `epsilons`.
+      - Typ: float
+      - Beschreibung: Die Standardabweichung der durchschnittlichen Anzahl gematchter Keypunkte für jedes Bilderpaar in einem Set.
+
+    - avg_max_num_matching_kpts
+      - Typ: float
+      - Beschreibung: Durchschnittliche Anzahl an maximal möglichen Matches für jedes Bilderpaar im Set.
+
+    - std_max_num_matching_kpts
+      - Typ: float
+      - Beschreibung: Standardabweichung der durchschnittlichen Anzahl an maximal möglichen Matches für jedes Bilderpaar im Set.
+
+    - avg_perc_matching_kpts_for_e_X
+      - X: Ein Integer. Stammt vom config Wert: `epsilons`.
+      - Typ: float:
+      - Beschreibung: Durchschnittliche Ratio von gematchten Keypunkten zu maximal matchbaren Keypunkten für jedes Bilderpaar in einem Set.
+
+
+
+
