@@ -85,6 +85,7 @@ parser.add_argument('--dry',
     default=False)
 
 parser.add_argument('--epsilons',
+    type=int,
     nargs='+',
     help='Set the maximal distance in pixels for two keypoints in an image ' +
     'pair in the webcam set to be treatet as equal. Default: [1]',
@@ -105,259 +106,259 @@ parser.add_argument('--eval__disable_all',
 
 
 # Number of found keypoints
-parser.add_argument('--eval__num_kpts_per_image',
-    dest='eval__num_kpts_per_image',
+parser.add_argument('--eval_image__num_kpts',
+    dest='eval_image__num_kpts',
     action='store_true',
     help='Get the number of found keypoints for each image.',
     default=None)
 
-parser.add_argument('--no-eval__num_kpts_per_image',
-    dest='eval__num_kpts_per_image',
+parser.add_argument('--no-eval_image__num_kpts',
+    dest='eval_image__num_kpts',
     action='store_false',
     help='Do not get the number of found keypoints for each image.',
     default=None)
 
 # maximal number of matching keypoints
-parser.add_argument('--eval__max_num_matching_kpts',
-    dest='eval__max_num_matching_kpts',
+parser.add_argument('--eval_imagepair__max_num_matching_kpts',
+    dest='eval_imagepair__max_num_matching_kpts',
     action='store_true',
     help='Get the maximal possible number of matching keypoints between image pairs.',
     default=None)
 
-parser.add_argument('--no-eval__max_num_matching_kpts',
-    dest='eval__max_num_matching_kpts',
+parser.add_argument('--no-eval_imagepair__max_num_matching_kpts',
+    dest='eval_imagepair__max_num_matching_kpts',
     action='store_false',
     help='Do not get the maximal possible number of matching keypoints between image pairs',
     default=None)
 
 # Actual number of matching keypoints for image pairs
-parser.add_argument('--eval__num_matching_kpts',
-    dest='eval__num_matching_kpts',
+parser.add_argument('--eval_imagepair__num_matching_kpts',
+    dest='eval_imagepair__num_matching_kpts',
     action='store_true',
     help='Get the actual number of matching keypoints between image pairs.',
     default=None)
 
-parser.add_argument('--no-eval__num_matching_kpts',
-    dest='eval__num_matching_kpts',
+parser.add_argument('--no-eval_imagepair__num_matching_kpts',
+    dest='eval_imagepair__num_matching_kpts',
     action='store_false',
     help='Do not get the actual number of matching keypoints between image pairs',
     default=None)
 
 # Percent of all possible matching keypoints, that are in fact matching.
-parser.add_argument('--eval__perc_matching_kpts',
-    dest='eval__perc_matching_kpts',
+parser.add_argument('--eval_imagepair__perc_matching_kpts',
+    dest='eval_imagepair__perc_matching_kpts',
     action='store_true',
     help='Get the percent of matching keypoints between image pairs.',
     default=None)
 
-parser.add_argument('--no-eval__perc_matching_kpts',
-    dest='eval__perc_matching_kpts',
+parser.add_argument('--no-eval_imagepair__perc_matching_kpts',
+    dest='eval_imagepair__perc_matching_kpts',
     action='store_false',
     help='Do not get the percent of matching keypoints between image pairs',
     default=None)
 
 # Average number of found keypoints per set.
-parser.add_argument('--eval__avg_num_kpts_in_set',
-    dest='eval__avg_num_kpts_in_set',
+parser.add_argument('--eval_set__avg_num_kpts',
+    dest='eval_set__avg_num_kpts',
     action='store_true',
     help='Get the average number of keypoints found for an image set.',
     default=None)
 
-parser.add_argument('--no-eval__avg_num_kpts_in_set',
-    dest='eval__avg_num_kpts_in_set',
+parser.add_argument('--no-eval_set__avg_num_kpts',
+    dest='eval_set__avg_num_kpts',
     action='store_false',
     help='Do not get the average number of keypoints found for an image set',
     default=None)
 
 # Standard deviation of average number of found keypoints per set.
-parser.add_argument('--eval__std_num_kpts_in_set',
-    dest='eval__std_num_kpts_in_set',
+parser.add_argument('--eval_set__std_num_kpts',
+    dest='eval_set__std_num_kpts',
     action='store_true',
     help='Get the standard deviation of the average number of keypoints found for an image set.',
     default=None)
 
-parser.add_argument('--no-eval__std_num_kpts_in_set',
-    dest='eval__std_num_kpts_in_set',
+parser.add_argument('--no-eval_set__std_num_kpts',
+    dest='eval_set__std_num_kpts',
     action='store_false',
     help='Do not get the standard deviation of the average number of keypoints found for an image set',
     default=None)
 
 # Average number of matching keypoints within e pixel distance.
-parser.add_argument('--eval__avg_num_matching_kpts_in_set',
-    dest='eval__avg_num_matching_kpts_in_set',
+parser.add_argument('--eval_set__avg_num_matching_kpts',
+    dest='eval_set__avg_num_matching_kpts',
     action='store_true',
     help='Get the average number of matching keypoints found for an image set.',
     default=None)
 
-parser.add_argument('--no-eval__avg_num_matching_kpts_in_set',
-    dest='eval__avg_num_matching_kpts_in_set',
+parser.add_argument('--no-eval_set__avg_num_matching_kpts',
+    dest='eval_set__avg_num_matching_kpts',
     action='store_false',
     help='Do not get the average number of matching keypoints found for an image set',
     default=None)
 
 # Standard deviation of average number of matching keypoints within e pixel distance.
-parser.add_argument('--eval__std_num_matching_kpts_in_set',
-    dest='eval__std_num_matching_kpts_in_set',
+parser.add_argument('--eval_set__std_num_matching_kpts',
+    dest='eval_set__std_num_matching_kpts',
     action='store_true',
     help='Get the standard deviation of the average number of matching keypoints found for an image set.',
     default=None)
 
-parser.add_argument('--no-eval__std_num_matching_kpts_in_set',
-    dest='eval__std_num_matching_kpts_in_set',
+parser.add_argument('--no-eval_set__std_num_matching_kpts',
+    dest='eval_set__std_num_matching_kpts',
     action='store_false',
     help='Do not get the standard deviation of the average number of matching keypoints found for an image set',
     default=None)
 
 # Average number of maximal possible matching keypoints within e pixel distance for each set.
-parser.add_argument('--eval__avg_max_num_matching_kpts_in_set',
-    dest='eval__avg_max_num_matching_kpts_in_set',
+parser.add_argument('--eval_set__avg_max_num_matching_kpts',
+    dest='eval_set__avg_max_num_matching_kpts',
     action='store_true',
     help='Get the average number of maximal possible matching keypoints found for an image set.',
     default=None)
 
-parser.add_argument('--no-eval__avg_max_num_matching_kpts_in_set',
-    dest='eval__avg_max_num_matching_kpts_in_set',
+parser.add_argument('--no-eval_set__avg_max_num_matching_kpts',
+    dest='eval_set__avg_max_num_matching_kpts',
     action='store_false',
     help='Do not get the average number of maximal possible matching keypoints found for an image set',
     default=None)
 
 # Standard deviatn of average number of maximal possible matching keypoints within e pixel distance for each set.
-parser.add_argument('--eval__std_max_num_matching_kpts_in_set',
-    dest='eval__std_max_num_matching_kpts_in_set',
+parser.add_argument('--eval_set__std_max_num_matching_kpts',
+    dest='eval_set__std_max_num_matching_kpts',
     action='store_true',
     help='Get the standard deviation of the average number of maximal possible matching keypoints found for an image set.',
     default=None)
 
-parser.add_argument('--no-eval__std_max_num_matching_kpts_in_set',
-    dest='eval__std_max_num_matching_kpts_in_set',
+parser.add_argument('--no-eval_set__std_max_num_matching_kpts',
+    dest='eval_set__std_max_num_matching_kpts',
     action='store_false',
     help='Do not get the standard deviation of the average number of maximal possible matching keypoints found for an image set',
     default=None)
 
 # Average percent of matching keypoints of all images in set.
-parser.add_argument('--eval__avg_perc_matchting_kpts_in_set',
-    dest='eval__avg_perc_matchting_kpts_in_set',
+parser.add_argument('--eval_set__avg_perc_matchting_kpts',
+    dest='eval_set__avg_perc_matchting_kpts',
     action='store_true',
     help='Get the average percentage of matching keypoints found for an image set.',
     default=None)
 
-parser.add_argument('--no-eval__avg_perc_matchting_kpts_in_set',
-    dest='eval__avg_perc_matchting_kpts_in_set',
+parser.add_argument('--no-eval_set__avg_perc_matchting_kpts',
+    dest='eval_set__avg_perc_matchting_kpts',
     action='store_false',
     help='Do not get the average percentage of matching keypoints found for an image set',
     default=None)
 
 # Standard deviation of the average percent of matching keypoints of all images in set.
-parser.add_argument('--eval__std_perc_matchting_kpts_in_set',
-    dest='eval__std_perc_matchting_kpts_in_set',
+parser.add_argument('--eval_set__std_perc_matchting_kpts',
+    dest='eval_set__std_perc_matchting_kpts',
     action='store_true',
     help='Get the standard deviation of the average percentage of matching keypoints found for an image set.',
     default=None)
 
-parser.add_argument('--no-eval__std_perc_matchting_kpts_in_set',
-    dest='eval__std_perc_matchting_kpts_in_set',
+parser.add_argument('--no-eval_set__std_perc_matchting_kpts',
+    dest='eval_set__std_perc_matchting_kpts',
     action='store_false',
     help='Do not get the standard deviation of the average percentage of matching keypoints found for an image set',
     default=None)
 
 # Average number of keypoints in collection
-parser.add_argument('--eval__avg_num_kpts_in_collection',
-    dest='eval__avg_num_kpts_in_collection',
+parser.add_argument('--eval_collection__avg_num_kpts',
+    dest='eval_collection__avg_num_kpts',
     action='store_true',
     help='Get the average number of keypoints found for an image collection.',
     default=None)
 
-parser.add_argument('--no-eval__avg_num_kpts_in_collection',
-    dest='eval__avg_num_kpts_in_collection',
+parser.add_argument('--no-eval_collection__avg_num_kpts',
+    dest='eval_collection__avg_num_kpts',
     action='store_false',
     help='Do not get the average number of keypoints found for an image collection',
     default=None)
 
 # Standard deviation of average number of keypoints in collection
-parser.add_argument('--eval__std_num_kpts_in_collection',
-    dest='eval__std_num_kpts_in_collection',
+parser.add_argument('--eval_collection__std_num_kpts',
+    dest='eval_collection__std_num_kpts',
     action='store_true',
     help='Get the standard deviaton of the average number of keypoints found for an image collection.',
     default=None)
 
-parser.add_argument('--no-eval__std_num_kpts_in_collection',
-    dest='eval__std_num_kpts_in_collection',
+parser.add_argument('--no-eval_collection__std_num_kpts',
+    dest='eval_collection__std_num_kpts',
     action='store_false',
     help='Do not get the standard deviaton of the average number of keypoints found for an image collection.',
     default=None)
 
 # Average number of matching keypoints in collection for epsilon e.
-parser.add_argument('--eval__avg_num_matching_kpts_in_collection',
-    dest='eval__avg_num_matching_kpts_in_collection',
+parser.add_argument('--eval_collection__avg_num_matching_kpts',
+    dest='eval_collection__avg_num_matching_kpts',
     action='store_true',
     help='Get the average number of matching keypoints found for an image collection.',
     default=None)
 
-parser.add_argument('--no-eval__avg_num_matching_kpts_in_collection',
-    dest='eval__avg_num_matching_kpts_in_collection',
+parser.add_argument('--no-eval_collection__avg_num_matching_kpts',
+    dest='eval_collection__avg_num_matching_kpts',
     action='store_false',
     help='Do not get the average number of matching keypoints found for an image collection',
     default=None)
 
 # Standard deviaton of average number of matching keypoints in collection for epsilon e.
-parser.add_argument('--eval__std_num_matching_kpts_in_collection',
-    dest='eval__std_num_matching_kpts_in_collection',
+parser.add_argument('--eval_collection__std_num_matching_kpts',
+    dest='eval_collection__std_num_matching_kpts',
     action='store_true',
     help='Get standard deviaton of the average number of matching keypoints found for an image collection.',
     default=None)
 
-parser.add_argument('--no-eval__std_num_matching_kpts_in_collection',
-    dest='eval__std_num_matching_kpts_in_collection',
+parser.add_argument('--no-eval_collection__std_num_matching_kpts',
+    dest='eval_collection__std_num_matching_kpts',
     action='store_false',
     help='Do not get standard deviaton of the average number of matching keypoints found for an image collection',
     default=None)
 
 # Average percentage of matching keypoints in collection for epsilon e.
-parser.add_argument('--eval__avg_perc_matching_kpts_in_collection',
-    dest='eval__avg_perc_matching_kpts_in_collection',
+parser.add_argument('--eval_collection__avg_perc_matching_kpts',
+    dest='eval_collection__avg_perc_matching_kpts',
     action='store_true',
     help='Get average percentage of matching keypoints found for an image collection.',
     default=None)
 
-parser.add_argument('--no-eval__avg_perc_matching_kpts_in_collection',
-    dest='eval__avg_perc_matching_kpts_in_collection',
+parser.add_argument('--no-eval_collection__avg_perc_matching_kpts',
+    dest='eval_collection__avg_perc_matching_kpts',
     action='store_false',
     help='Do not get the average percentage of matching keypoints found for an image collection',
     default=None)
 
 # Standard deviation of average percentage of matching keypoints in collection for epsilon e.
-parser.add_argument('--eval__std_perc_matching_kpts_in_collection',
-    dest='eval__std_perc_matching_kpts_in_collection',
+parser.add_argument('--eval_collection__std_perc_matching_kpts',
+    dest='eval_collection__std_perc_matching_kpts',
     action='store_true',
     help='Get standard deviation of the average percentage of matching keypoints found for an image collection.',
     default=None)
 
-parser.add_argument('--no-eval__std_perc_matching_kpts_in_collection',
-    dest='eval__std_perc_matching_kpts_in_collection',
+parser.add_argument('--no-eval_collection__std_perc_matching_kpts',
+    dest='eval_collection__std_perc_matching_kpts',
     action='store_false',
     help='Do not get standard deviaton of the average percentage of matching keypoints found for an image collection',
     default=None)
 
 # evaluation plan
 eval_plan = {
-    'eval__num_kpts_per_image': True,
-    'eval__max_num_matching_kpts': True,
-    'eval__num_matching_kpts': True,
-    'eval__perc_matching_kpts': True,
-    'eval__avg_num_kpts_in_set': True,
-    'eval__std_num_kpts_in_set': True,
-    'eval__avg_num_matching_kpts_in_set': True,
-    'eval__std_num_matching_kpts_in_set': True,
-    'eval__avg_max_num_matching_kpts_in_set': True,
-    'eval__std_max_num_matching_kpts_in_set': True,
-    'eval__avg_perc_matchting_kpts_in_set': True,
-    'eval__std_perc_matchting_kpts_in_set': True,
-    'eval__avg_num_kpts_in_collection': True,
-    'eval__std_num_kpts_in_collection': True,
-    'eval__avg_num_matching_kpts_in_collection': True,
-    'eval__std_num_matching_kpts_in_collection': True,
-    'eval__avg_perc_matching_kpts_in_collection': True,
-    'eval__std_perc_matching_kpts_in_collection': True
+    'eval_image__num_kpts': True,
+    'eval_imagepair__max_num_matching_kpts': True,
+    'eval_imagepair__num_matching_kpts': True,
+    'eval_imagepair__perc_matching_kpts': True,
+    'eval_set__avg_num_kpts': True,
+    'eval_set__std_num_kpts': True,
+    'eval_set__avg_num_matching_kpts': True,
+    'eval_set__std_num_matching_kpts': True,
+    'eval_set__avg_max_num_matching_kpts': True,
+    'eval_set__std_max_num_matching_kpts': True,
+    'eval_set__avg_perc_matchting_kpts': True,
+    'eval_set__std_perc_matchting_kpts': True,
+    'eval_collection__avg_num_kpts': True,
+    'eval_collection__std_num_kpts': True,
+    'eval_collection__avg_num_matching_kpts': True,
+    'eval_collection__std_num_matching_kpts': True,
+    'eval_collection__avg_perc_matching_kpts': True,
+    'eval_collection__std_perc_matching_kpts': True
 }
 
 def get_config(argv):

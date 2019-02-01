@@ -19,40 +19,40 @@ def build_list_of_evaluations(config:Dict, file_system:Dict) -> None:
         set_names = [s for s in file_system[collection_name] if not s.startswith('_')]
 
         # Find number of found keypoints for each file in collection.
-        if config['eval__num_kpts_per_image']:
+        if config['eval_image__num_kpts']:
             list_of_evaluations.append(Evaluater(
                 [collection_name, 'num_kpts'],
                 config,
                 file_system,
-                efunc.eval__num_kpts,
+                efunc.eval_image__num_kpts,
                 eval_config={
                     'collection_name': collection_name
                 }))
 
         # Find number of maximal possible equal keypoints
-        if config['eval__max_num_matching_kpts']:
+        if config['eval_imagepair__max_num_matching_kpts']:
             for set_name in set_names:
                 list_of_evaluations.append(Evaluater(
                     [collection_name, set_name, 'max_num_matching_kpts'],
                     config,
                     file_system,
-                    efunc.eval__num_max_equal_kpts,
+                    efunc.eval_imagepair__num_max_matching_kpts,
                     eval_config={
                         'collection_name': collection_name,
                         'set_name': set_name
                     }))
 
         # Find number of matching kpts for all image pairs in each set.
-        if config['eval__max_num_matching_kpts']:
+        if config['eval_imagepair__num_matching_kpts']:
             for set_name in set_names:
                 for epsilon in config['epsilons']:
                     for i in file_system[collection_name][set_name]:
                         for j in file_system[collection_name][set_name]:
                             list_of_evaluations.append(Evaluater(
-                                [collection_name, set_name, 'num_matching_kpts_with_e_{}'.format(epsilon)],
+                                [collection_name, set_name, 'num_matching_kpts_for_e_{}'.format(epsilon)],
                                 config,
                                 file_system,
-                                efunc.eval__num_matching_kpts_with_e,
+                                efunc.eval__num_matching_kpts_for_e,
                                 eval_config={
                                     'collection_name': collection_name,
                                     'set_name': set_name,
@@ -62,14 +62,15 @@ def build_list_of_evaluations(config:Dict, file_system:Dict) -> None:
                                 }
                             ))
 
-        if config['eval__perc_matching_kpts']:
+        # Find the percentage of matchting kpts for all image pairs
+        if config['eval_imagepair__perc_matching_kpts']:
             for set_name in set_names:
                 for epsilon in config['epsilons']:
                     list_of_evaluations.append(Evaluater(
                         [collection_name, set_name, 'perc_matching_kpts_for_e_{}'.format(epsilon)],
                         config,
                         file_system,
-                        efunc.eval__perc_repeatability_for_image_pairs_with_e,
+                        efunc.eval_imagepair__perc_matching_keypoints_for_e,
                         eval_config={
                             'collection_name': collection_name,
                             'set_name': set_name,
@@ -78,40 +79,40 @@ def build_list_of_evaluations(config:Dict, file_system:Dict) -> None:
                     ))
 
         # Average number of keypoints of all images in set.
-        if config['eval__avg_num_kpts_in_set']:
+        if config['eval_set__avg_num_kpts']:
             for set_name in set_names:
                 list_of_evaluations.append(Evaluater(
                     [collection_name, set_name, 'avg_num_kpts'],
                     config,
                     file_system,
-                    efunc.eval__avg_number_kpts_in_set,
+                    efunc.eval_set__avg_num_kpts,
                     eval_config={
                         'collection_name': collection_name,
                         'set_name': set_name
                     }
                 ))
 
-        if config['eval__std_num_kpts_in_set']:
+        if config['eval_set__std_num_kpts']:
             for set_name in set_names:
                 list_of_evaluations.append(Evaluater(
                     [collection_name, set_name, 'std_num_kpts'],
                     config,
                     file_system,
-                    efunc.eval__std_number_kpts_in_set,
+                    efunc.eval_set__std_num_kpts,
                     eval_config={
                         'collection_name': collection_name,
                         'set_name': set_name
                     }
                 ))
 
-        if config['eval__avg_num_matching_kpts_in_set']:
+        if config['eval_set__avg_num_matching_kpts']:
             for set_name in set_names:
                 for epsilon in config['epsilons']:
                     list_of_evaluations.append(Evaluater(
                         [collection_name, set_name, 'avg_num_matching_kpts_for_e_{}'.format(epsilon)],
                         config,
                         file_system,
-                        efunc.eval__avg_num_matching_kpts_in_set,
+                        efunc.eval_set__avg_num_matching_kpts_for_e,
                         eval_config={
                             'collection_name': collection_name,
                             'set_name': set_name,
@@ -119,14 +120,14 @@ def build_list_of_evaluations(config:Dict, file_system:Dict) -> None:
                         }
                     ))
 
-        if config['eval__std_num_matching_kpts_in_set']:
+        if config['eval_set__std_num_matching_kpts']:
             for set_name in set_names:
                 for epsilon in config['epsilons']:
                     list_of_evaluations.append(Evaluater(
                         [collection_name, set_name, 'std_num_matching_kpts_for_e_{}'.format(epsilon)],
                         config,
                         file_system,
-                        efunc.eval__std_num_matching_kpts_in_set,
+                        efunc.eval_set__std_num_matching_kpts_for_e,
                         eval_config={
                             'collection_name': collection_name,
                             'set_name': set_name,
@@ -135,40 +136,40 @@ def build_list_of_evaluations(config:Dict, file_system:Dict) -> None:
                     ))
 
 
-        if config['eval__avg_max_num_matching_kpts_in_set']:
+        if config['eval_set__avg_max_num_matching_kpts']:
             for set_name in set_names:
                 list_of_evaluations.append(Evaluater(
                     [collection_name, set_name, 'avg_max_num_matching_kpts'],
                     config,
                     file_system,
-                    efunc.eval__avg_max_num_matching_kpts_in_set,
+                    efunc.eval_set__avg_max_num_matching_kpts,
                     eval_config={
                         'collection_name': collection_name,
                         'set_name': set_name
                     }
                 ))
 
-        if config['eval__std_max_num_matching_kpts_in_set']:
+        if config['eval_set__std_max_num_matching_kpts']:
             for set_name in set_names:
                 list_of_evaluations.append(Evaluater(
                     [collection_name, set_name, 'std_max_num_matching_kpts'],
                     config,
                     file_system,
-                    efunc.eval__std_max_num_matching_kpts_in_set,
+                    efunc.eval_set__std_max_num_matching_kpts,
                     eval_config={
                         'collection_name': collection_name,
                         'set_name': set_name
                     }
                 ))
 
-        if config['eval__avg_perc_matchting_kpts_in_set']:
+        if config['eval_set__avg_perc_matchting_kpts']:
             for set_name in set_names:
                 for epsilon in config['epsilons']:
                     list_of_evaluations.append(Evaluater(
                         [collection_name, set_name, 'avg_perc_matching_kpts_for_e_{}'.format(epsilon)],
                         config,
                         file_system,
-                        efunc.eval__avg_perc_matchting_kpts_in_set,
+                        efunc.eval_set__avg_perc_matchting_kpts_for_e,
                         eval_config={
                             'collection_name': collection_name,
                             'set_name': set_name,
@@ -176,14 +177,14 @@ def build_list_of_evaluations(config:Dict, file_system:Dict) -> None:
                         }
                     ))
 
-        if config['eval__std_perc_matchting_kpts_in_set']:
+        if config['eval_set__std_perc_matchting_kpts']:
             for set_name in set_names:
                 for epsilon in config['epsilons']:
                     list_of_evaluations.append(Evaluater(
                         [collection_name, set_name, 'std_perc_matching_kpts_for_e_{}'.format(epsilon)],
                         config,
                         file_system,
-                        efunc.eval__std_perc_matchting_kpts_in_set,
+                        efunc.eval_set__std_perc_matchting_kpts_for_e,
                         eval_config={
                             'collection_name': collection_name,
                             'set_name': set_name,
@@ -191,37 +192,37 @@ def build_list_of_evaluations(config:Dict, file_system:Dict) -> None:
                         }
                     ))
 
-        if config['eval__avg_num_kpts_in_collection']:
+        if config['eval_collection__avg_num_kpts']:
             list_of_evaluations.append(Evaluater(
                 [collection_name, 'avg_num_kpts'],
                 config,
                 file_system,
-                efunc.eval__avg_num_kpts_in_collection,
+                efunc.eval_collection__avg_num_kpts,
                 eval_config={
                     'collection_name': collection_name,
                     'set_names': set_names
                 }
             ))
 
-        if config['eval__std_num_kpts_in_collection']:
+        if config['eval_collection__std_num_kpts']:
             list_of_evaluations.append(Evaluater(
                 [collection_name, 'std_num_kpts'],
                 config,
                 file_system,
-                efunc.eval__avg_num_kpts_in_collection,
+                efunc.eval_collection__std_num_kpts,
                 eval_config={
                     'collection_name': collection_name,
                     'set_names': set_names
                 }
             ))
 
-        if config['eval__avg_num_matching_kpts_in_collection']:
+        if config['eval_collection__avg_num_matching_kpts']:
             for epsilon in config['epsilons']:
                 list_of_evaluations.append(Evaluater(
                     [collection_name, 'avg_num_matching_kpts_for_e_{}'.format(epsilon)],
                     config,
                     file_system,
-                    efunc.eval__avg_num_matching_kpts_in_collection,
+                    efunc.eval_collection__avg_num_matching_kpts_for_e,
                     eval_config={
                         'collection_name': collection_name,
                         'set_names': set_names,
@@ -229,13 +230,13 @@ def build_list_of_evaluations(config:Dict, file_system:Dict) -> None:
                     }
                 ))
 
-        if config['eval__std_num_matching_kpts_in_collection']:
+        if config['eval_collection__std_num_matching_kpts']:
              for epsilon in config['epsilons']:
                 list_of_evaluations.append(Evaluater(
                     [collection_name, 'std_num_matching_kpts_for_e_{}'.format(epsilon)],
                     config,
                     file_system,
-                    efunc.eval__std_num_matching_kpts_in_collection,
+                    efunc.eval_collection__std_num_matching_kpts_for_e,
                     eval_config={
                         'collection_name': collection_name,
                         'set_names': set_names,
@@ -243,13 +244,13 @@ def build_list_of_evaluations(config:Dict, file_system:Dict) -> None:
                     }
                 ))
 
-        if config['eval__avg_perc_matching_kpts_in_collection']:
+        if config['eval_collection__avg_perc_matching_kpts']:
             for epsilon in config['epsilons']:
                 list_of_evaluations.append(Evaluater(
                     [collection_name, 'avg_perc_matching_kpts_for_e_{}'.format(epsilon)],
                     config,
                     file_system,
-                    efunc.eval__avg_perc_matching_kpts_in_collection,
+                    efunc.eval_collection__avg_perc_matching_kpts_for_e,
                     eval_config={
                         'collection_name': collection_name,
                         'set_names': set_names,
@@ -257,13 +258,13 @@ def build_list_of_evaluations(config:Dict, file_system:Dict) -> None:
                     }
                 ))
 
-        if config['eval__std_perc_matching_kpts_in_collection']:
+        if config['eval_collection__std_perc_matching_kpts']:
             for epsilon in config['epsilons']:
                 list_of_evaluations.append(Evaluater(
                     [collection_name, 'std_perc_matching_kpts_for_e_{}'.format(epsilon)],
                     config,
                     file_system,
-                    efunc.eval__std_perc_matching_kpts_in_collection,
+                    efunc.eval_collection__std_perc_matching_kpts_for_e,
                     eval_config={
                         'collection_name': collection_name,
                         'set_names': set_names,
