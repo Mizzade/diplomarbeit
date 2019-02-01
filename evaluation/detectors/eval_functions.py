@@ -7,7 +7,6 @@ import json
 import os
 from tqdm import tqdm
 import pickle
-import util_functions as util
 from Evaluater import Evaluater
 
 def eval_image__num_kpts(ev:Evaluater, obj:Dict) -> pd.DataFrame:

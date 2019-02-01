@@ -7,7 +7,6 @@ import json
 import os
 from tqdm import tqdm
 import pickle
-import util_functions as util
 
 class Evaluater():
 
