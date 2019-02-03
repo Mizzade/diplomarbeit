@@ -9,6 +9,8 @@ opencv-contrib-python = "==3.4.2.17"
 tqdm = "==4.28.1"
 numpy = "==1.15.4"
 pandas = "==0.24.0"
+jupyter = "==1.0.0"
+matplotlib = "==2.2.3"
 
 [dev-packages]
 
