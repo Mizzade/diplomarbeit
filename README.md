@@ -87,3 +87,6 @@ Siehe dazu [hier](./scripts/eval/README.md)
 ### Ausgabe der Detetkor Evalueriung
 Siehe dazu [hier](./evaluation/detectors/README.md)
 
+### Informationen zu den Bilderkollektionen
+Siehe dazu [hier](./data/README.md)
+

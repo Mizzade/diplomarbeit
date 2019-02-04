@@ -1,5 +1,31 @@
 # Datasets und Quellen
 
+### Generelle Übersicht der verwendeten Datensets
+| Kollektion  | Setname     | Anzahl Bilder|
+|:------------|:------------|:------------:|
+| Webcam      |             |              |
+|             | chamonix    | 40           |
+|             | courbevoie  | 50           |
+|             | frankfurt   | 40           |
+|             | mexico      | 40           |
+|             | panorama    | 40           |
+|             | stlouis     | 40           |
+| Eisert      |             |              |
+|             | v_set_01    | 2            |
+|             | v_set_02    | 2            |
+|             | v_set_03    | 2            |
+|             | v_set_04    | 2            |
+|             | v_set_05    | 2            |
+|             | v_set_06    | 2            |
+|             | v_set_07    | 2            |
+|             | v_set_08    | 2            |
+|             | v_set_09    | 2            |
+|             | v_set_10    | 2            |
+|             | v_set_12    | 2            |
+|             | v_set_13    | 2            |
+| Example     | v_churchill | 6            |
+
+
 # Webcam
 This dataset is the "Webcam" dataset, which appeared in [1]. We collected series
 of images from outdoor webcams captured  at different times of day and different
