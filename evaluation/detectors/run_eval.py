@@ -13,6 +13,13 @@ from Evaluater import Evaluater
 def build_list_of_evaluations(config:Dict, file_system:Dict) -> None:
     list_of_evaluations = []
 
+    if config['eval_meta__settings']:
+        list_of_evaluations.append(Evaluater(
+            ['_meta'],
+            config,
+            file_system,
+            efunc.store_meta_information
+        ))
 
     for collection_name in config['collection_names']:
         set_names = [s for s in file_system[collection_name] if not s.startswith('_')]

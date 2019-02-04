@@ -13,7 +13,7 @@ class Evaluater():
     def __init__(self,
         target_keypath:List[str],
         config:Dict,
-        file_system: Dict,
+        file_system:Dict,
         eval_func:Callable,
         eval_config:Dict=None,
         requirements:Dict=None) -> None:
@@ -50,21 +50,6 @@ class Evaluater():
         except Exception as e:
             print('Something went wrong while saving.\n ', e)
 
-    # def _key_exists(self, obj:Dict, list_of_keys:List[List[str]]) -> bool:
-    #     if type(obj) is not dict:
-    #         raise AttributeError('_key_exists() exspects dict as first argument')
-    #     if len(list_of_keys) == 0:
-    #         raise AttributeError('_key_exists() espects a list of list of keys with at least one key in it. O were given.')
-
-    #     for lok in list_of_keys:
-    #         _obj = obj
-    #         for key in lok:
-    #             try:
-    #                 _obj = _obj[key]
-    #             except KeyError:
-    #                 return False
-
-    #     return True
 
     def _insert_key_and_value(self, target:Dict, value:Any) -> Dict:
         if type(target) is not dict:

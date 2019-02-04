@@ -104,6 +104,18 @@ parser.add_argument('--eval__disable_all',
     action='store_false',
     help='Disable all evaluation tests')
 
+# Store meta settings in output.
+parser.add_argument('--eval_meta__settings',
+    dest='eval_meta__settings',
+    action='store_true',
+    help='Store meta information inside the evaluation output. Default: True',
+    default=None)
+
+parser.add_argument('--no-eval_meta__settings',
+    dest='eval_meta__settings',
+    action='store_false',
+    help='Do not store meta information inside the evaluation output.',
+    default=None)
 
 # Number of found keypoints
 parser.add_argument('--eval_image__num_kpts',
@@ -341,6 +353,7 @@ parser.add_argument('--no-eval_collection__std_perc_matching_kpts',
 
 # evaluation plan
 eval_plan = {
+    'eval_meta__settings': True,
     'eval_image__num_kpts': True,
     'eval_imagepair__max_num_matching_kpts': True,
     'eval_imagepair__num_matching_kpts': True,

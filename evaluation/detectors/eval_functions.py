@@ -9,6 +9,26 @@ from tqdm import tqdm
 import pickle
 from Evaluater import Evaluater
 
+def store_meta_information(ev:Evaluater, obj:Dict) -> Dict:
+    """Stores meta information, like config and file_system object etc.
+
+    Arguments:
+        ev {Evaluater} -- The evaluater object. Allows access to config,
+        file_system and all Evaluter properites.
+        obj {Dict} -- The target object wherein to save the output of this function.
+        Helpful if you want to access already computed elements.
+
+    Returns:
+        Dict -- Element to store wihtin `obj`.
+    """
+    output = {
+        'config': ev.config,
+        'file_system': ev.file_system
+    }
+
+    return output
+
+
 def eval_image__num_kpts(ev:Evaluater, obj:Dict) -> pd.DataFrame:
     """Returns pandas dataframe containing the number of found keypoints for
     each file in ev.file_list
