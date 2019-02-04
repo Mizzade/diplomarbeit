@@ -388,6 +388,7 @@ def get_config(argv):
     config['tmp_dir_detector'] = os.path.join(config['root_dir_detector'], config['tmp_dir_detector'])
 
     config['kpts_file_format'] = '{}.csv' if config['max_size'] is None else '{}_{}.csv'
+    config['kpts_image_format'] = '{}.png' if config['max_size'] is None else '{}_{}.png'
 
     # If enable_all is not true, only take the evaluation tests, that have
     # specifically been activated.
