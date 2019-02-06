@@ -51,3 +51,7 @@ point_number='1000'
 
 $matlab -r "point_extractor('$dataset_name','$conv_feature_name','$feature_name',$point_number);  exit(0);";
 ```
+```python
+ python ./scripts/run/run_detectors.py --root_dir $(pwd) --max_size 1200 --detectors tcovdet --collection_names webcam eisert --set_names frankfurt v_set_01 --max_num_images 4
+
+```
