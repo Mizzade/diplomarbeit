@@ -1,25 +1,5 @@
 """
 Run trained detector with image to get feature map
-
-Usage: python patch_network_test_point.py --train_name mexico_tilde_p24_Mexico_train_point_translation_iter_20 --stats_name mexico_tilde_p24_Mexico_train_point --dataset_name VggAffineDataset --save_feature covariant_point_tilde
-
-General options:
-    --training      Name of the training dataset
-    --stats_name    Name of the mean and the variance of the patches
-    --dataset_name  dataset name (option VggAffineDataset, EFDataset, WebcamDataset)
-    --save_feature  name to save the feature
-    --alpha         Trade-off parameter between invertible loss and covariant loss
-    --descriptor_dim Number of the parameter for transformation (translation 2)
-    --patch_size    Default 32
-
-Output:
-
-    feature map
-
-Examples:
-
-    >>> python patch_network_test_point.py --train_name mexico_tilde_p24_Mexico_train_point_translation_iter_20 --stats_name mexico_tilde_p24_Mexico_train_point --dataset_name VggAffineDataset --save_feature covariant_point_tilde
-
 """
 
 from __future__ import print_function
@@ -101,12 +81,6 @@ parser.add_argument('--stats_name',
     help='Name of the stats file containing mean and std for the training data ' +
     'used to create the tensorflow model. Default: mexico_tilde_p24_Mexico_train_point')
 
-parser.add_argument('--dataset_name',
-    nargs='?',
-    type=str,
-    default='webcam',
-    help='Training dataset name. Name of the image collection.')
-
 parser.add_argument('--save_feature',
     nargs='?',
     type=str,
@@ -178,7 +152,6 @@ parser.add_argument('--dry',
     default=False)
 
 def main(args):
-
     # Get necessary directories
     output_dir = args.output_dir
     image_dir = args.image_dir
@@ -188,7 +161,6 @@ def main(args):
 
     train_name = args.train_name
     stats_name = args.stats_name
-    dataset_name = args.dataset_name
     save_feature_name = args.save_feature
 
     # Create list of file names.
@@ -219,13 +191,6 @@ def main(args):
 
     cnn_model = patch_cnn.PatchCNN(CNNConfig)
 
-    if dataset_name=='webcam' :
-        subsets = ['chamonix', 'courbevoie', 'frankfurt', 'panorama', 'stlouis'] #'Mexico', #not using mexico for test,
-
-
-    if not os.path.exists(save_dir):
-        os.makedirs(save_dir, exist_ok=True)
-
     saver = tf.train.Saver()
     gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.8)
 
@@ -247,7 +212,7 @@ def main(args):
             io_utils.create_dir(save_dir) # Create folder if it does not exists
 
             output_list = []
-            if extension in ['ppm', 'pgm', 'png', 'jpg']:
+            if extension in ['.ppm', '.pgm', '.png', '.jpg']:
                 print(file_base)
                 save_file = file_base + '.mat'
                 save_name = os.path.join(save_dir, save_file)

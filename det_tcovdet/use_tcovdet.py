@@ -89,7 +89,8 @@ def detect_bulk(
         '--save_feature', 'covariant_points',
         '--output_dir', config['tmp_dir_tcovdet'],
         '--file_list', ' '.join(file_list),
-        '--dry'])
+        ])
+
     except Exception as e:
         print('Something went terrible wrong.')
         print(e)
