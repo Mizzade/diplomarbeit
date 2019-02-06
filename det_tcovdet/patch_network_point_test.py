@@ -40,6 +40,7 @@ from skimage.transform import pyramid_gaussian
 import exifread
 import argparse
 import sys
+import io_utils
 
 from datetime import datetime
 
@@ -86,29 +87,56 @@ def read_image_from_name(file_name):
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--train_name", nargs='?', type=str, default = 'mexico_tilde_p24_Mexico_train_point_translation_iter_20',
-                    help="Training dataset name")
+parser.add_argument('--train_name',
+    nargs='?',
+    type=str,
+    default='mexico_tilde_p24_Mexico_train_point_translation_iter_20',
+    help='Name of the tensorflow model to use within the TENSORFLOW_DIR. ' +
+    'Default: mexico_tilde_p24_Mexico_train_point_translation_iter_20')
 
-parser.add_argument("--stats_name", nargs='?', type=str, default = 'mexico_tilde_p24_Mexico_train_point',
-                    help="Training dataset name")
+parser.add_argument('--stats_name',
+    nargs='?',
+    type=str,
+    default='mexico_tilde_p24_Mexico_train_point',
+    help='Name of the stats file containing mean and std for the training data ' +
+    'used to create the tensorflow model. Default: mexico_tilde_p24_Mexico_train_point')
 
-parser.add_argument("--dataset_name",
+parser.add_argument('--dataset_name',
     nargs='?',
     type=str,
     default='webcam',
-    help="Training dataset name. Name of the image collection.")
+    help='Training dataset name. Name of the image collection.')
 
-parser.add_argument("--save_feature", nargs='?', type=str, default = 'covariant_point_tilde',
-                    help="Training dataset name")
+parser.add_argument('--save_feature',
+    nargs='?',
+    type=str,
+    default ='covariant_point_tilde',
+    help='Name of the subfolder within OUTPUT_DIR wherein to save the ' +
+    'covariant features. Default: covariant_point_tilde.')
 
-parser.add_argument("--alpha", nargs='?', type=float, default = 1.0,
-                    help="alpha")
+parser.add_argument('--alpha',
+    nargs='?',
+    type=float,
+    default = 1.0,
+    help='Learning rate alpha. Default: 1.0')
 
-parser.add_argument("--descriptor_dim", nargs='?', type=int, default = 2,
-                    help="Number of embedding dimemsion")
+parser.add_argument('--descriptor_dim',
+    nargs='?',
+    type=int,
+    default=2,
+    help='Number of embedding dimemsions. Default: 2')
 
-parser.add_argument("--patch_size", nargs='?', type=int, default = 32,
-                    help="Size of the patch")
+parser.add_argument('--patch_size',
+    nargs='?',
+    type=int,
+    default=32,
+    help='Size of the patches. Default: 32')
+
+parser.add_argument('--batch_size',
+    nargs='?',
+    type=int,
+    default=128,
+    help='Batch size when computing features. Default: 128')
 
 parser.add_argument('--output_dir',
     type=str,
@@ -126,89 +154,106 @@ parser.add_argument('--data_dir',
     'Default: data',
     default='data')
 
-args = parser.parse_args()
-train_name = args.train_name
-stats_name = args.stats_name
-dataset_name = args.dataset_name
-save_feature_name = args.save_feature
+parser.add_argument('--tensorflow_dir',
+    type=str,
+    help='Folder containing the .ckpt files for the tensorflow model. ' +
+    'Relative to DATA_DIR. Default: tensorflow',
+    default='tensorflow')
 
-output_dir = args.output_dir
-image_dir = args.image_dir
-data_dir = args.data_dir
+parser.add_argument('--stats_dir',
+    type=str,
+    help='Folder containing the stas (mean, std) for the training data used ' +
+    'to create the model in tensorflow. Relative to DATA_DIR. Default: stats',
+    default='stats')
 
-tensorflow_dir = os.path.join(data_dir, 'tensorflow')
-stats_dir = os.path.join(data_dir, 'stats')
+parser.add_argument('--file_list',
+    type=str,
+    help='List of absolute file paths to images for which to compute keypoints ' +
+    ' as a long string.')
 
-# Parameters
-patch_size = args.patch_size
-batch_size = 128
-descriptor_dim = args.descriptor_dim
+parser.add_argument('--dry',
+    dest='dry',
+    action='store_true',
+    help='If checked, only print parsed args and return. Default: False',
+    default=False)
 
-print('Loading training stats:')
+def main(args):
+
+    # Get necessary directories
+    output_dir = args.output_dir
+    image_dir = args.image_dir
+    data_dir = args.data_dir
+    tensorflow_dir = os.path.join(data_dir, args.tensorflow_dir)
+    stats_dir = os.path.join(data_dir, args.stats_dir)
+
+    train_name = args.train_name
+    stats_name = args.stats_name
+    dataset_name = args.dataset_name
+    save_feature_name = args.save_feature
+
+    # Create list of file names.
+    file_list = args.file_list.split(' ')
+
+    # Parameters
+    alpha = args.alpha
+    patch_size = args.patch_size
+    batch_size = args.batch_size
+    descriptor_dim = args.descriptor_dim
+
+    stats_path = os.path.join(stats_dir, 'stats_{}.pkl'.format(stats_name))
 
 
-with open(os.path.join(stats_dir, 'stats_{}.pkl'.format(stats_name)), 'rb') as src:
-    mean, std = pickle.load(src, encoding='utf-8')
-print(mean)
-print(std)
 
-CNNConfig = {
-    "patch_size": patch_size,
-    "descriptor_dim" : descriptor_dim,
-    "batch_size" : batch_size,
-    "alpha" : args.alpha,
-    "train_flag" : False
-}
+    print('Loading training stats:')
+    with open(stats_path, 'rb') as src:
+        mean, std = pickle.load(src, encoding='utf-8')
+    print('Training data loaded:\nMean: {}\nStd: {}'.format(mean, std))
 
-cnn_model = patch_cnn.PatchCNN(CNNConfig)
+    CNNConfig = {
+        'patch_size': patch_size,
+        'descriptor_dim' : descriptor_dim,
+        'batch_size' : batch_size,
+        'alpha' : alpha,
+        'train_flag' : False
+    }
 
-#dataset information
-# subsets = []
-# if dataset_name=='VggAffineDataset' :
-#     subsets = ['bikes', 'trees', 'graf', 'wall', 'boat', 'bark', 'leuven', 'ubc']
+    cnn_model = patch_cnn.PatchCNN(CNNConfig)
 
-# if dataset_name=='EFDataset' :
-#     subsets = ['notredame','obama','paintedladies','rushmore','yosemite']
+    if dataset_name=='webcam' :
+        subsets = ['chamonix', 'courbevoie', 'frankfurt', 'panorama', 'stlouis'] #'Mexico', #not using mexico for test,
 
-if dataset_name=='webcam' :
-    subsets = ['chamonix', 'courbevoie', 'frankfurt', 'panorama', 'stlouis'] #'Mexico', #not using mexico for test,
 
-working_dir = data_dir
-load_dir = os.path.join(image_dir, dataset_name)
-save_dir = os.path.join(output_dir, save_feature_name, dataset_name)
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir, exist_ok=True)
 
-if not os.path.exists(save_dir):
-    os.makedirs(save_dir, exist_ok=True)
+    saver = tf.train.Saver()
+    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.8)
 
-saver = tf.train.Saver()
-gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.8)
+    with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
+        try:
+            saver.restore(sess, os.path.join(tensorflow_dir, '{}_model.ckpt'.format(train_name)))
+            # saver.restore(sess, '../tensorflow_model/'+train_name+'_model.ckpt')
+            print('Model restored.')
+        except:
+            print('No model found .Exit.')
+            exit()
 
-with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
-    try:
-        saver.restore(sess, os.path.join(tensorflow_dir, '{}_model.ckpt'.format(train_name)))
-        # saver.restore(sess, "../tensorflow_model/"+train_name+"_model.ckpt")
-        print("Model restored.")
-    except:
-        print('No model found')
-        exit()
 
-    for i,subset in enumerate(subsets) :
-        index = 1
+        for file_path in file_list:
+            collection_name, set_name, file_base, extension = io_utils.get_path_components(file_path)
+            file_name = '{}.{}'.format(file_base, extension)
 
-        # Create output dir for each data set
-        if not os.path.exists(os.path.join(save_dir, subset)):
-            os.makedirs(os.path.join(save_dir, subset), exist_ok=True)
+            save_dir = os.path.join(output_dir, save_feature_name, collection_name, set_name)
+            io_utils.create_dir(save_dir) # Create folder if it does not exists
 
-        for file in os.listdir(os.path.join(load_dir, subset)):
             output_list = []
-            if file.endswith(".ppm") or file.endswith(".pgm") or file.endswith(".png") or file.endswith(".jpg") :
-                image_name = os.path.join(load_dir, subset, file)
-                print(image_name)
-                save_file = file[0:-4] + '.mat'
-                save_name = os.path.join(save_dir, subset, save_file)
+            if extension in ['ppm', 'pgm', 'png', 'jpg']:
+                print(file_base)
+                save_file = file_base + '.mat'
+                save_name = os.path.join(save_dir, save_file)
 
                 #read image
-                img, ratio = read_image_from_name(image_name)
+                img, ratio = read_image_from_name(file_path)
                 if img.shape[2] == 1 :
                     img = np.repeat(img, 3, axis = 2)
 
@@ -218,7 +263,7 @@ with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
                 #predict transformation
                 for (j, resized) in enumerate(pyramid) :
                     fetch = {
-                        "o1": cnn_model.o1
+                        'o1': cnn_model.o1
                     }
 
                     resized = np.asarray(resized)
@@ -226,7 +271,17 @@ with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
                     resized = resized.reshape((1,resized.shape[0],resized.shape[1],resized.shape[2]))
 
                     result = sess.run(fetch, feed_dict={cnn_model.patch: resized})
-                    result_mat = result["o1"].reshape((result["o1"].shape[1],result["o1"].shape[2],result["o1"].shape[3]))
+                    result_mat = result['o1'].reshape((result['o1'].shape[1],result['o1'].shape[2],result['o1'].shape[3]))
                     output_list.append(result_mat)
 
                 sio.savemat(save_name,{'output_list':output_list})
+
+if __name__ == '__main__':
+    args = parser.parse_args()
+
+    if args.dry:
+        for k, v in vars(args).items():
+            print('{}: {}'.format(k, v))
+        print('\nfile_list:\n', args.file_list.split(' '))
+    else:
+        main(args)
