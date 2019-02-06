@@ -56,6 +56,9 @@ def get_file_list(config:Dict, sorted_output=True) -> List[str]:
     allowed_extensions = config['allowed_extensions']
     collection_names = config['collection_names']
     set_names = config['set_names']
+    max_num_images = config['max_num_images']
+    skip_first_n = config['skip_first_n']
+
 
     file_list = []
     for collection_name in next(os.walk(data_dir))[1]:
@@ -74,6 +77,12 @@ def get_file_list(config:Dict, sorted_output=True) -> List[str]:
     if sorted_output:
         file_list = sorted(file_list)
 
+    # Skip first n
+    file_list = file_list[skip_first_n:]
+
+    # Take only m images
+    if max_num_images:
+        file_list = file_list[:max_num_images]
     return file_list
 
 def print_configuration(config:Dict) -> None:

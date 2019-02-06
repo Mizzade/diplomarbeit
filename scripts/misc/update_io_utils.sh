@@ -16,7 +16,7 @@ if test -z ROOT ; then
   exit 1
 fi
 
-target_dirs=("desc_doap" "desc_tfeat" "pipe_lift" "pipe_sift" "pipe_superpoint")
+target_dirs=("desc_doap" "desc_tfeat" "pipe_lift" "pipe_sift" "pipe_superpoint" "det_tcovdet")
 for i in "${target_dirs[@]}"
 do
   $ROOT/scripts/misc/copy_io_utils.sh $ROOT $i

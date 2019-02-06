@@ -49,7 +49,7 @@ parser.add_argument('--max_size',
 parser.add_argument('--detectors',
     nargs='+',
     help='Choose which detectors should be run. Default: (sift, tilde, lift, superpoint)',
-    default=['sift', 'tilde', 'lift', 'superpoint'])
+    default=['sift', 'tilde', 'lift', 'superpoint', 'tcovdet'])
 
 parser.add_argument('--max_num_images',
     type=int,
@@ -61,7 +61,7 @@ parser.add_argument('--skip_first_n',
     type=int,
     help='Skip the first n images when using a model. A value of None means ' +
     'not to skip any images. Default: None',
-    default=None)
+    default=0)
 
 parser.add_argument('--collection_names',
     nargs='+',
@@ -84,8 +84,6 @@ parser.add_argument('--dry',
     default=False)
 
 # Arguments for detectors
-
-
 # SIFT
 parser.add_argument('--root_dir_sift',
     type=str,
@@ -157,6 +155,20 @@ parser.add_argument('--main_tcovdet',
     type=str,
     help='Name of the main python file to start the model. Default: use_tcovdet.py',
     default='use_tcovdet.py')
+
+parser.add_argument('--bulk_mode_tcovdet',
+    dest='bulk_mode_tcovdet',
+    action='store_true',
+    help='Computes keypoints for all images in one go. Opens up matlab only '
+    + 'once, thus speeding up the whole process. Default: True',
+    default=True)
+
+parser.add_argument('--no-bulk_mode_tcovdet',
+    dest='bulk_mode_tcovdet',
+    action='store_false',
+    help='Compute keypoints for each image individually. Useful if you want to '
+    + 'compute keypoints for only one image.',
+    default=True)
 
 # SuperPoint
 parser.add_argument('--root_dir_superpoint',
