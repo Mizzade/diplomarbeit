@@ -25,6 +25,10 @@
 # TILDE
 /det_tilde/tmp
 
+# TCovDet
+/det_tcovdet/tmp
+/det_tcovdet/io_utils.py
+
 # Evaluation
 /evaluation/detectors/tmp
 
