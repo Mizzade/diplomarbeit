@@ -11,6 +11,7 @@ echo "Setup for TILDE: done."
 # DOAP
 echo "Start setup for DOAP..."
 echo "======================="
+$ROOT/scripts/desc_doap/setup_doap.sh $ROOT
 $ROOT/scripts/desc_doap/setup_vlfeat.sh $ROOT
 $ROOT/scripts/desc_doap/setup_matconvnet.sh $ROOT
 $ROOT/scripts/misc/copy_io_utils.sh $ROOT desc_doap
@@ -48,3 +49,13 @@ $ROOT/scripts/pipe_sift/setup_sift.sh $ROOT
 $ROOT/scripts/misc/copy_io_utils.sh $ROOT pipe_sift
 echo "======================"
 echo "Setup for SIFT: done."
+
+# TCovDet
+# SIFT
+echo "Start setup for TCovDet..."
+echo "========================"
+$ROOT/scripts/det_tcovdet/setup_tcovdet.sh $ROOT
+$ROOT/scripts/det_tcovdet/setup_vlfeat.sh $ROOT
+$ROOT/scripts/misc/copy_io_utils.sh $ROOT det_tcovdet
+echo "======================"
+echo "Setup for TCovDet: done."
