@@ -48,8 +48,8 @@ parser.add_argument('--max_size',
 
 parser.add_argument('--descriptors',
     nargs='+',
-    help='Choose which descriptors should be run. Default: (sift, tfeat, doap)',
-    default=['sift', 'tfeat', 'doap'])
+    help='Choose which descriptors should be run. Default: (sift, tfeat, doap, lift)',
+    default=['sift', 'tfeat', 'doap', 'lift'])
 
 parser.add_argument('--detectors',
     nargs='+',
