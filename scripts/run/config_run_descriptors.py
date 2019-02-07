@@ -53,8 +53,8 @@ parser.add_argument('--descriptors',
 
 parser.add_argument('--detectors',
     nargs='+',
-    help='Choose which detectors should be run. Default: (sift, tilde, lift, superpoint)',
-    default=['sift', 'tilde', 'lift', 'superpoint'])
+    help='Choose which detectors should be run. Default: (sift, tilde, lift, tcovdet, superpoint)',
+    default=['sift', 'tilde', 'lift', 'tcovdet', 'superpoint'])
 
 parser.add_argument('--max_num_images',
     type=int,
