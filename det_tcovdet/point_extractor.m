@@ -68,7 +68,7 @@ for i = 1:numel(file_list)
     end
 
     output = x.output_list;
-    disp(['output: ', output])
+    % disp(['output: ', output])
     if numel(output)==0
         disp(['Output number is 0 for ' image_name]);
         save(out_path, 'feature', 'score');
@@ -173,7 +173,7 @@ for i = 1:numel(file_list)
             score = [score;score_t];
         end
     end
-    disp('Feature size: ')
-    disp(size(feature))
+    % disp('Feature size: ')
+    % disp(size(feature))
     save(out_path, 'feature', 'score');
 end

@@ -213,7 +213,6 @@ def main(args):
 
             output_list = []
             if extension in ['.ppm', '.pgm', '.png', '.jpg']:
-                print(file_base)
                 save_file = file_base + '.mat'
                 save_name = os.path.join(save_dir, save_file)
 
@@ -247,6 +246,5 @@ if __name__ == '__main__':
     if args.dry:
         for k, v in vars(args).items():
             print('{}: {}'.format(k, v))
-        print('\nfile_list:\n', args.file_list.split(' '))
     else:
         main(args)
