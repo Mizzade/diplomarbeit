@@ -79,10 +79,11 @@ def detect_bulk(
     # Load each created .mat file, extract the keypoints (Column 2 and 5),
     # create list of cv2.KeyPoint.
     # Then load the image, scale it, draw the keypoints in it and save everything
-    for i, file in enumerate(file_list):
+    for i in tqdm(range(len(file_list))):
+        file = file_list[i]
         mat_path = os.path.join(config['tmp_dir_tcovdet'], 'feature_points', collection_names[i], set_names[i], image_names[i] + '.mat')
         kpts_numpy = loadmat(mat_path)['feature'][:, [2, 5]]        # numpy array
-        kpts_cv2 = [cv2.KeyPoint(x[0], x[1]) for x in kpts_numpy]   # list of cv2.KeyPoint
+        kpts_cv2 = [cv2.KeyPoint(x[0], x[1], 1.0) for x in kpts_numpy]   # list of cv2.KeyPoint
 
         img = cv2.imread(file, 0)
         if (img.shape[0] * img.shape[1]) > (1024 * 768):
