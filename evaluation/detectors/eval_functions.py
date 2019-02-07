@@ -261,7 +261,7 @@ def eval_set__std_perc_matchting_kpts_for_e(ev:Evaluater, obj:Dict) -> float:
 
     return output
 
-def eval_set__stats_perc_matching_kpts_for_e(ev:Evaluater, obj:Dict) -> None:
+def eval_set__stats_perc_matching_kpts_for_e(ev:Evaluater, obj:Dict) -> Dict:
     collection_name = ev.eval_config['collection_name']
     set_name = ev.eval_config['set_name']
     epsilon = ev.eval_config['epsilon']
@@ -289,7 +289,7 @@ def eval_set__stats_perc_matching_kpts_for_e(ev:Evaluater, obj:Dict) -> None:
 
 
     lt_std = y < avg - std
-    gt_std = y > avg -std
+    gt_std = y > avg +std
     condition = (lt_std) | (gt_std)
     val_extrema = y[condition].flatten()
     idx_extrema = np.where(condition)[0]
@@ -438,3 +438,59 @@ def eval_collection__std_perc_matching_kpts_for_e(ev:Evaluater, obj:Dict) -> flo
     output = np.std((avgs * weights) / total)
 
     return output
+
+def eval_collection__stats_num_kpts_for_e(ev:Evaluater, obj:Dict) -> Dict:
+    collection_name = ev.eval_config['collection_name']
+    set_names = sorted(ev.eval_config['set_names'])
+    file_system = ev.file_system
+    epsilon = ev.eval_config['epsilon']
+
+    y = [obj[collection_name][set_name]['stats_num_kpts']['avg'] for set_name in set_names]
+    y = np.array(y)
+
+    val_min = np.min(y)
+    val_max = np.max(y)
+    idx_min = np.argmin(y)
+    idx_max = np.argmax(y)
+
+    avg = np.mean(y)
+    std = np.std(y)
+
+    lt_std = y < avg - std
+    gt_std = y > avg + std
+    condition = (lt_std) | (gt_std)
+    val_extrema = y[condition].flatten()
+    idx_extrema = np.where(condition)[0]
+    num_extrema = len(val_extrema)
+
+    val_extrema_lt_std = y[lt_std].flatten()
+    idx_extrema_lt_std = np.where(lt_std)[0]
+    num_extrema_lt_std = len(val_extrema_lt_std)
+
+    val_extrema_gt_std = y[gt_std].flatten()
+    idx_extrema_gt_std = np.where(gt_std)[0]
+    num_extrema_gt_std = len(val_extrema_gt_std)
+
+    output = {
+        '_description': "Average number of found keypoints per set.",
+        'set_names': set_names,
+        'y': y,
+        'avg': avg,
+        'std': std,
+        'val_min': val_min,
+        'val_max': val_max,
+        'idx_min': idx_min,
+        'idx_max': idx_max,
+        'val_extrema': val_extrema,
+        'idx_extrema': idx_extrema,
+        'num_extrema': num_extrema,
+        'val_extrema_lt_std': val_extrema_lt_std,
+        'idx_extrema_lt_std': idx_extrema_lt_std,
+        'num_extrema_lt_std': num_extrema_lt_std,
+        'val_extrema_gt_std': val_extrema_gt_std,
+        'idx_extrema_gt_std': idx_extrema_gt_std,
+        'num_extrema_gt_std': num_extrema_gt_std
+    }
+
+    return output
+

@@ -305,6 +305,20 @@ def build_list_of_evaluations(config:Dict, file_system:Dict) -> None:
                     }
                 ))
 
+        if config['eval_collection__stats_num_kpts']:
+            for epsilon in config['epsilons']:
+                list_of_evaluations.append(Evaluater(
+                    [collection_name, 'stats_num_kpts_for_e_{}'.format(epsilon)],
+                    config,
+                    file_system,
+                    efunc.eval_collection__stats_num_kpts_for_e,
+                    eval_config={
+                        'collection_name': collection_name,
+                        'set_names': set_names,
+                        'epsilon': epsilon
+                    }
+                ))
+
     return list_of_evaluations
 
 
