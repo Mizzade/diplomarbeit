@@ -110,6 +110,18 @@ def build_list_of_evaluations(config:Dict, file_system:Dict) -> None:
                         'set_name': set_name
                     }
                 ))
+        if config['eval_set__stats_num_kpts']:
+            for set_name in set_names:
+                list_of_evaluations.append(Evaluater(
+                    [collection_name, set_name, 'stats_num_kpts'],
+                    config,
+                    file_system,
+                    efunc.eval_set__stats_num_kpts,
+                    eval_config={
+                        'collection_name': collection_name,
+                        'set_name': set_name
+                    }
+                ))
 
         if config['eval_set__avg_num_matching_kpts']:
             for set_name in set_names:

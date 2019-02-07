@@ -195,6 +195,22 @@ parser.add_argument('--no-eval_set__std_num_kpts',
     help='Do not get the standard deviation of the average number of keypoints found for an image set',
     default=None)
 
+# Stats for the number of found keypoints in set.
+# Contains max, min, avg, std, number of extrema, number of extrema above std,
+# number of extrema below std.
+parser.add_argument('--eval_set__stats_num_kpts',
+    dest='eval_set__stats_num_kpts',
+    action='store_true',
+    help='Get an stats object for number of keypoints containing max, min, avg, std, number of extrema ' +
+    ' (noe), noe above std and noe below std.',
+    default=None)
+
+parser.add_argument('--no-eval_set__stats_num_kpts',
+    dest='eval_set__stats_num_kpts',
+    action='store_false',
+    help='Do not create the stats object for number of keypoints for an image set.',
+    default=None)
+
 # Average number of matching keypoints within e pixel distance.
 parser.add_argument('--eval_set__avg_num_matching_kpts',
     dest='eval_set__avg_num_matching_kpts',
@@ -360,6 +376,7 @@ eval_plan = {
     'eval_imagepair__perc_matching_kpts': True,
     'eval_set__avg_num_kpts': True,
     'eval_set__std_num_kpts': True,
+    'eval_set__stats_num_kpts': True,
     'eval_set__avg_num_matching_kpts': True,
     'eval_set__std_num_matching_kpts': True,
     'eval_set__avg_max_num_matching_kpts': True,

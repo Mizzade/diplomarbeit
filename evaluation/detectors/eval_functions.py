@@ -149,6 +149,47 @@ def eval_set__std_num_kpts(ev:Evaluater, obj:Dict) -> float:
 
     return output
 
+def eval_set__stats_num_kpts(ev:Evaluater, obj:Dict) -> Dict:
+    collection_name = ev.eval_config['collection_name']
+    set_name = ev.eval_config['set_name']
+    config = ev.config
+    fs = ev.file_system
+
+    y = obj[collection_name]['num_kpts'].loc[fs[collection_name][set_name]].values.flatten()
+    avg = obj[collection_name][set_name]['avg_num_kpts']
+    std = obj[collection_name][set_name]['std_num_kpts']
+
+    idx_min = np.argmin(y)
+    idx_max = np.argmax(y)
+
+    val_min = np.min(y)
+    val_max = np.max(y)
+
+    condition = (y < avg-std) | (y > avg+std)
+    idx_extrema = np.where((y < avg-std) | (y > avg+std))[0]
+    val_extrema = y[condition].flatten()
+
+    num_extrema = len(val_extrema)
+    num_extrema_lt_std = len(y[y < avg-std].flatten())
+    num_extrema_gt_std = len(y[y > avg+std].flatten())
+
+    output = {
+        'avg': avg,
+        'std': std,
+        'idx_min': idx_min,
+        'idx_max': idx_max,
+        'val_min': val_min,
+        'val_max': val_max,
+        'idx_extrema': idx_extrema,
+        'val_extrema': val_extrema,
+        'num_extrema': num_extrema,
+        'num_extrema_lt_std': num_extrema_lt_std,
+        'num_extrema_gt_std': num_extrema_gt_std
+    }
+
+    return output
+
+
 def eval_set__avg_num_matching_kpts_for_e(ev:Evaluater, obj:Dict) -> float:
     collection_name = ev.eval_config['collection_name']
     set_name = ev.eval_config['set_name']
