@@ -27,6 +27,7 @@
 
 # TCovDet
 /det_tcovdet/tmp
+/det_tcovdet/vlfeat-0.9.21
 /det_tcovdet/io_utils.py
 
 # Evaluation
