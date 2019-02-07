@@ -1,7 +1,7 @@
-#function point_extractor_2d_NC17(datasets_name, load_feature_name, save_feature_name, point_number)
 function point_extractor_2d_NC17(vlfeat_root, config_path)
 
 %Change this to your own vlfeat folder
+%run(fullfile(strcat(vlfeat_root, '/toolbox/vl_setup')));
 addpath(genpath(strcat(vlfeat_root, '/toolbox/mex/')));
 
 % Load config
@@ -10,10 +10,10 @@ configStruct = load(config_path);
 file_list = string(configStruct.file_list);                 % abs path to images
 collection_names = string(configStruct.collection_names);   % collection name for each image
 set_names = string(configStruct.set_names);                 % set name for each image
-image_names = string(configStruct.image_bases);             % image names without extension
+image_names = string(configStruct.image_names);             % image names without extension
 dir_output = string(configStruct.dir_output);               % path to output dir in tmp
 dir_data = string(configStruct.dir_data);                   % path to folder containing featuer mats.
-point_number = configStruct.point_number                    % number of keypoints per image
+point_number = configStruct.point_number;                   % number of keypoints per image
 
 
 maxsize = 1024*768;
@@ -27,10 +27,13 @@ for i = 1:numel(file_list)
     feature = [];
     score = [];
 
-    image_path = file_list(i);
-    collection_name = collection_names(i);
-    set_name = set_names(i);
-    image_name = image_names(i);
+    image_path = strtrim(file_list(i));
+    collection_name = strtrim(collection_names(i));
+    set_name = strtrim(set_names(i));
+    image_name = strtrim(image_names(i));
+
+    [s, mess, messid] = mkdir(strcat(dir_output, '/', collection_name));
+    [s, mess, messid] = mkdir(strcat(dir_output, '/', collection_name, '/', set_name));
 
     in_path = strcat(dir_data, '/', collection_name, '/', set_name, '/', image_name, '.mat');
     out_path = strcat(dir_output, '/', collection_name, '/', set_name, '/', image_name, '.mat');
@@ -44,9 +47,8 @@ for i = 1:numel(file_list)
         continue;
     end
 
-    disp([image_list(i).name x.output_list]);
     if numel(x.output_list) == 0
-        disp(['No Source: ' dir_data load_feature_name '/' datasets_name '/' subset '/' image_list(i).name(1:end-4) '.mat']);
+        disp(['No Source: ', out_path])
         save(out_path, 'feature', 'score');
         continue;
     end
