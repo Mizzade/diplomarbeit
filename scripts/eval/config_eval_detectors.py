@@ -289,6 +289,18 @@ parser.add_argument('--no-eval_set__std_perc_matchting_kpts',
     help='Do not get the standard deviation of the average percentage of matching keypoints found for an image set',
     default=None)
 
+parser.add_argument('--eval_set__stats_perc_matching_kpts',
+    dest='eval_set__stats_perc_matching_kpts',
+    action='store_true',
+    help='For each image i, get the average percentage of matching keypoints of image i to all images j != i.',
+    default=None)
+
+parser.add_argument('--no-eval_set__stats_perc_matching_kpts',
+    dest='eval_set__stats_perc_matching_kpts',
+    action='store_false',
+    help='Skip --eval_set_perc_matching_kpts.',
+    default=None)
+
 # Average number of keypoints in collection
 parser.add_argument('--eval_collection__avg_num_kpts',
     dest='eval_collection__avg_num_kpts',
@@ -383,6 +395,7 @@ eval_plan = {
     'eval_set__std_max_num_matching_kpts': True,
     'eval_set__avg_perc_matchting_kpts': True,
     'eval_set__std_perc_matchting_kpts': True,
+    'eval_set__stats_perc_matching_kpts': True,
     'eval_collection__avg_num_kpts': True,
     'eval_collection__std_num_kpts': True,
     'eval_collection__avg_num_matching_kpts': True,

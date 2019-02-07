@@ -165,15 +165,25 @@ def eval_set__stats_num_kpts(ev:Evaluater, obj:Dict) -> Dict:
     val_min = np.min(y)
     val_max = np.max(y)
 
-    condition = (y < avg-std) | (y > avg+std)
-    idx_extrema = np.where((y < avg-std) | (y > avg+std))[0]
-    val_extrema = y[condition].flatten()
+    lt_std = (y < avg - std)
+    gt_std = (y > avg + std)
+    condition = lt_std | gt_std
 
+    idx_extrema = np.where(condition)[0]
+    val_extrema = y[condition].flatten()
     num_extrema = len(val_extrema)
-    num_extrema_lt_std = len(y[y < avg-std].flatten())
-    num_extrema_gt_std = len(y[y > avg+std].flatten())
+
+    idx_extrema_lt_std = np.where(lt_std)[0]
+    val_extrema_lt_std = y[lt_std]
+    num_extrema_lt_std = len(val_extrema_lt_std)
+
+    idx_extrema_gt_std = np.where(gt_std)[0]
+    val_extrema_gt_std = y[gt_std]
+    num_extrema_gt_std = len(val_extrema_gt_std)
+
 
     output = {
+        'y': y,
         'avg': avg,
         'std': std,
         'idx_min': idx_min,
@@ -183,12 +193,15 @@ def eval_set__stats_num_kpts(ev:Evaluater, obj:Dict) -> Dict:
         'idx_extrema': idx_extrema,
         'val_extrema': val_extrema,
         'num_extrema': num_extrema,
+        'idx_extrema_lt_std': idx_extrema_lt_std,
+        'val_extrema_lt_std': val_extrema_lt_std,
         'num_extrema_lt_std': num_extrema_lt_std,
+        'idx_extrema_gt_std': idx_extrema_gt_std,
+        'val_extrema_gt_std': val_extrema_gt_std,
         'num_extrema_gt_std': num_extrema_gt_std
     }
 
     return output
-
 
 def eval_set__avg_num_matching_kpts_for_e(ev:Evaluater, obj:Dict) -> float:
     collection_name = ev.eval_config['collection_name']
@@ -199,7 +212,6 @@ def eval_set__avg_num_matching_kpts_for_e(ev:Evaluater, obj:Dict) -> float:
     output = np.mean(num_matching_kpts)
 
     return output
-
 
 def eval_set__std_num_matching_kpts_for_e(ev:Evaluater, obj:Dict) -> float:
     collection_name = ev.eval_config['collection_name']
@@ -246,6 +258,71 @@ def eval_set__std_perc_matchting_kpts_for_e(ev:Evaluater, obj:Dict) -> float:
 
     perc_matching_kpts = obj[collection_name][set_name]['perc_matching_kpts_for_e_{}'.format(epsilon)].values
     output = np.std(perc_matching_kpts)
+
+    return output
+
+def eval_set__stats_perc_matching_kpts_for_e(ev:Evaluater, obj:Dict) -> None:
+    collection_name = ev.eval_config['collection_name']
+    set_name = ev.eval_config['set_name']
+    epsilon = ev.eval_config['epsilon']
+
+    heatmap = obj[collection_name][set_name]['perc_matching_kpts_for_e_{}'.format(epsilon)].values
+
+    # create a mask, that hides diagonal elements
+    mask = np.ones(heatmap.shape).astype('int')
+    np.fill_diagonal(mask, 0)
+
+    # Remove the diagonal elements within the square array to create
+    # an new matrix from NxN to Nx(N-1)
+    rows = heatmap[np.where(mask)].reshape(heatmap.shape[0], heatmap.shape[1]-1)
+
+    # Create a new array containing the mean value of each row. (1, N-1).
+    # And compute the mean value of that too.
+    y = rows.mean(axis=1)
+    avg = y.mean()
+    std = y.std()
+
+    val_min = np.min(y)
+    val_max = np.max(y)
+    idx_min = np.argmin(y)
+    idx_max = np.argmax(y)
+
+
+    lt_std = y < avg - std
+    gt_std = y > avg -std
+    condition = (lt_std) | (gt_std)
+    val_extrema = y[condition].flatten()
+    idx_extrema = np.where(condition)[0]
+    num_extrema = len(val_extrema)
+
+    val_extrema_lt_std = y[lt_std].flatten()
+    idx_extrema_lt_std = np.where(lt_std)[0]
+    num_extrema_lt_std = len(val_extrema_lt_std)
+
+    val_extrema_gt_std = y[gt_std].flatten()
+    idx_extrema_gt_std = np.where(gt_std)[0]
+    num_extrema_gt_std = len(val_extrema_gt_std)
+
+    output = {
+        '_description': "Average repeatability of keypoints of image i in all other images j != i.",
+        'y': y,
+        'rows': rows,
+        'avg': avg,
+        'std': std,
+        'val_min': val_min,
+        'val_max': val_max,
+        'idx_min': idx_min,
+        'idx_max': idx_max,
+        'val_extrema': val_extrema,
+        'idx_extrema': idx_extrema,
+        'num_extrema': num_extrema,
+        'val_extrema_lt_std': val_extrema_lt_std,
+        'idx_extrema_lt_std': idx_extrema_lt_std,
+        'num_extrema_lt_std': num_extrema_lt_std,
+        'val_extrema_gt_std': val_extrema_gt_std,
+        'idx_extrema_gt_std': idx_extrema_gt_std,
+        'num_extrema_gt_std': num_extrema_gt_std
+    }
 
     return output
 
