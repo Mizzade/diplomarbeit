@@ -443,7 +443,6 @@ def eval_collection__stats_num_kpts_for_e(ev:Evaluater, obj:Dict) -> Dict:
     collection_name = ev.eval_config['collection_name']
     set_names = sorted(ev.eval_config['set_names'])
     file_system = ev.file_system
-    epsilon = ev.eval_config['epsilon']
 
     y = [obj[collection_name][set_name]['stats_num_kpts']['avg'] for set_name in set_names]
     y = np.array(y)
