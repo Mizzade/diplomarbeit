@@ -59,3 +59,10 @@ $ROOT/scripts/det_tcovdet/setup_vlfeat.sh $ROOT
 $ROOT/scripts/misc/copy_io_utils.sh $ROOT det_tcovdet
 echo "======================"
 echo "Setup for TCovDet: done."
+
+# Evaluation for Detectors
+echo "Start setup for Evaluation of detectors..."
+echo "========================"
+$ROOT/scripts/eval/setup_eval_detectors.sh $ROOT
+echo "======================"
+echo "Setup for evaluation of detectors: done."
