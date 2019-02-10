@@ -40,7 +40,7 @@ def detect(
     io_utils.create_dir(config['tmp_dir_tilde'])
 
     # 2)
-    img = cv2.imread(image_path)
+    img = cv2.imread(image_path, 0)
     img = io_utils.smart_scale(img, config['max_size'], prevent_upscaling=True) if config['max_size'] is not None else img
 
     # 2b)
