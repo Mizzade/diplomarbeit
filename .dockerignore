@@ -1,1 +1,4 @@
 outputs/*
+outputs_old/*
+output_evaluation/*
+data/*
