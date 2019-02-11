@@ -168,7 +168,7 @@ parser.add_argument('--no-bulk_mode_tcovdet',
     action='store_false',
     help='Compute keypoints for each image individually. Useful if you want to '
     + 'compute keypoints for only one image.',
-    default=True)
+    default=None)
 
 # SuperPoint
 parser.add_argument('--root_dir_superpoint',
