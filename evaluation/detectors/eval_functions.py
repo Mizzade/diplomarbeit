@@ -181,6 +181,14 @@ def eval_set__stats_num_kpts(ev:Evaluater, obj:Dict) -> Dict:
     val_extrema_gt_std = y[gt_std]
     num_extrema_gt_std = len(val_extrema_gt_std)
 
+    y_float = y.astype('float32')
+    y_normalized = np.divide(y - avg, std, out=np.zeros_like(y_float), where=std!=0)
+    val_min_normalized = np.min(y_normalized)
+    val_max_normalized = np.max(y_normalized)
+    idx_min_normalized = np.argmin(y_normalized)
+    idx_max_normalized = np.argmax(y_normalized)
+    variation = np.abs([idx_max_normalized - idx_min_normalized])
+
 
     output = {
         'y': y,
@@ -198,7 +206,13 @@ def eval_set__stats_num_kpts(ev:Evaluater, obj:Dict) -> Dict:
         'num_extrema_lt_std': num_extrema_lt_std,
         'idx_extrema_gt_std': idx_extrema_gt_std,
         'val_extrema_gt_std': val_extrema_gt_std,
-        'num_extrema_gt_std': num_extrema_gt_std
+        'num_extrema_gt_std': num_extrema_gt_std,
+        'y_normalized': y_normalized,
+        'val_min_normalized': val_min_normalized,
+        'val_max_normalized': val_max_normalized,
+        'idx_min_normalized': idx_min_normalized,
+        'idx_max_normalized': idx_max_normalized,
+        'variation': variation
     }
 
     return output
@@ -303,6 +317,13 @@ def eval_set__stats_perc_matching_kpts_for_e(ev:Evaluater, obj:Dict) -> Dict:
     idx_extrema_gt_std = np.where(gt_std)[0]
     num_extrema_gt_std = len(val_extrema_gt_std)
 
+    y_normalized = np.divide(y - avg, std, out=np.zeros_like(y), where=std!=0)
+    val_min_normalized = np.min(y_normalized)
+    val_max_normalized = np.max(y_normalized)
+    idx_min_normalized = np.argmin(y_normalized)
+    idx_max_normalized = np.argmax(y_normalized)
+    variation = np.abs([idx_max_normalized - idx_min_normalized])
+
     output = {
         '_description': "Average repeatability of keypoints of image i in all other images j != i.",
         'y': y,
@@ -321,7 +342,13 @@ def eval_set__stats_perc_matching_kpts_for_e(ev:Evaluater, obj:Dict) -> Dict:
         'num_extrema_lt_std': num_extrema_lt_std,
         'val_extrema_gt_std': val_extrema_gt_std,
         'idx_extrema_gt_std': idx_extrema_gt_std,
-        'num_extrema_gt_std': num_extrema_gt_std
+        'num_extrema_gt_std': num_extrema_gt_std,
+        'y_normalized': y_normalized,
+        'val_min_normalized': val_min_normalized,
+        'val_max_normalized': val_max_normalized,
+        'idx_min_normalized': idx_min_normalized,
+        'idx_max_normalized': idx_max_normalized,
+        'variation': variation
     }
 
     return output
@@ -470,6 +497,14 @@ def eval_collection__stats_num_kpts_for_e(ev:Evaluater, obj:Dict) -> Dict:
     idx_extrema_gt_std = np.where(gt_std)[0]
     num_extrema_gt_std = len(val_extrema_gt_std)
 
+    y_float = y.astype('float32')
+    y_normalized = np.divide(y_float - avg, std, out=np.zeros_like(y_float), where=std!=0)
+    val_min_normalized = np.min(y_normalized)
+    val_max_normalized = np.max(y_normalized)
+    idx_min_normalized = np.argmin(y_normalized)
+    idx_max_normalized = np.argmax(y_normalized)
+    variation = np.abs([idx_max_normalized - idx_min_normalized])
+
     output = {
         '_description': "Average number of found keypoints per set.",
         'set_names': set_names,
@@ -488,7 +523,13 @@ def eval_collection__stats_num_kpts_for_e(ev:Evaluater, obj:Dict) -> Dict:
         'num_extrema_lt_std': num_extrema_lt_std,
         'val_extrema_gt_std': val_extrema_gt_std,
         'idx_extrema_gt_std': idx_extrema_gt_std,
-        'num_extrema_gt_std': num_extrema_gt_std
+        'num_extrema_gt_std': num_extrema_gt_std,
+        'y_normalized': y_normalized,
+        'val_min_normalized': val_min_normalized,
+        'val_max_normalized': val_max_normalized,
+        'idx_min_normalized': idx_min_normalized,
+        'idx_max_normalized': idx_max_normalized,
+        'variation': variation
     }
 
     return output
@@ -525,6 +566,13 @@ def eval_collection__stats_perc_matching_kpts_for_e(ev:Evaluater, obj:Dict) -> D
     idx_extrema_gt_std = np.where(gt_std)[0]
     num_extrema_gt_std = len(val_extrema_gt_std)
 
+    y_normalized = np.divide(y - avg, std, out=np.zeros_like(y), where=std!=0)
+    val_min_normalized = np.min(y_normalized)
+    val_max_normalized = np.max(y_normalized)
+    idx_min_normalized = np.argmin(y_normalized)
+    idx_max_normalized = np.argmax(y_normalized)
+    variation = np.abs([idx_max_normalized - idx_min_normalized])
+
     output = {
         '_description': "Average percentage of matching keypoints per set in whole collection",
         'set_names': set_names,
@@ -543,7 +591,13 @@ def eval_collection__stats_perc_matching_kpts_for_e(ev:Evaluater, obj:Dict) -> D
         'num_extrema_lt_std': num_extrema_lt_std,
         'val_extrema_gt_std': val_extrema_gt_std,
         'idx_extrema_gt_std': idx_extrema_gt_std,
-        'num_extrema_gt_std': num_extrema_gt_std
+        'num_extrema_gt_std': num_extrema_gt_std,
+        'y_normalized': y_normalized,
+        'val_min_normalized': val_min_normalized,
+        'val_max_normalized': val_max_normalized,
+        'idx_min_normalized': idx_min_normalized,
+        'idx_max_normalized': idx_max_normalized,
+        'variation': variation
     }
 
     return output
