@@ -20,7 +20,6 @@ def start_subprocess(config:Dict, file_system:Dict) -> None:
     esf.write_config_file(path_to_config_file, [config, file_system])
 
     try:
-        # subprocess.check_call(['pipenv', 'run', 'python', '-V'], cwd=config['root_dir_detector'])
         subprocess.check_call(['pipenv', 'run', 'python', 'run_eval.py',
             path_to_config_file],
             cwd=config['root_dir_detector'])
@@ -37,7 +36,7 @@ def main(config:Dict) -> None:
         _config = copy.deepcopy(config)
         _config['detector_name'] = detector_name
 
-        file_system = esf.build_file_system(_config)
+        file_system = esf.build_file_system(_config, fs_type='keypoints')
         processes.append(mp.Process(
             target=start_subprocess,
             args=(_config, file_system)))
