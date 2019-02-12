@@ -16,8 +16,8 @@ parser.add_argument('--root_dir',
 
 parser.add_argument('--output_dir',
     type=str,
-    help='Path to directory containing the results of the detectors. ' +
-    'Relative to ROOT_DIR. Default: outputs',
+    help='Path to directory containing the results of the detector evaluation. ' +
+    'Relative to ROOT_DIR. Default: output_evaluation',
     default='output_evaluation')
 
 parser.add_argument('--data_dir',
@@ -29,7 +29,7 @@ parser.add_argument('--data_dir',
 parser.add_argument('--image_dir',
     type=str,
     help='Path to the directory containing the image collections. Relative ' +
-    'to ROO_DIR. Default: data',
+    'to ROOT_DIR. Default: data',
     default='data')
 
 parser.add_argument('--root_dir_detector',
@@ -54,14 +54,14 @@ parser.add_argument('--max_size',
 
 parser.add_argument('--detectors',
     nargs='+',
-    help='Choose which detectors should be run. Default: (sift, tilde, lift, superpoint)',
+    help='Choose which detectors should be run. Default: (sift, tilde, lift, superpoint, tcovdet)',
     default=['sift', 'tilde', 'lift', 'superpoint', 'tcovdet'])
 
 parser.add_argument('--collection_names',
     nargs='+',
     help='Name of all collections to be processed within the data_dir. ' +
     'Skip collections that are not found. A value of None means all ' +
-    'collections. Default: None',
+    'collections. Default: webcam',
     default=['webcam'])
 
 parser.add_argument('--set_names',
@@ -81,7 +81,7 @@ parser.add_argument('--allowed_extensions',
 parser.add_argument('--dry',
     dest='dry',
     action='store_true',
-    help='If set, only print config, but do not run models. Default: False',
+    help='If set, only print config, but do not run evaluation. Default: False',
     default=False)
 
 parser.add_argument('--epsilons',
