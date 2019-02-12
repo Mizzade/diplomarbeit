@@ -13,7 +13,8 @@ import copy
 
 def start_subprocess(config:Dict, file_system:Dict) -> None:
     # Build config file
-    config_file = '{}_{}_config.pkl'.format(config['descriptor_name'], config['detector_name'])
+    config_file_scheme = '{}_{}_config.pkl' if config['max_size'] is None else '{}_{}_{}_config.pkl'
+    config_file = config_file_scheme.format(config['descriptor_name'], config['detector_name'], config['max_size'])
     path_to_config_file = os.path.join(config['tmp_dir_descriptor'], config_file)
 
     # Write config file into tmp dir:
