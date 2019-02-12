@@ -44,7 +44,7 @@ def main(config:Dict) -> None:
             args=(_config, file_system)))
 
     # Create tmp dir if it not exists:
-    esf.create_dir(config['tmp_dir_detector'])
+    esf.create_dir(config['tmp_dir_descriptor'])
 
     # Run processes
     for p in processes:
@@ -55,7 +55,7 @@ def main(config:Dict) -> None:
         p.join()
 
     # Remove tmp dir
-    esf.remove_dir(config['tmp_dir_detector'])
+    esf.remove_dir(config['tmp_dir_descriptor'])
 
 if __name__ == "__main__":
     argv = sys.argv[1:]

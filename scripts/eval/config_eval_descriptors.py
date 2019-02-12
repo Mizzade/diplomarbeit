@@ -109,14 +109,6 @@ def get_config(argv):
     config = vars(config)
 
     config['set_names'] = esf.get_set_names(config)
-
-    # Set absolute paths
-    # config['data_dir'] = os.path.join(config['root_dir'], config['data_dir'])
-    # config['image_dir'] = os.path.join(config['root_dir'], config['image_dir'])
-    # config['output_dir'] = os.path.join(config['root_dir'], config['output_dir'])
-    # config['root_dir_descriptor'] = os.path.join(config['root_dir'], config['root_dir_descriptor'])
-    # config['tmp_dir_descriptor'] = os.path.join(config['root_dir_descriptor'], config['tmp_dir_descriptor'])
-
     config['kpts_file_format'] = '{}.csv' if config['max_size'] is None else '{}_{}.csv'
     config['kpts_image_format'] = '{}.png' if config['max_size'] is None else '{}_{}.png'
 
