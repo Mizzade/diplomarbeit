@@ -52,6 +52,11 @@ parser.add_argument('--max_size',
     'Default: None',
     default=None)
 
+parser.add_argument('--descriptors',
+    nargs='+',
+    help='Choose which descriptors should be used. Default: (sift, tfeat, doap, lift, superpoint)',
+    default=['sift', 'tfeat', 'doap', 'lift', 'superpoint'])
+
 parser.add_argument('--detectors',
     nargs='+',
     help='Choose which detectors should be used. Default: (sift, tilde, lift, superpoint, tcovdet)',
