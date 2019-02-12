@@ -22,7 +22,7 @@ def start_subprocess(config:Dict, file_system:Dict) -> None:
     try:
         subprocess.check_call(['pipenv', 'run', 'python', 'run_eval.py',
             path_to_config_file],
-            cwd=config['root_dir_detector'])
+            cwd=config['root_dir_descriptor'])
 
     except Exception as e:
         print('Could not evaluate descriptor {} with detector {}'.format(config['descriptor_name'], config['detector_name']))
