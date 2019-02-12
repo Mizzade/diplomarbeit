@@ -85,7 +85,9 @@ def write_config_file(path_to_config_file:str, data_list: List[Any]) -> None:
             protocol=pickle.HIGHEST_PROTOCOL)
 
 
-def build_file_system(config:Dict, sorted_output:bool=True):
+def build_file_system(config:Dict, fs_type:str, sorted_output:bool=True):
+
+    assert (fs_type == 'keypoints') or (fs_type == 'descriptors')
 
     output = {}
 
@@ -102,14 +104,23 @@ def build_file_system(config:Dict, sorted_output:bool=True):
                 for file in os.listdir(set_path):
                     file_name, _ = os.path.splitext(file)
 
-                    kpts_path = os.path.join(
-                        config['data_dir'],
-                        collection_name,
-                        set_name,
-                        'keypoints',
-                        config['detector_name'],
-                        config['kpts_file_format'].format(file_name, config['max_size'])
-                    )
+                    if fs_type == 'keypoints':
+                        kpts_path = os.path.join(
+                            config['data_dir'],
+                            collection_name,
+                            set_name,
+                            fs_type,
+                            config['detector_name'],
+                            config['kpts_file_format'].format(file_name, config['max_size']))
+                    elif fs_type == 'descriptors':
+                        kpts_path = os.path.join(
+                            config['data_dir'],
+                            collection_name,
+                            set_name,
+                            fs_type,
+                            config['descriptor_name'],
+                            config['detector_name'],
+                            config['kpts_file_format'].format(file_name, config['max_size']))
 
                     if os.path.exists(kpts_path):
                         output[collection_name][set_name].append(kpts_path)     # append file path to set of collection
