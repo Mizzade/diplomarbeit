@@ -75,6 +75,18 @@ Manche Modell können nur Bilder bis zur einer bestimmten Größe handhaben, bev
 | TFeat             | 1400          |
 
 
+### Patchgrößen für Deskriptoren
+
+| MODEL             | Patch Size (px) |
+|:------------------|:----------------|
+| SIFT              | no Limit        |
+| LIFT              | no Limit        |
+| SuperPoint        | ?               |
+| DOAP              | 42x42           |
+| TFeat             | 32x32           |
+
+
+
 ### Starten der Detektoren und Deskriptoren
 Siehe dazu [hier](./scripts/run/README.md)
 
