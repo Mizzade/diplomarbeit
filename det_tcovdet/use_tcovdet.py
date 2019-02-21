@@ -59,6 +59,9 @@ def detect_bulk(
         # Where the .mat files of the covariant step lie
         dir_data = os.path.join(config['tmp_dir_tcovdet'], 'covariant_points')
 
+        # Set maxinal number of keypoints to find
+        point_number = 1000 if config['max_num_keypoints'] is None else config['max_num_keypoints']
+
         savemat(matlab_config_path, {
             'file_list': file_list,
             'collection_names': collection_names,
@@ -66,7 +69,7 @@ def detect_bulk(
             'image_names': image_names,
             'dir_output': dir_output,
             'dir_data': dir_data,
-            'point_number': 1000
+            'point_number': point_number
         })
         subprocess.check_call(['matlab', '-nosplash', '-r',
         "point_extractor('vlfeat-0.9.21', '{}');quit".format(matlab_config_path)])
