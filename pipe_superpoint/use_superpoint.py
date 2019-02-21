@@ -15,9 +15,9 @@ import pickle
 def load_superpoint(\
     weights_path: str='models/superpoint_v1.pth',  # Path to pretrained weights file. \
     nms_dist: int=4,            # Non Maximum Suppression (NMS) distance. \
-    conf_thresh: float=0.015,   # Detector confidende threshold. \
+    conf_thresh: float=0.0,     # Detector confidende threshold. 0.015\
     nn_thresh: float=0.7,       # Descriptor matching threshold. \
-    cuda: bool=False,            # Use cuda to speed up computation. \
+    cuda: bool=False,           # Use cuda to speed up computation. \
     width: int=120,             # Input image height. \
     height: int=160             # Input image width. \
     ) -> SuperPointFrontend:
@@ -206,13 +206,19 @@ def detect(
     """
 
     img = cv2.imread(image_path, 0)
-    img = io_utils.smart_scale(img, config['max_size'], prevent_upscaling=True) if config['max_size'] is not None else img
+    img = io_utils.smart_scale(img, config['max_size'], prevent_upscaling=config['prevent_upscaling']) if config['max_size'] is not None else img
 
     # Adjust values on the fly.
     model.height = img.shape[0]
     model.width = img.shape[1]
 
     _kp, desc, heatmap = detectAndCompute(model, img)
+
+    max_num_kp = config['max_num_keypoints']
+    if max_num_kp:
+        _kp = _kp[:max_num_kp]
+        desc = desc[:max_num_kp]
+
     kp = kps2KeyPoints(_kp)
     img_kp = cv2.drawKeypoints(img, kp, None)
     return (kp, desc, img_kp, heatmap)
@@ -247,8 +253,13 @@ def main(argv: Tuple[str]) -> None:
             keypoints, descriptors, keypoints_image, heatmap_image = detect(file, config, model)
 
             # Save detector output
-            io_utils.save_detector_output(file, config['detector_name'], config, keypoints,
-                keypoints_image, heatmap_image)
+            io_utils.save_detector_output(
+                file,
+                config['detector_name'],
+                config,
+                keypoints,
+                keypoints_image,
+                heatmap_image)
 
             # Save descriptor output
             io_utils.save_descriptor_output(file, config, descriptors)
