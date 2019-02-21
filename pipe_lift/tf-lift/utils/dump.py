@@ -81,7 +81,8 @@ def readh5(h5node):
         if isinstance(h5node[_key], h5py._hl.group.Group):
             dict_from_file[_key] = readh5(h5node[_key])
         else:
-            dict_from_file[_key] = h5node[_key].value
+            dict_from_file[_key] = h5node[_key][()]
+            # dict_from_file[_key] = h5node[_key].value
 
     return dict_from_file
 

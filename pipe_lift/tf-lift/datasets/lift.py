@@ -248,7 +248,8 @@ class Dataset(object):
                         self.config.data_name + '/' + \
                         self.config.data_name + '.h5'
                     with h5py.File(fn, 'r') as f:
-                        self.points = f['points'].value
+                        self.points = f['points'][()]
+                        # self.points = f['points'].value
 
             # Argsort the ID
             print("[{}] sorting IDs...".format(task))
