@@ -30,6 +30,12 @@ python ./scripts/run/run_detectors.py -h
 
 Alternativ können die Optionen auch in der File `config_run_detectors.py` betrachtet werden.
 
+Die Keypunkte für die Evaluierung der Detektor-Modell wurden mit folgendem
+Befehl erstellt:
+```python
+ python scripts/run/run_detectors.py --root_dir $(pwd) --max_size 1200 --collection_names example --max_num_keypoints 1000 --detectors sift
+ ```
+
 #### Anmerkung:
 Der Detektor TILDE wird in einem Docker Container ausgeführt, die Ergebnisse
 wieder in den Ausgabeordner des Host-Systems zurückschreibt. Der Docker Container
