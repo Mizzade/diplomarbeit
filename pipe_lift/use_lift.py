@@ -248,7 +248,7 @@ def compute(image_file_path:str, config:Dict, model:Any) -> np.array:
 
     # 2) Load and scale image
     img = cv2.imread(image_file_path, 0)
-    img = io_utils.smart_scale(img, config['max_size'], prevent_upscaling=True) if config['max_size'] is not None else img
+    img = io_utils.smart_scale(img, config['max_size'], prevent_upscaling=config['prevent_upscaling']) if config['max_size'] is not None else img
 
     # 2b) Write image in tmp dir
     cv2.imwrite(path_tmp_img, img)
@@ -313,7 +313,7 @@ def detect(image_path:str, config:Dict, detector:Any) -> None:
 
     # 1)
     img = cv2.imread(image_path, 0)
-    img = io_utils.smart_scale(img, config['max_size'], prevent_upscaling=True) if config['max_size'] is not None else img
+    img = io_utils.smart_scale(img, config['max_size'], prevent_upscaling=config['prevent_upscaling']) if config['max_size'] is not None else img
 
     # Build paths
     path_tmp_img = os.path.join(config['tmp_dir_lift'], 'tmp_img.png')
@@ -325,10 +325,12 @@ def detect(image_path:str, config:Dict, detector:Any) -> None:
     cv2.imwrite(path_tmp_img, img)
 
     # 3) Keypoints
+    num_kpts = 1000 if config['max_num_keypoints'] is None else config['max_num_keypoints']
     try:
         subprocess.check_call(['python',
             'main.py',
             '--subtask=kp',
+            '--test_num_keypoint={}'.format(num_kpts),
             '--test_img_file={}'.format(path_tmp_img),
             '--test_out_file={}'.format(path_tmp_kpts)],
             cwd=lift_path)
@@ -369,8 +371,13 @@ def main(argv: Tuple[str]) -> None:
         for file in tqdm(file_list):
             keypoints, keypoints_image, heatmap_image = detect(file, config, None)
             if keypoints is not None:
-                io_utils.save_detector_output(file, config['detector_name'], config, keypoints,
-                    keypoints_image, heatmap_image)
+                io_utils.save_detector_output(
+                    file,
+                    config['detector_name'],
+                    config,
+                    keypoints,
+                    keypoints_image,
+                    heatmap_image)
 
     elif config['task'] == 'descriptors':
         for file in tqdm(file_list):
