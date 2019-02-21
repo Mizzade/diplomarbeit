@@ -41,7 +41,7 @@ def detect(
 
     # 2)
     img = cv2.imread(image_path, 0)
-    img = io_utils.smart_scale(img, config['max_size'], prevent_upscaling=True) if config['max_size'] is not None else img
+    img = io_utils.smart_scale(img, config['max_size'], prevent_upscaling=config['prevent_upscaling']) if config['max_size'] is not None else img
 
     # 2b)
     tmp_filename = 'tmp_img.png'
@@ -75,6 +75,11 @@ def detect(
 
     # 4)
     kpts_file = np.loadtxt(path_tmp_kpts, dtype=int, comments='#', delimiter=', ')
+
+    max_num_keypoints = config['max_num_keypoints']
+    if max_num_keypoints:
+        kpts_file = kpts_file[:max_num_keypoints]
+
     kpts = [cv2.KeyPoint(x[0], x[1], _size=1) for x in kpts_file]
     heatmap = np.loadtxt(path_tmp_heatmap, dtype=float, comments='# ', delimiter=', ')
     img_kp = cv2.drawKeypoints(img, kpts, None)
