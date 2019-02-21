@@ -49,8 +49,16 @@ parser.add_argument('--max_size',
 parser.add_argument('--max_num_keypoints',
     type=int,
     help='Set the maximal number of keypoints a detector model should ' +
-    'return. Default: 1000',
-    default=1000)
+    'return. Default: None',
+    default=None)
+
+parser.add_argument('--prevent_upscaling',
+    dest='prevent_upscaling',
+    action='store_true',
+    help='If MAX_SIZE is set, use the image\' default size, if it is smaller ' +
+    'than the MAX_SIZE value. If PREVENT_UPSCALING is False scale the image ' +
+    'to fit MAX_SIZE. Default: True',
+    default=True)
 
 parser.add_argument('--detectors',
     nargs='+',
