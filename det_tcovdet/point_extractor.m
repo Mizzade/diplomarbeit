@@ -131,7 +131,8 @@ for i = 1:numel(file_list)
             end
         end
         [vote, binary_img] = ApplyNonMax2Score(vote);
-        binary_img = binary_img.*(vote>1.2);
+        % binary_img = binary_img.*(vote>1.2);
+        binary_img = binary_img.*(vote>1.0);
 
         vote = reshape(vote,1,output_width*output_height);
         grid_x = reshape(grid_x,1,output_width*output_height);
@@ -140,11 +141,11 @@ for i = 1:numel(file_list)
         binary_img = reshape(binary_img,1,output_width*output_height);
 
         % If this is not commented, then no features will be found
-        % for some reason.
-        %vote(~binary_img) = [];
-        %grid_x(~binary_img) = [];
-        %grid_y(~binary_img) = [];
-        %real_output(~binary_img,:) = [];
+        %for some reason.
+        vote(~binary_img) = [];
+        grid_x(~binary_img) = [];
+        grid_y(~binary_img) = [];
+        real_output(~binary_img,:) = [];
 
         [~,idx] = sort(vote,'descend');
 

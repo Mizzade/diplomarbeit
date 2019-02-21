@@ -86,18 +86,22 @@ def detect_bulk(
         file = file_list[i]
         mat_path = os.path.join(config['tmp_dir_tcovdet'], 'feature_points', collection_names[i], set_names[i], image_names[i] + '.mat')
         kpts_numpy = loadmat(mat_path)['feature'][:, [2, 5]]        # numpy array
-        kpts_cv2 = [cv2.KeyPoint(x[0], x[1], 1.0) for x in kpts_numpy]   # list of cv2.KeyPoint
 
-        img = cv2.imread(file, 0)
-        if (img.shape[0] * img.shape[1]) > (1024 * 768):
-            ratio = (1024 * 768 / float(img.shape[0] * img.shape[1]))**(0.5)
-            img = cv2.resize(img, (int(img.shape[1] * ratio), int(img.shape[0] * ratio)), interpolation = cv2.INTER_CUBIC)
+        if len(kpts_numpy):
+            kpts_cv2 = [cv2.KeyPoint(x[0], x[1], 1.0) for x in kpts_numpy]   # list of cv2.KeyPoint
 
-        img_kp = cv2.drawKeypoints(img, kpts_cv2, None)
+            img = cv2.imread(file, 0)
+            if (img.shape[0] * img.shape[1]) > (1024 * 768):
+                ratio = (1024 * 768 / float(img.shape[0] * img.shape[1]))**(0.5)
+                img = cv2.resize(img, (int(img.shape[1] * ratio), int(img.shape[0] * ratio)), interpolation = cv2.INTER_CUBIC)
 
-        # Save everything.
-        io_utils.save_detector_output(file, config['detector_name'], config,
-            kpts_cv2, img_kp, None)
+            img_kp = cv2.drawKeypoints(img, kpts_cv2, None)
+
+            # Save everything.
+            io_utils.save_detector_output(file, config['detector_name'], config,
+                kpts_cv2, img_kp, None)
+        else:
+            print('Warning: Did not find any keypoints!')
 
 def main(argv: Tuple[str]) -> None:
     """Runs the TCovDet model and saves the results.

@@ -18,7 +18,7 @@ class PatchCNN:
             if CNNConfig["train_flag"]:
                 scope.reuse_variables()
                 self.o2 = self.model(self.patch_t)
-            
+
         self.o1_flat = tf.reshape(self.o1, [-1, self.descriptor_dim])
 
         if CNNConfig["train_flag"]:
@@ -38,7 +38,8 @@ class PatchCNN:
         return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='VALID')
 
     def conv2d_layer(self, name, shape, x):
-        weight_init = tf.uniform_unit_scaling_initializer(factor=0.5)
+        # weight_init = tf.uniform_unit_scaling_initializer(factor=0.5)
+        weight_init = tf.initializers.variance_scaling(scale=0.5, distribution='uniform')
         weight = self._variable_with_weight_decay(name=name + '_W', shape = shape, wd = 1e-5);
         bias = self._variable_with_weight_decay(name=name + '_b', shape = [shape[3]], wd = 1e-5);
 
@@ -61,7 +62,8 @@ class PatchCNN:
 
     def _variable_with_weight_decay(self, name, shape, wd):
         dtype = tf.float32
-        weight_init = tf.uniform_unit_scaling_initializer(factor=0.5)
+        # weight_init = tf.uniform_unit_scaling_initializer(factor=0.5)
+        weight_init = tf.initializers.variance_scaling(scale=0.5, distribution='uniform')
         #weight_init = tf.truncated_normal_initializer(stddev=1.0)
         var = tf.get_variable(name=name, dtype = tf.float32, \
                 shape=shape, initializer = weight_init)
@@ -98,7 +100,7 @@ class PatchCNN:
     #regression loss with invertable loss to standard patches
     def regression_loss(self):
         alpha_tf = tf.constant(self.alpha)
-        
+
         with tf.name_scope('all_loss'):
             #invertable loss for standard patches
             with tf.name_scope('inver_loss'):
@@ -109,10 +111,10 @@ class PatchCNN:
             #total loss
             with tf.name_scope('loss'):
                 loss = tf.multiply(alpha_tf,inver_loss) + covariance_loss
-        
-        #write summary 
+
+        #write summary
         tf.summary.scalar('loss', loss)
         tf.summary.scalar('inver_loss', inver_loss)
         tf.summary.scalar('covariance_loss', covariance_loss)
-        
+
         return loss, inver_loss, covariance_loss
