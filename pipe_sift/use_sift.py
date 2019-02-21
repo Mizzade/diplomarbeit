@@ -8,14 +8,21 @@ from tqdm import tqdm
 import io_utils
 import pickle
 
-def load_sift() -> cv2.xfeatures2d_SIFT:
+def load_sift(config:Dict) -> cv2.xfeatures2d_SIFT:
     """Creates an SIFT instance.
+
+    Arguments:
+        config {dict} -- config object. See config_run_detectors.py for more
+            information.
 
     Returns:
         cv2.xfeatures2d_SIFT -- The SIFT keypoint detector and desriptor.
     """
 
-    return cv2.xfeatures2d.SIFT_create()
+    nfeatures = 0 if config['max_num_keypoints'] is None else config['max_num_keypoints']
+
+
+    return cv2.xfeatures2d.SIFT_create(nfeatures)
 
 def compute(image_file_path:str, config:Dict, model:Any) -> np.array:
     """Computes descriptors from keypoints saved in a file.
@@ -59,7 +66,7 @@ def detect(image_path:str, config:Dict, detector:Any) -> Tuple[List, np.array, N
     Returns keypoints, heatmap and image with keypoints.
     """
     img = cv2.imread(image_path, 0)
-    img = io_utils.smart_scale(img, config['max_size'], prevent_upscaling=True) if config['max_size'] is not None else img
+    img = io_utils.smart_scale(img, config['max_size'], prevent_upscaling=config['prevent_upscaling']) if config['max_size'] is not None else img
     kpts = detector.detect(img, None)
     img_kp = cv2.drawKeypoints(img, kpts, None)
     return (kpts, img_kp, None)
@@ -79,13 +86,18 @@ def main(argv: Tuple[str]) -> None:
         config_file = pickle.load(src, encoding='utf-8')
 
     config, file_list = config_file
-    model = load_sift()
+    model = load_sift(config)
 
     if config['task'] == 'keypoints':
         for file in tqdm(file_list):
             keypoints, keypoints_image, heatmap_image = detect(file, config, model)
-            io_utils.save_detector_output(file, config['detector_name'], config, keypoints,
-                keypoints_image, heatmap_image)
+            io_utils.save_detector_output(
+                file,
+                config['detector_name'],
+                config,
+                keypoints,
+                keypoints_image,
+                heatmap_image)
 
     elif config['task'] == 'descriptors':
         for file in tqdm(file_list):
