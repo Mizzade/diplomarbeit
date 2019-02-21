@@ -2,3 +2,10 @@ outputs/*
 outputs_old/*
 output_evaluation/*
 data/*
+desc_doap/*
+desc_tfeat/*
+det_tcovdet/*
+examples/*
+pipe_lift/*
+pipe_sift/*
+pipe_superpoint/*
