@@ -46,6 +46,12 @@ parser.add_argument('--max_size',
     'means to take the image with its original size. Default: None',
     default=None)
 
+parser.add_argument('--max_num_keypoints',
+    type=int,
+    help='Set the maximal number of keypoints a detector model should ' +
+    'return. Default: 1000',
+    default=1000)
+
 parser.add_argument('--detectors',
     nargs='+',
     help='Choose which detectors should be run. Default: (sift, tilde, lift, superpoint)',
