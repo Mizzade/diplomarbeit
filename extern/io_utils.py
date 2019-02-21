@@ -15,13 +15,15 @@ def remove_dir(path: str):
 
 def build_output_file_name(
     image_name:str,
+    max_num_keypoints:int=None,
     max_size:int=None,
     extension:str=None) -> str:
     """Returns the output file name of a given image.
-    Output format is: <prefix><image_name>_<max_size>.<extension>"""
+    Output format is: <prefix><image_name>_<max_num_keypoints>_<max_size>.<extension>"""
+    _n = '_' + str(max_num_keypoints) if max_num_keypoints else ''
     _m = '_' + str(max_size) if max_size else ''
     _e = 'csv' if extension is None else extension
-    return '{}{}.{}'.format(image_name, _m, _e)
+    return '{}{}{}.{}'.format(image_name, _n, _m, _e)
 
 def build_output_dir_path(
     output_dir:str,
@@ -47,10 +49,21 @@ def build_output_path(
     detector_name:str,
     image_name:str,
     descriptor_name:str=None,
+    max_num_keypoints:int=None,
     max_size:int=None,
     extension:str=None) -> str:
-    _d = build_output_dir_path(output_dir, collection_name, set_name, output_type, detector_name, descriptor_name=descriptor_name)
-    _f = build_output_file_name(image_name, max_size, extension)
+    _d = build_output_dir_path(
+        output_dir,
+        collection_name,
+        set_name,
+        output_type,
+        detector_name,
+        descriptor_name=descriptor_name)
+
+    _f = build_output_file_name(image_name,
+        max_num_keypoints=max_num_keypoints,
+        max_size=max_size,
+        extension=extension)
 
     return os.path.join(_d, _f)
 
@@ -86,23 +99,56 @@ def save_detector_output(
     collection_name, set_name, file_name, _ = get_path_components(file_path)
 
     # Keypoints
-    output_keypoints_path = build_output_path(config['output_dir'],
-        collection_name, set_name, 'keypoints', model_name, file_name,
-        max_size=config['max_size'])
-    save_keypoints_list(keypoints, output_keypoints_path, image_shape, verbose=config['verbose'])
+    output_keypoints_path = build_output_path(
+        config['output_dir'],
+        collection_name,
+        set_name,
+        'keypoints',
+        model_name,
+        file_name,
+        max_size=config['max_size'],
+        max_num_keypoints=config['max_num_keypoints'])
+
+    save_keypoints_list(
+        keypoints,
+        output_keypoints_path,
+        image_shape,
+        verbose=config['verbose'])
 
     # Image of keypoints
-    output_keypoints_image_path = build_output_path(config['output_dir'],
-        collection_name, set_name, 'keypoint_images', model_name, file_name,
-        max_size=config['max_size'], extension='png')
-    save_keypoints_image(keypoints_image, output_keypoints_image_path, verbose=config['verbose'])
+    output_keypoints_image_path = build_output_path(
+        config['output_dir'],
+        collection_name,
+        set_name,
+        'keypoint_images',
+        model_name,
+        file_name,
+        max_size=config['max_size'],
+        max_num_keypoints=config['max_num_keypoints'],
+        extension='png')
+
+    save_keypoints_image(
+        keypoints_image,
+        output_keypoints_image_path,
+        verbose=config['verbose'])
 
     # Heatmap
     if heatmap_image is not None:
-        output_heatmap_path = build_output_path(config['output_dir'],
-            collection_name, set_name, 'heatmap_images', model_name, file_name,
-            max_size=config['max_size'], extension='png')
-        save_keypoints_image(heatmap_image, output_heatmap_path, config['verbose'])
+        output_heatmap_path = build_output_path(
+            config['output_dir'],
+            collection_name,
+            set_name,
+            'heatmap_images',
+            model_name,
+            file_name,
+            max_size=config['max_size'],
+            max_num_keypoints=config['max_num_keypoints'],
+            extension='png')
+
+        save_keypoints_image(
+            heatmap_image,
+            output_heatmap_path,
+            config['verbose'])
 
 def save_descriptor_output( file_path:str, config:Dict, descriptors:np.array) -> None:
     collection_name, set_name, image_name, _ = get_path_components(file_path)
