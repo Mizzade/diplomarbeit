@@ -137,7 +137,7 @@ class SuperPointFrontend(object):
     pts[2, :] = heatmap[xs, ys]
     pts, _ = self.nms_fast(pts, H, W, dist_thresh=self.nms_dist) # Apply NMS.
     inds = np.argsort(pts[2,:])
-    pts = pts[:,inds[::-1]] # Sort by confidence.
+    pts = pts[:,inds[::-1]] # Sort by confidence descending.
     # Remove points along border.
     bord = self.border_remove
     toremoveW = np.logical_or(pts[0, :] < bord, pts[0, :] >= (W-bord))
