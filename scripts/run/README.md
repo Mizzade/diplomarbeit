@@ -30,11 +30,24 @@ python ./scripts/run/run_detectors.py -h
 
 Alternativ können die Optionen auch in der File `config_run_detectors.py` betrachtet werden.
 
-Die Keypunkte für die Evaluierung der Detektor-Modell wurden mit folgendem
-Befehl erstellt:
+Die Keypunkte für die Evaluierung der Detektor-Modelle wurden wie folgt erstellt:
+Für 1000 Keypunkte:
+
 ```python
- python scripts/run/run_detectors.py --root_dir $(pwd) --max_size 1200 --collection_names example --max_num_keypoints 1000 --detectors sift
- ```
+python scripts/run/run_detectors.py --root_dir $(pwd) --max_size 1200 --max_num_keypoints 1000 --collection_names webcam
+```
+
+Für 5000 Keypunkte:
+
+```python
+python scripts/run/run_detectors.py --root_dir $(pwd) --max_size 1200 --max_num_keypoints 5000 --collection_names webcam
+```
+
+Für 10000 Keypunkte:
+
+```python
+python scripts/run/run_detectors.py --root_dir $(pwd) --max_size 1200 --max_num_keypoints 10000 --collection_names webcam
+```
 
 #### Anmerkung:
 Der Detektor TILDE wird in einem Docker Container ausgeführt, die Ergebnisse
