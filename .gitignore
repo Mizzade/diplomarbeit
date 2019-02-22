@@ -45,3 +45,4 @@
 
 # MISC
 .vscode
+*.pyc
