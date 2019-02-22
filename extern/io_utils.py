@@ -5,6 +5,27 @@ import os
 import numpy as np
 import shutil
 
+def draw_keypoints(
+    img:np.array,
+    kpts:List[cv2.KeyPoint],
+    config:Dict) -> np.array:
+    """Draws keypoints in keypoint list `kpts` into given image `img` using
+    the color in `config`. Uses cv2.drawKeypoints function internally.
+
+    Arguments:
+        img {np.array} -- Numpy array image.
+        kpts {List[cv2.KeyPoint]} -- List of keypoints to draw into image.
+        config {Dict} -- See config_run_detectors.py for more information.
+
+    Returns:
+        np.array -- Image with keypoint drawn into it.
+    """
+    assert config['keypoint_color'] is not None
+
+    img_kp = cv2.drawKeypoints(img, kpts, None, color=config['keypoint_color'])
+
+    return img_kp
+
 def create_dir(path: str):
     if path is not None and not os.path.exists(path):
         os.makedirs(path, exist_ok=True)

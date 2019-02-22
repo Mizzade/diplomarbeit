@@ -346,7 +346,7 @@ def detect(image_path:str, config:Dict, detector:Any) -> None:
     kpts_cv2 = kp_list_2_opencv_kp_list(kpts_numpy)
 
     # 6) Draw keypoints in image
-    img_kp = cv2.drawKeypoints(img, kpts_cv2, None)
+    img_kp = io_utils.draw_keypoints(img, kpts_cv2, config)
 
     return (kpts_cv2, img_kp, None)
 

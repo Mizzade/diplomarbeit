@@ -220,7 +220,8 @@ def detect(
         desc = desc[:max_num_kp]
 
     kp = kps2KeyPoints(_kp)
-    img_kp = cv2.drawKeypoints(img, kp, None)
+    img_kp = io_utils.draw_keypoints(img, kp, config)
+
     return (kp, desc, img_kp, heatmap)
 
 def main(argv: Tuple[str]) -> None:

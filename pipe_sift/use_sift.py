@@ -68,7 +68,7 @@ def detect(image_path:str, config:Dict, detector:Any) -> Tuple[List, np.array, N
     img = cv2.imread(image_path, 0)
     img = io_utils.smart_scale(img, config['max_size'], prevent_upscaling=config['prevent_upscaling']) if config['max_size'] is not None else img
     kpts = detector.detect(img, None)
-    img_kp = cv2.drawKeypoints(img, kpts, None)
+    img_kp = io_utils.draw_keypoints(img, kpts, config)
     return (kpts, img_kp, None)
 
 def main(argv: Tuple[str]) -> None:

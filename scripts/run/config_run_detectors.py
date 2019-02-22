@@ -60,6 +60,14 @@ parser.add_argument('--prevent_upscaling',
     'to fit MAX_SIZE. Default: True',
     default=True)
 
+parser.add_argument('--keypoint_color',
+    type=int,
+    nargs=3,
+    help='Color of the keypoints drawn into the corresponding image. Tuple of ' +
+    'three integer RGB values from 0 to 255. If set to [-1, -1, -1], all keypoints ' +
+    'will have random colors. Default: [255, 0, 0]',
+    default=[255, 0, 0])
+
 parser.add_argument('--detectors',
     nargs='+',
     help='Choose which detectors should be run. Default: (sift, tilde, lift, superpoint)',
@@ -210,6 +218,9 @@ def get_config(argv):
 
     config['collection_names'] = rsf.get_collection_names(config)
     config['set_names'] = rsf.get_set_names(config)
+
+    # correct colors
+    config['keypoint_color'] = config['keypoint_color'][::-1]
 
     # Set absolute paths
     config['data_dir'] = os.path.join(config['root_dir'], config['data_dir'])

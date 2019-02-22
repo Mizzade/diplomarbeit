@@ -82,7 +82,7 @@ def detect(
 
     kpts = [cv2.KeyPoint(x[0], x[1], _size=1) for x in kpts_file]
     heatmap = np.loadtxt(path_tmp_heatmap, dtype=float, comments='# ', delimiter=', ')
-    img_kp = cv2.drawKeypoints(img, kpts, None)
+    img_kp = io_utils.draw_keypoints(img, kpts, config)
 
     return (kpts, img_kp, heatmap)
 

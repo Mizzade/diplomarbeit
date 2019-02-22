@@ -95,7 +95,7 @@ def detect_bulk(
                 ratio = (1024 * 768 / float(img.shape[0] * img.shape[1]))**(0.5)
                 img = cv2.resize(img, (int(img.shape[1] * ratio), int(img.shape[0] * ratio)), interpolation = cv2.INTER_CUBIC)
 
-            img_kp = cv2.drawKeypoints(img, kpts_cv2, None)
+            img_kp = io_utils.draw_keypoints(img, kpts_cv2, config)
 
             # Save everything.
             io_utils.save_detector_output(file, config['detector_name'], config,
