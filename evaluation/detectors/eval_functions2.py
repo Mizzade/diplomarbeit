@@ -120,14 +120,14 @@ def df_image_pair__recall_precision(
 
     # precision for rank i
     prec_i = cum_sum_labels / index_count
-    df.loc[:, 'precision_i'] = pd.Series(prec_i, index=df.index)
+    df.loc[:, 'precision_i'] = pd.Series(prec_i)
 
     # recall for rank i
     if num_correct_labels == 0:
         rec_i = np.zeros_like(cum_sum_labels, dtype=np.float)
     else:
         rec_i = np.divide(cum_sum_labels, num_correct_labels, out=np.zeros_like(cum_sum_labels, dtype=np.float), where=num_correct_labels==0)
-    df.loc[:, 'recall_i'] = pd.Series(rec_i, index=df.index)
+    df.loc[:, 'recall_i'] = pd.Series(rec_i)
 
     return df
 
@@ -141,3 +141,58 @@ def _area(a, b):
     return dx * dy
   else:
     return 0.0
+
+def float_image_pair__average_precision(
+    data:Dict,
+    config:Dict,
+    fs:Dict,
+    eval_config:Dict) -> pd.DataFrame:
+
+    i = eval_config['i']
+    j = eval_config['j']
+    collection_name = eval_config['collection_name']
+    set_name = eval_config['set_name']
+
+    df = data['collections'][collection_name]['sets'][set_name]\
+        ['image_pairs']['{}_{}'.format(i, j)]
+
+    try:
+        true_positives = df.precision_i.values[df.label == 1]
+        if len(true_positives) == 0:
+            average_precision = 0
+        else:
+            average_precision = np.mean(true_positives)
+    except:
+        average_precision = 0
+
+    return average_precision
+
+def float_set__mean_average_precision(
+    data:Dict,
+    config:Dict,
+    fs:Dict,
+    eval_config:Dict) -> pd.DataFrame:
+
+    collection_name = eval_config['collection_name']
+    set_name = eval_config['set_name']
+
+    _d = data['collections'][collection_name]['sets'][set_name]['image_pairs']
+    ap_values = np.array([_d[x] for x in _d if x.startswith('ap')])
+    np.nan_to_num(ap_values, copy=False)
+
+    return np.mean(ap_values)
+
+def float_collection__mean_average_precision(
+    data:Dict,
+    config:Dict,
+    fs:Dict,
+    eval_config:Dict) -> pd.DataFrame:
+
+    collection_name = eval_config['collection_name']
+    set_names = list(data['collections'][collection_name]['sets'].keys())
+
+    _d = data['collections'][collection_name]['sets']
+    map_values = np.array([_d[set_name]['map'] for set_name in set_names])
+    np.nan_to_num(map_values, copy=False)
+
+    return np.mean(map_values)

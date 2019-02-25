@@ -23,9 +23,21 @@ def fill_eval_queue(config:Dict, ev:Evaluater) -> Evaluater:
             for i in range(num_files):
                 for j in range(num_files):
                     if i != j:
-                        if config['eval_imagepair__recall_precision']:
-                            ev.add_eval_case(ec.eval_img_pair__recall_precision(
+                        if config['eval_image_pair__recall_precision']:
+                            ev.add_eval_case(ec.eval_image_pair__recall_precision(
                                 collection_name, set_name, i, j))
+
+                        if config['eval_image_pair__average_precision']:
+                            ev.add_eval_case(ec.eval_image_pair__average_precision(
+                                collection_name, set_name, i, j))
+
+            if config['eval_set__mean_average_precision']:
+                ev.add_eval_case(ec.eval_set__mean_average_precision(
+                    collection_name, set_name))
+
+        if config['eval_collection__mean_average_precision']:
+            ev.add_eval_case(ec.eval_collection__mean_average_precision(
+                collection_name))
 
     return ev
 
