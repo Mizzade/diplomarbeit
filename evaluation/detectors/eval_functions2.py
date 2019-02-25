@@ -146,7 +146,7 @@ def float_image_pair__average_precision(
     data:Dict,
     config:Dict,
     fs:Dict,
-    eval_config:Dict) -> pd.DataFrame:
+    eval_config:Dict) -> float:
 
     i = eval_config['i']
     j = eval_config['j']
@@ -171,7 +171,7 @@ def float_set__mean_average_precision(
     data:Dict,
     config:Dict,
     fs:Dict,
-    eval_config:Dict) -> pd.DataFrame:
+    eval_config:Dict) -> float:
 
     collection_name = eval_config['collection_name']
     set_name = eval_config['set_name']
@@ -182,11 +182,43 @@ def float_set__mean_average_precision(
 
     return np.mean(ap_values)
 
+def np_set__precision_recall_curve(
+    data:Dict,
+    config:Dict,
+    fs:Dict,
+    eval_config:Dict) -> np.array:
+
+    collection_name = eval_config['collection_name']
+    set_name = eval_config['set_name']
+    _d = data['collections'][collection_name]['sets'][set_name]['image_pairs']
+    img_pairs = [x for x in list(_d.keys()) if not x.startswith('ap')]
+
+    xs = np.arange(0, 1.1, 0.1)
+    ys = []
+
+    for pair in img_pairs:
+        df_i = _d[pair]
+        ys_i = []
+        for i in xs:
+            try:
+                maxP = np.max(df_i.precision_i.values[df_i.recall_i.values >= i])
+            except:
+                maxP = np.float(0)
+            ys_i.append(maxP)
+        ys.append(ys_i)
+
+    ys = np.array(ys).mean(axis=0)
+
+    # Returns x and y values, stacked verticall, so that row0 is xs, and
+    # row1 is ys.
+    return np.vstack([xs, ys])
+
+
 def float_collection__mean_average_precision(
     data:Dict,
     config:Dict,
     fs:Dict,
-    eval_config:Dict) -> pd.DataFrame:
+    eval_config:Dict) -> float:
 
     collection_name = eval_config['collection_name']
     set_names = list(data['collections'][collection_name]['sets'].keys())

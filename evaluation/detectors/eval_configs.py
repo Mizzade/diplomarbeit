@@ -53,6 +53,16 @@ def eval_set__mean_average_precision(
         'set_name': set_name
     }
 
+def eval_set__precision_recall_curve(
+    collection_name:str,
+    set_name:str) -> Dict:
+    return {
+        'key': ['collections', collection_name, 'sets', set_name, 'prcurve'],
+        'func': ef.np_set__precision_recall_curve,
+        'collection_name': collection_name,
+        'set_name': set_name
+    }
+
 def eval_collection__mean_average_precision(
     collection_name:str) -> Dict:
     return {

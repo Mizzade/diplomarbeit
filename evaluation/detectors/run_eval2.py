@@ -35,6 +35,10 @@ def fill_eval_queue(config:Dict, ev:Evaluater) -> Evaluater:
                 ev.add_eval_case(ec.eval_set__mean_average_precision(
                     collection_name, set_name))
 
+            if config['eval_set__precision_recall_curve']:
+                ev.add_eval_case(ec.eval_set__precision_recall_curve(
+                    collection_name, set_name))
+
         if config['eval_collection__mean_average_precision']:
             ev.add_eval_case(ec.eval_collection__mean_average_precision(
                 collection_name))

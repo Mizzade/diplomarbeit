@@ -174,12 +174,25 @@ parser.add_argument('--no-eval_collection__mean_average_precision',
     help='Default: None',
     default=None)
 
+parser.add_argument('--eval_set__precision_recall_curve',
+    dest='eval_set__precision_recall_curve',
+    action='store_true',
+    help='Default: None',
+    default=None)
+
+parser.add_argument('--no-eval_set__precision_recall_curve',
+    dest='eval_set__precision_recall_curve',
+    action='store_false',
+    help='Default: None',
+    default=None)
+
 
 eval_plan = {
     'eval_meta__settings': True,
     'eval_image_pair__recall_precision': True,
     'eval_image_pair__average_precision': True,
     'eval_set__mean_average_precision': True,
+    'eval_set__precision_recall_curve': True,
     'eval_collection__mean_average_precision': True
 }
 
