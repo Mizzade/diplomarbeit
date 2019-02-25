@@ -15,6 +15,20 @@ def eval_meta() -> Dict:
         'func': ef.store_meta_data
     }
 
+def eval_image_pair__stats(
+    collection_name:str,
+    set_name:str,
+    i:int,
+    j:int) -> Dict:
+    return {
+        'key': ['collections', collection_name, 'sets', set_name, 'image_pairs', 'stats_{}_{}'.format(i, j)],
+        'func': ef.dict_image_pair__stats,
+        'collection_name': collection_name,
+        'set_name': set_name,
+        'i': i,
+        'j': j
+    }
+
 def eval_image_pair__recall_precision(
     collection_name:str,
     set_name:str,
@@ -43,6 +57,16 @@ def eval_image_pair__average_precision(
         'j': j
     }
 
+def eval_set__stats(
+    collection_name:str,
+    set_name:str) -> Dict:
+    return {
+        'key': ['collections', collection_name, 'sets', set_name, 'stats'],
+        'func': ef.dict_set__stats,
+        'collection_name': collection_name,
+        'set_name': set_name
+    }
+
 def eval_set__mean_average_precision(
     collection_name:str,
     set_name:str) -> Dict:
@@ -61,6 +85,14 @@ def eval_set__precision_recall_curve(
         'func': ef.np_set__precision_recall_curve,
         'collection_name': collection_name,
         'set_name': set_name
+    }
+
+def eval_collection__stats(
+    collection_name:str) -> Dict:
+    return {
+        'key': ['collections', collection_name, 'stats'],
+        'func': ef.dict_collection__stats,
+        'collection_name': collection_name
     }
 
 def eval_collection__mean_average_precision(

@@ -21,6 +21,39 @@ def store_meta_data(
 
     return out
 
+def dict_image_pair__stats(
+    data:Dict,
+    config:Dict,
+    fs:Dict,
+    eval_config:Dict) -> Dict:
+
+    assert eval_config['i'] is not None
+    assert eval_config['j'] is not None
+    assert eval_config['collection_name'] is not None
+    assert eval_config['set_name'] is not None
+
+
+    i = eval_config['i']
+    j = eval_config['j']
+    collection_name = eval_config['collection_name']
+    set_name = eval_config['set_name']
+
+    assert data['collections'][collection_name]['sets'][set_name]\
+        ['image_pairs']['df_{}_{}'.format(i, j)] is not None
+
+    df = data['collections'][collection_name]['sets'][set_name]\
+        ['image_pairs']['df_{}_{}'.format(i, j)]
+
+    num_kpts = df.shape[0]
+    num_kpts_matched = np.sum(df.label)
+    ratio = num_kpts_matched / num_kpts
+
+    return {
+        'num_kpts': num_kpts,
+        'num_kpts_matched': num_kpts_matched,
+        'ratio': ratio
+    }
+
 def df_image_pair__recall_precision(
     data:Dict,
     config:Dict,
@@ -167,6 +200,31 @@ def float_image_pair__average_precision(
 
     return average_precision
 
+def dict_set__stats(
+    data:Dict,
+    config:Dict,
+    fs:Dict,
+    eval_config:Dict) -> pd.DataFrame:
+
+    collection_name = eval_config['collection_name']
+    set_name = eval_config['set_name']
+    _d = data['collections'][collection_name]['sets'][set_name]['image_pairs']
+
+    num_kpts = []
+    num_kpts_matched = []
+    ratio = []
+
+    for i in [_d[x] for x in list(_d.keys()) if x.startswith('stats')]:
+        num_kpts.append(i['num_kpts'])
+        num_kpts_matched.append(i['num_kpts_matched'])
+        ratio.append(i['ratio'])
+
+    return {
+        'num_kpts': np.mean(num_kpts),
+        'num_kpts_matched': np.mean(num_kpts_matched),
+        'ratio': np.mean(ratio)
+    }
+
 def float_set__mean_average_precision(
     data:Dict,
     config:Dict,
@@ -212,6 +270,33 @@ def np_set__precision_recall_curve(
     # Returns x and y values, stacked verticall, so that row0 is xs, and
     # row1 is ys.
     return np.vstack([xs, ys])
+
+def dict_collection__stats(
+    data:Dict,
+    config:Dict,
+    fs:Dict,
+    eval_config:Dict) -> float:
+
+    collection_name = eval_config['collection_name']
+    set_names = list(data['collections'][collection_name]['sets'].keys())
+
+
+    num_kpts = []
+    num_kpts_matched = []
+    ratio = []
+
+    for set_name in set_names:
+        _d = data['collections'][collection_name]['sets'][set_name]['stats']
+        num_kpts.append(_d['num_kpts'])
+        num_kpts_matched.append(_d['num_kpts_matched'])
+        ratio.append(_d['ratio'])
+
+    return {
+        'num_kpts': np.mean(num_kpts),
+        'num_kpts_matched': np.mean(num_kpts_matched),
+        'ratio': np.mean(ratio)
+    }
+
 
 
 def float_collection__mean_average_precision(

@@ -126,6 +126,18 @@ parser.add_argument('--no-eval_meta__settings',
     default=None)
 
 # Evaluation for image pairs in sets.
+parser.add_argument('--eval_image_pair__stats',
+    dest='eval_image_pair__stats',
+    action='store_true',
+    help='Default: None',
+    default=None)
+
+parser.add_argument('--no-eval_image_pair__stats',
+    dest='eval_image_pair__stats',
+    action='store_false',
+    help='Default: None',
+    default=None)
+
 parser.add_argument('--eval_image_pair__recall_precision',
     dest='eval_image_pair__recall_precision',
     action='store_true',
@@ -146,6 +158,18 @@ parser.add_argument('--eval_image_pair__average_precision',
 
 parser.add_argument('--no-eval_image_pair__average_precision',
     dest='eval_image_pair__average_precision',
+    action='store_false',
+    help='Default: None',
+    default=None)
+
+parser.add_argument('--eval_set__stats',
+    dest='eval_set__stats',
+    action='store_true',
+    help='Default: None',
+    default=None)
+
+parser.add_argument('--no-eval_set__stats',
+    dest='eval_set__stats',
     action='store_false',
     help='Default: None',
     default=None)
@@ -186,6 +210,18 @@ parser.add_argument('--no-eval_set__precision_recall_curve',
     help='Default: None',
     default=None)
 
+parser.add_argument('--eval_collection__stats',
+    dest='eval_collection__stats',
+    action='store_true',
+    help='Default: None',
+    default=None)
+
+parser.add_argument('--no-eval_collection__stats',
+    dest='eval_collection__stats',
+    action='store_false',
+    help='Default: None',
+    default=None)
+
 parser.add_argument('--eval_collection__mean_precision_recall_curve',
     dest='eval_collection__mean_precision_recall_curve',
     action='store_true',
@@ -201,10 +237,13 @@ parser.add_argument('--no-eval_collection__mean_precision_recall_curve',
 
 eval_plan = {
     'eval_meta__settings': True,
+    'eval_image_pair__stats': True,
     'eval_image_pair__recall_precision': True,
     'eval_image_pair__average_precision': True,
+    'eval_set__stats': True,
     'eval_set__mean_average_precision': True,
     'eval_set__precision_recall_curve': True,
+    'eval_set__stats': True,
     'eval_collection__mean_average_precision': True,
     'eval_collection__mean_precision_recall_curve': True
 }

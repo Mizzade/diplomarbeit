@@ -27,9 +27,17 @@ def fill_eval_queue(config:Dict, ev:Evaluater) -> Evaluater:
                             ev.add_eval_case(ec.eval_image_pair__recall_precision(
                                 collection_name, set_name, i, j))
 
+                        if config['eval_image_pair__stats']:
+                            ev.add_eval_case(ec.eval_image_pair__stats(
+                                collection_name, set_name, i, j))
+
                         if config['eval_image_pair__average_precision']:
                             ev.add_eval_case(ec.eval_image_pair__average_precision(
                                 collection_name, set_name, i, j))
+
+            if config['eval_set__stats']:
+                ev.add_eval_case(ec.eval_set__stats(
+                    collection_name, set_name))
 
             if config['eval_set__mean_average_precision']:
                 ev.add_eval_case(ec.eval_set__mean_average_precision(
@@ -38,6 +46,10 @@ def fill_eval_queue(config:Dict, ev:Evaluater) -> Evaluater:
             if config['eval_set__precision_recall_curve']:
                 ev.add_eval_case(ec.eval_set__precision_recall_curve(
                     collection_name, set_name))
+
+        if config['eval_collection__stats']:
+            ev.add_eval_case(ec.eval_collection__stats(
+                collection_name))
 
         if config['eval_collection__mean_average_precision']:
             ev.add_eval_case(ec.eval_collection__mean_average_precision(
