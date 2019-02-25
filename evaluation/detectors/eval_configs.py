@@ -21,7 +21,7 @@ def eval_image_pair__recall_precision(
     i:int,
     j:int) -> Dict:
     return {
-        'key': ['collections', collection_name, 'sets', set_name, 'image_pairs', '{}_{}'.format(i, j)],
+        'key': ['collections', collection_name, 'sets', set_name, 'image_pairs', 'df_{}_{}'.format(i, j)],
         'func': ef.df_image_pair__recall_precision,
         'collection_name': collection_name,
         'set_name': set_name,

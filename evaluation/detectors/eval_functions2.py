@@ -154,7 +154,7 @@ def float_image_pair__average_precision(
     set_name = eval_config['set_name']
 
     df = data['collections'][collection_name]['sets'][set_name]\
-        ['image_pairs']['{}_{}'.format(i, j)]
+        ['image_pairs']['df_{}_{}'.format(i, j)]
 
     try:
         true_positives = df.precision_i.values[df.label == 1]
@@ -191,7 +191,7 @@ def np_set__precision_recall_curve(
     collection_name = eval_config['collection_name']
     set_name = eval_config['set_name']
     _d = data['collections'][collection_name]['sets'][set_name]['image_pairs']
-    img_pairs = [x for x in list(_d.keys()) if not x.startswith('ap')]
+    img_pairs = [x for x in list(_d.keys()) if x.startswith('df')]
 
     xs = np.arange(0, 1.1, 0.1)
     ys = []
@@ -233,7 +233,7 @@ def np_collection__mean_precision_recall_curve(
     data:Dict,
     config:Dict,
     fs:Dict,
-    eval_config:Dict) -> float:
+    eval_config:Dict) -> np.array:
 
     collection_name = eval_config['collection_name']
     set_names = list(data['collections'][collection_name]['sets'].keys())
