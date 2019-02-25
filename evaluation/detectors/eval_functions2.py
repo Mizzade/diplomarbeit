@@ -228,3 +228,19 @@ def float_collection__mean_average_precision(
     np.nan_to_num(map_values, copy=False)
 
     return np.mean(map_values)
+
+def np_collection__mean_precision_recall_curve(
+    data:Dict,
+    config:Dict,
+    fs:Dict,
+    eval_config:Dict) -> float:
+
+    collection_name = eval_config['collection_name']
+    set_names = list(data['collections'][collection_name]['sets'].keys())
+
+    _d = data['collections'][collection_name]['sets']
+
+    xs = np.arange(0, 1.1, 0.1)
+    ys = np.mean(np.vstack([_d[set_name]['prcurve'][1] for set_name in set_names]), axis=0)
+
+    return np.vstack([xs, ys])

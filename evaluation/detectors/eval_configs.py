@@ -70,3 +70,11 @@ def eval_collection__mean_average_precision(
         'func': ef.float_collection__mean_average_precision,
         'collection_name': collection_name
     }
+
+def eval_collection__mean_precision_recall_curve(
+    collection_name:str) -> Dict:
+    return {
+        'key': ['collections', collection_name, 'mprcurve'],
+        'func': ef.np_collection__mean_precision_recall_curve,
+        'collection_name': collection_name
+    }
