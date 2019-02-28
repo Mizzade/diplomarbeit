@@ -39,6 +39,7 @@
 /outputs/example
 /outputs_old
 /outputs_test
+/output_evaluation/detectors
 
 # Evaluation
 # /evaluation/detectors/outputs
