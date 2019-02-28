@@ -15,6 +15,13 @@ parser.add_argument('--verbose',
     help='Allow for more informational output while models working.',
     default=False)
 
+parser.add_argument('--task',
+    type=str,
+    choices=['descriptors', 'patches'],
+    help='Select a task for descriptors: descriptors or patches. ' +
+    'Default: descriptors',
+    default='descriptors')
+
 parser.add_argument('--root_dir',
     type=str,
     help='Set the path to the root directory of this repository.',
@@ -166,8 +173,6 @@ parser.add_argument('--main_lift',
 def get_config(argv):
     config, _ = parser.parse_known_args()
     config = vars(config)
-
-    config['task'] = 'descriptors'
 
     config['collection_names'] = rsf.get_collection_names(config)
     config['set_names'] = rsf.get_set_names(config)

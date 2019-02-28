@@ -36,13 +36,22 @@ def start_subprocess(config:Dict, file_list:List[str]) -> None:
 def main(config):
     file_list = rsf.get_file_list(config)
 
-    for descriptor_name in config['descriptors']:
-        for detector_name in config['detectors']:
-            print('\nStarting descriptor `{}` with detector `{}`'.format(descriptor_name, detector_name))
-            config['detector_name'] = detector_name
+    if config['task'] == 'patches':
+        for descriptor_name in config['descriptors']:
+            print('\nStarting descriptor `{}` for patch description'.format(descriptor_name))
+            config['detector_name'] = 'hpatches'
             config['descriptor_name'] = descriptor_name
             start_subprocess(config, file_list)
-            print(('Descriptor `{}` with detector `{}` done.'.format(descriptor_name, detector_name)))
+            print('\nDescriptor `{}` for patch description done.'.format(descriptor_name))
+
+    elif config['task'] == 'descriptors':
+        for descriptor_name in config['descriptors']:
+            for detector_name in config['detectors']:
+                print('\nStarting descriptor `{}` with detector `{}`'.format(descriptor_name, detector_name))
+                config['detector_name'] = detector_name
+                config['descriptor_name'] = descriptor_name
+                start_subprocess(config, file_list)
+                print(('Descriptor `{}` with detector `{}` done.'.format(descriptor_name, detector_name)))
 
 
 if __name__ == "__main__":
