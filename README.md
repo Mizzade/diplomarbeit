@@ -76,13 +76,16 @@ Manche Modell können nur Bilder bis zur einer bestimmten Größe handhaben, bev
 
 
 ### Patchgrößen für Deskriptoren
+Dies sind die Größen, die die Patches haben müssen, um mit dem jeweiligen
+Deskriptor zu funktionieren.
 
 | MODEL             | Patch Size (px) |
 |:------------------|:----------------|
 | SIFT              | no Limit        |
-| LIFT              | no Limit        |
+| LIFT              | 128x128         |
 | SuperPoint        | ?               |
-| DOAP              | 42x42           |
+| DOAP              | 32x32           |
+| DOAP ST           | 42x42           | (in diesem Repo)
 | TFeat             | 32x32           |
 
 
