@@ -91,6 +91,31 @@ def compute_descriptors(model:tfeat_model.TNet, list_of_patches: List[np.array],
     descrs = model(patches)
     return descrs.detach().cpu().numpy()
 
+def computeForPatchImages(image_file_path:str, config:Dict, model:Any) -> np.array:
+    """Computes descriptors for images containing patches to be described."""
+    # Load patch image
+
+    img = cv2.imread(image_file_path, 0)
+
+    # Assuming the patches are ordered vertically, and all patches are squares
+    # of size MxM, find number of patches in image and compute the descriptor
+    # for each patch.
+    patch_size = img.shape[1]
+    num_patches = np.int(img.shape[0] / patch_size)
+    patch_center = 15.5 # Tfeat patches must be 32x32, from 0 to 31.
+
+    patches = []
+
+    for i in range(num_patches):
+        patch = img[i*patch_size:(i+1)*patch_size, :] # 65x65 Patch
+        patch = io_utils.smart_scale(patch, 32, prevent_upscaling=True) # 32x32
+        patches.append(patch)
+
+    # TODO: Muss hier das Patch noch rektifiziert werden?
+    desc = compute_descriptors(model, patches, use_gpu=False)
+
+    return desc
+
 def compute(image_file_path:str, config:Dict, model:Any) -> np.array:
     """Computes descriptors from keypoints saved in a file."""
     # Load image and scale appropiately. Image is later used to create patch,
@@ -150,6 +175,12 @@ def main(argv: Tuple[str]) -> None:
     if config['task'] == 'descriptors':
         for file in tqdm(file_list):
             descriptors = compute(file, config, model)
+            if descriptors is not None:
+                io_utils.save_descriptor_output(file, config, descriptors)
+
+    elif config['task'] == 'patches':
+        for file in tqdm(file_list):
+            descriptors = computeForPatchImages(file, config, model)
             if descriptors is not None:
                 io_utils.save_descriptor_output(file, config, descriptors)
 
