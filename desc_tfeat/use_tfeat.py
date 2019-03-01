@@ -93,8 +93,8 @@ def compute_descriptors(model:tfeat_model.TNet, list_of_patches: List[np.array],
 
 def computeForPatchImages(image_file_path:str, config:Dict, model:Any) -> np.array:
     """Computes descriptors for images containing patches to be described."""
-    # Load patch image
 
+    # Load patch image
     img = cv2.imread(image_file_path, 0)
 
     # Assuming the patches are ordered vertically, and all patches are squares
@@ -102,7 +102,6 @@ def computeForPatchImages(image_file_path:str, config:Dict, model:Any) -> np.arr
     # for each patch.
     patch_size = img.shape[1]
     num_patches = np.int(img.shape[0] / patch_size)
-    patch_center = 15.5 # Tfeat patches must be 32x32, from 0 to 31.
 
     patches = []
 

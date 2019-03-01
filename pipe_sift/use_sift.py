@@ -42,7 +42,6 @@ def computeForPatchImages(image_file_path:str, config:Dict, model:Any) -> np.arr
 
     # keypoint at patch center with size (diameter) of patch
     kp = cv2.KeyPoint(patch_center, patch_center, patch_size)
-    print('patch_center: ', patch_center, 'patch_size: ', patch_size)
 
     desc = []
 
