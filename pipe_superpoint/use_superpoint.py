@@ -214,7 +214,7 @@ def computeForPatchImages(image_file_path:str, config:Dict, model:Any) -> np.arr
 
     desc = np.vstack(desc)
 
-    return None
+    return desc
 
 def detect(
     image_path:str,
