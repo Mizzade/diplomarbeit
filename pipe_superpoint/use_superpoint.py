@@ -187,6 +187,35 @@ def scale_kps(model: SuperPointFrontend, image: np.array, kps: np.array) -> np.a
     scaling = np.array([_fx, _fy, 1])
     return scaling * kps
 
+def computeForPatchImages(image_file_path:str, config:Dict, model:Any) -> np.array:
+    """Computes descriptors for images containing patches to be described."""
+    # Load patch image
+
+    img = cv2.imread(image_file_path, 0)
+
+    # Assuming the patches are ordered vertically, and all patches are squares
+    # of size MxM, find number of patches in image and compute the descriptor
+    # for each patch.
+    patch_size = img.shape[1]
+    num_patches = np.int(img.shape[0] / patch_size)
+    patch_center = np.int(0.5 * (patch_size - 1))
+
+    # Adjust values on the fly.
+    model.height = patch_size
+    model.width = patch_size
+
+    desc = []
+    for i in range(num_patches):
+        patch = img[i*patch_size:(i+1)*patch_size, :]
+        patch = convert_image_to_float32(patch)
+        patch = normalize_image(patch)
+        d = model.run_patch_description(patch, [patch_center, patch_center])
+        desc.append(d)
+
+    desc = np.vstack(desc)
+
+    return None
+
 def detect(
     image_path:str,
     config:Dict,
@@ -264,6 +293,12 @@ def main(argv: Tuple[str]) -> None:
 
             # Save descriptor output
             io_utils.save_descriptor_output(file, config, descriptors)
+
+    elif config['task'] == 'patches':
+        for file in tqdm(file_list):
+            descriptors = computeForPatchImages(file, config, model)
+            if descriptors is not None:
+                io_utils.save_descriptor_output(file, config, descriptors)
 
 if __name__ == "__main__":
     argv = sys.argv[1:]

@@ -153,7 +153,7 @@ parser.add_argument('--main_doap',
 # LIFT
 parser.add_argument('--root_dir_lift',
     type=str,
-    help='Path to the root folder of the TFeat module relative from ROOT_DIR. ' +
+    help='Path to the root folder of the LIFT module relative from ROOT_DIR. ' +
     'Default: pipe_lift',
     default='pipe_lift')
 
@@ -167,6 +167,24 @@ parser.add_argument('--main_lift',
     type=str,
     help='Name of the main python file to start the model. Default: use_lift.py',
     default='use_lift.py')
+
+# SuperPoint
+parser.add_argument('--root_dir_superpoint',
+    type=str,
+    help='Path to the root folder of the SuperPoint module relative from ROOT_DIR. ' +
+    'Default: pipe_superpoint',
+    default='pipe_superpoint')
+
+parser.add_argument('--tmp_dir_superpoint',
+    type=str,
+    help='Path to temporary directory to save intermediate results. Relative ' +
+    'to ROOT_DIR_SUPERPOINT. Default: tmp',
+    default='tmp')
+
+parser.add_argument('--main_superpoint',
+    type=str,
+    help='Name of the main python file to start the model. Default: use_superpoint.py',
+    default='use_superpoint.py')
 
 
 
@@ -192,6 +210,9 @@ def get_config(argv):
 
     config['root_dir_lift'] = os.path.join(config['root_dir'], config['root_dir_lift'])
     config['tmp_dir_lift'] = os.path.join(config['root_dir_lift'], config['tmp_dir_lift'])
+
+    config['root_dir_superpoint'] = os.path.join(config['root_dir'], config['root_dir_superpoint'])
+    config['tmp_dir_superpoint'] = os.path.join(config['root_dir_superpoint'], config['tmp_dir_superpoint'])
 
     return config
 
