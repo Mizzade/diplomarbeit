@@ -11,6 +11,8 @@ from Evaluater2 import Evaluater
 def get_collection_names(config:Dict, sorted_output:bool=True) -> List[str]:
     """Returns the names of the collections specified in the config's
     `collection_names` parameter that are also inside the data directory.
+    If `collection_names` is None, return all names of the folders in the
+    data dir.
 
     Arguments:
         config {Dict} -- See scripts/eval/config_eval_detectors.py
