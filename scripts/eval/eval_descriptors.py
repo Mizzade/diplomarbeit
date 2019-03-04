@@ -7,29 +7,46 @@ import json
 import argparse
 import pickle
 import config_eval_descriptors as ced
-import eval_support_functions as esf
+import eval_support_functions2 as esf
 import multiprocessing as mp
 import copy
 
 def start_subprocess(config:Dict, file_system:Dict) -> None:
+    eval_dir = os.path.join(
+        config['root_dir'],
+        config['root_dir_evaluation'])
+
+    tmp_dir = os.path.join(
+        eval_dir,
+        config['tmp_dir_evaluation'])
+
     # Build config file
-    config_file_scheme = '{}_{}_config.pkl' if config['max_size'] is None else '{}_{}_{}_config.pkl'
-    config_file = config_file_scheme.format(config['descriptor_name'], config['detector_name'], config['max_size'])
+    config_file = '{}_{}_config.pkl'.format(config['descriptor_name'], config['detector_name'])
+    path_to_config_file = os.path.join(tmp_dir, config_file)
+
+    # Build config file
     path_to_config_file = os.path.join(config['tmp_dir_descriptor'], config_file)
 
     # Write config file into tmp dir:
-    esf.write_config_file(path_to_config_file, [config, file_system])
+    # Write config file into tmp dir:
+    esf.write_config_file(path_to_config_file, [config])
 
     try:
-        subprocess.check_call(['pipenv', 'run', 'python', 'run_eval.py',
+        subprocess.check_call(['pipenv', 'run', 'python', 'run_eval2.py',
             path_to_config_file],
-            cwd=config['root_dir_descriptor'])
+            cwd=eval_dir)
 
     except Exception as e:
         print('Could not evaluate descriptor {} with detector {}'.format(config['descriptor_name'], config['detector_name']))
         print('Reason:\n', e)
 
 def main(config:Dict) -> None:
+
+    tmp_dir = os.path.join(
+        config['root_dir'],
+        config['root_dir_evaluation']
+        config['tmp_dir_evaluation'])
+
     # Setup a list of processes to be run
     processes = []
 
@@ -39,13 +56,12 @@ def main(config:Dict) -> None:
             _config['descriptor_name'] = descriptor_name
             _config['detector_name'] = detector_name
 
-        file_system = esf.build_file_system(_config, fs_type='descriptors')
         processes.append(mp.Process(
             target=start_subprocess,
-            args=(_config, file_system)))
+            args=(_config,)))
 
     # Create tmp dir if it not exists:
-    esf.create_dir(config['tmp_dir_descriptor'])
+    esf.create_dir(tmp_dir)
 
     # Run processes
     for p in processes:
@@ -56,7 +72,7 @@ def main(config:Dict) -> None:
         p.join()
 
     # Remove tmp dir
-    esf.remove_dir(config['tmp_dir_descriptor'])
+    esf.remove_dir(tmp_dir)
 
 if __name__ == "__main__":
     argv = sys.argv[1:]

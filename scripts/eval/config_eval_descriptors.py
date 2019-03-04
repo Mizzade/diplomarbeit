@@ -1,6 +1,5 @@
 import argparse
 import os
-import eval_support_functions as esf
 
 parser = argparse.ArgumentParser()
 
@@ -17,13 +16,13 @@ parser.add_argument('--root_dir',
 parser.add_argument('--output_dir',
     type=str,
     help='Path to directory containing the results of the detector evaluation. ' +
-    'Relative to ROOT_DIR. Default: output_evaluation/descriptors',
-    default=os.path.join('output_evaluation', 'descriptors'))
+    'Relative to ROOT_DIR. Default: output_evaluation',
+    default=os.path.join('output_evaluation'))
 
 parser.add_argument('--data_dir',
     type=str,
     help='Path to the directory containing data sets from the detectors and ' +
-    ' descriptors. Relative to ROOT_DIR. Default: outputs',
+    'descriptors. Relative to ROOT_DIR. Default: outputs',
     default='outputs')
 
 parser.add_argument('--image_dir',
@@ -32,16 +31,16 @@ parser.add_argument('--image_dir',
     'to ROOT_DIR. Default: data',
     default='data')
 
-parser.add_argument('--root_dir_descriptor',
+parser.add_argument('--root_dir_evaluation',
     type=str,
     help='Path to the folder containing the functions for evaluating the ' +
-    'descriptors. Relative from ROOT_DIR. Default: evaluation/descriptors',
+    'detectors. Relative from ROOT_DIR. Default: evaluation/descriptors',
     default=os.path.join('evaluation', 'descriptors'))
 
-parser.add_argument('--tmp_dir_descriptor',
+parser.add_argument('--tmp_dir_evaluation',
     type=str,
-    help='Path to temporary directory to save intermediate results and config ' +
-    'and config file. Relative from ROOT_DIR_DETECTOR. Default: tmp',
+    help='Path to temporary directory to save intermediate results ' +
+    'and config file. Relative from ROOT_DIR_EVALUATION. Default: tmp',
     default='tmp')
 
 parser.add_argument('--max_size',
@@ -49,6 +48,14 @@ parser.add_argument('--max_size',
     help='If descriptors and detectors have been run with MAX_SIXE paramater ' +
     'the resulting .csv files with have the corresponding postfix <_MAX_SIXE>. ' +
     'This allows to only select those files with the appropriate postfix. ' +
+    'Default: None',
+    default=None)
+
+parser.add_argument('--max_num_keypoints',
+    type=int,
+    help='If the detector has been run with the MAX_NUM_KEYPOINTS parameter ' +
+    'the resulting .csv files will have the corresponding postfix <_MAX_NUM_KEYPOINTS>. ' +
+    'This allows to only select thos files with the appropriate postfix. ' +
     'Default: None',
     default=None)
 
@@ -108,17 +115,15 @@ def get_config(argv):
     config, _ = parser.parse_known_args()
     config = vars(config)
 
-    # Set absolute paths
-    config['data_dir'] = os.path.join(config['root_dir'], config['data_dir'])
-    config['image_dir'] = os.path.join(config['root_dir'], config['image_dir'])
-    config['output_dir'] = os.path.join(config['root_dir'], config['output_dir'])
-    config['root_dir_descriptor'] = os.path.join(config['root_dir'], config['root_dir_descriptor'])
-    config['tmp_dir_descriptor'] = os.path.join(config['root_dir_descriptor'], config['tmp_dir_descriptor'])
+    file_format = '{}'
+    if config['max_num_keypoints']:
+        file_format += '_{}'
+    if config['max_size']:
+        file_format += '_{}'
 
-
-    config['set_names'] = esf.get_set_names(config)
-    config['kpts_file_format'] = '{}.csv' if config['max_size'] is None else '{}_{}.csv'
-    config['kpts_image_format'] = '{}.png' if config['max_size'] is None else '{}_{}.png'
+    config['kpts_file_format'] = file_format + '.csv'
+    config['kpts_image_format'] = file_format + '.png'
+    config['eval_file_format'] = file_format + '.pkl'
 
     # If enable_all is not true, only take the evaluation tests, that have
     # specifically been activated.
