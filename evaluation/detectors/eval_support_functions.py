@@ -174,7 +174,16 @@ def build_evaluater_for_detectors(config:Dict) -> Evaluater:
     fs = build_file_system(config)
     return Evaluater('detectors', config, fs)
 
-def create_dir(path: str):
+def create_dir(path: str) -> None:
+    """Creates folder at given filepath `path`
+
+    Arguments:
+        path {str} -- Folderpath and subfolders to be crated.
+
+    Returns:
+        None
+    """
+
     if path is not None and not os.path.exists(path):
         os.makedirs(path, exist_ok=True)
 
