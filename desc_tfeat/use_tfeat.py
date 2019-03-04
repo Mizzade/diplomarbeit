@@ -133,7 +133,8 @@ def compute(image_file_path:str, config:Dict, model:Any) -> np.array:
         'keypoints',
         config['detector_name'],
         image_name,
-        max_size=config['max_size'])
+        max_size=config['max_size'],
+        max_num_keypoints=config['max_num_keypoints'])
 
     if not os.path.isfile(keypoints_file_path):
         print('Could not find keypoints in path: {}\n.Skip'.format(keypoints_file_path))

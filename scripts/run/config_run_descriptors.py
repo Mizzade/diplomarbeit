@@ -53,6 +53,21 @@ parser.add_argument('--max_size',
     'means to take the image with its original size. Default: None',
     default=None)
 
+parser.add_argument('--max_num_keypoints',
+    type=int,
+    help='If you only want the descriptors of detector files that have been ' +
+    'been found with the parameter MAX_NUM_KEYPOINTS, set this parameter to ' +
+    'to the corresponding value. Default: None',
+    default=None)
+
+parser.add_argument('--prevent_upscaling',
+    dest='prevent_upscaling',
+    action='store_true',
+    help='If MAX_SIZE is set, use the image\' default size, if it is smaller ' +
+    'than the MAX_SIZE value. If PREVENT_UPSCALING is False scale the image ' +
+    'to fit MAX_SIZE. Default: True',
+    default=True)
+
 parser.add_argument('--descriptors',
     nargs='+',
     help='Choose which descriptors should be run. Default: (sift, tfeat, doap, lift)',

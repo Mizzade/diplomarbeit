@@ -181,7 +181,8 @@ def save_descriptor_output( file_path:str, config:Dict, descriptors:np.array) ->
         config['detector_name'],
         image_name,
         descriptor_name=config['descriptor_name'],
-        max_size=config['max_size'])
+        max_size=config['max_size'],
+        max_num_keypoints=config['max_num_keypoints'])
     save_descriptors(descriptors, output_descriptor_path, verbose=config['verbose'])
 
 def numpy_to_cv2_kp(kpts_numpy:np.array) -> List[cv2.KeyPoint]:
