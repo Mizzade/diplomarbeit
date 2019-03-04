@@ -12,6 +12,16 @@ import eval_functions2 as ef
 import eval_configs as ec
 
 def fill_eval_queue(config:Dict, ev:Evaluater) -> Evaluater:
+    """Given a config object and en Evaluater, fill the Evaluater's task queue
+    with tasks depending on the config's settings. Returns the input Evaluater
+
+    Arguments:
+        config {Dict} -- See config_eval_descriptors.py
+        ev {Evaluater} -- See descriptors/Evaluater2.py
+
+    Returns:
+        Evaluater -- The input Evaluater, now with modified internal state.
+    """
     if config['eval_meta__settings']:
         ev.add_eval_case(ec.eval_meta())
 
