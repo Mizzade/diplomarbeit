@@ -11,7 +11,7 @@ import eval_support_functions2 as esf
 import multiprocessing as mp
 import copy
 
-def start_subprocess(config:Dict, file_system:Dict) -> None:
+def start_subprocess(config:Dict) -> None:
     eval_dir = os.path.join(
         config['root_dir'],
         config['root_dir_evaluation'])
@@ -25,9 +25,8 @@ def start_subprocess(config:Dict, file_system:Dict) -> None:
     path_to_config_file = os.path.join(tmp_dir, config_file)
 
     # Build config file
-    path_to_config_file = os.path.join(config['tmp_dir_descriptor'], config_file)
+    path_to_config_file = os.path.join(tmp_dir, config_file)
 
-    # Write config file into tmp dir:
     # Write config file into tmp dir:
     esf.write_config_file(path_to_config_file, [config])
 

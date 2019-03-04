@@ -132,67 +132,12 @@ def get_keypoint_files_in_set_for_collection(
 
     return file_names
 
-def get_descriptor_files_in_set_for_collection(
-    config:Dict,
-    collection_name:str,
-    set_name:str,
-    sorted_output:bool=True) -> List[str]:
-    """Get all descriptor files for a collection and set that fit the
-    `desc_file_format` parameter within `config` object.
-
-    Arguments:
-        config {Dict} -- See config_eval_descriptors.py
-        collection_name {str} -- Name of a collection in `data_dir`.
-        set_name {str} -- Name of a set within that colleciton.
-
-    Keyword Arguments:
-        sorted_output {bool} -- Whether to return a sorted list of the files
-        within the set. (default: {True})
-
-    Returns:
-        List[str] -- All file names for that collection/set combination that fit
-        `desc_file_format` parameter filled with `max_num_keypoints` and
-        `max_size` values of `config` object.
-    """
-    assert config['root_dir']
-    assert config['data_dir']
-    assert config['detector_name']
-    assert config['descriptor_name']
-    assert config['kpts_file_format']
-
-    set_path = os.path.join(
-        config['root_dir'],
-        config['data_dir'],
-        collection_name,
-        set_name,
-        'descriptors',
-        config['descriptor_name'],
-        config['detector_name'])
-
-    file_names = os.listdir(set_path)
-
-    # Only get files within set path
-    file_names = [fname for fname in file_names \
-        if os.path.isfile(os.path.join(set_path, fname))]
-
-    # Only get files that fit the parametes within config object
-    file_names = [fname for fname in file_names \
-        if config['desc_file_format'] \
-            .format('', config['max_num_keypoints'], config['max_size']) in fname]
-
-    if sorted_output:
-        file_names = sorted(file_names)
-
-    return file_names
-
 def build_file_system(
     config:Dict,
     sorted_output:bool=True) -> Dict:
     """Builds an dictionary, containing all collections names. Each collection
     name has a dictionary as value, whose keys are the corresponding set names
-    of the collection. Each set_name key has in turn to keys: kpts and desc.
-    Those values are the names of the keypoint files as well as the corresponding
-    descriptor files.
+    of the collection. The values in turn are the file names of that set.
 
     Arguments:
         config {Dict} -- See config_eval_detectors.py
@@ -216,13 +161,13 @@ def build_file_system(
             config, collection_name, sorted_output=sorted_output)
 
         for set_name in set_names:
-            file_system[collection_name][set_name] = {}
-            file_system[collection_name][set_name]['kpts'] = \
+            # Note: While keypoint files and descriptor files are found in different
+            # locations in the data dir, their names are identical and depend on
+            # corresponding image and the paramters max_size and max_num_keypoints.
+            # Thus we can savely just take the keypoint file names.
+            file_system[collection_name][set_name] = \
                 get_keypoint_files_in_set_for_collection(
-                    config, collection_name, set_name, sorted_output=sorted_output)
-            file_system[collection_name][set_name]['desc'] = \
-                get_descriptor_files_in_set_for_collection(
-                    config, collection_name, set_name, sorted_output=sorted_output)
+                    config, collection_name, set_name,sorted_output=sorted_output)
 
     return file_system
 
