@@ -154,8 +154,6 @@ def build_file_system(
 
     collection_names = get_collection_names(config, sorted_output=sorted_output)
 
-    data_dir = os.path.join(config['root_dir'], config['data_dir'])
-
     file_system = {}
     for collection_name in collection_names:
         file_system[collection_name] = {}
