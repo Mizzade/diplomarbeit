@@ -44,7 +44,7 @@ def main(config:Dict) -> None:
 
     tmp_dir = os.path.join(
         config['root_dir'],
-        config['root_dir_evaluation']
+        config['root_dir_evaluation'],
         config['tmp_dir_evaluation'])
 
     # Setup a list of processes to be run

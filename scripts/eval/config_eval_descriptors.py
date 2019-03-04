@@ -123,7 +123,7 @@ def get_config(argv):
 
     config['kpts_file_format'] = file_format + '.csv'
     config['kpts_image_format'] = file_format + '.png'
-    config['eval_file_format'] = file_format + '.pkl'
+    config['eval_file_format'] = 'desc_{}_det_' + file_format + '.pkl'
 
     # If enable_all is not true, only take the evaluation tests, that have
     # specifically been activated.
