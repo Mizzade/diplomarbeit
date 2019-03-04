@@ -13,6 +13,19 @@ class EvalCase():
         self.config = config
 
     def run(self, data:Dict, config:Dict, fs:Dict) -> Tuple[str, Any]:
+        """Runs a evaluation case. Returns the keypath and the value of the
+        evaluation.
+
+        Arguments:
+            data {Dict} -- Data object in which to store the this evaluation's
+            value. Might be used to get already computed value from.
+            config {Dict} -- Config ojbect. See config_eval_descriptors.py
+            fs {Dict} -- Filesystem, with collection names, corresponding set
+            names and file names.
+
+        Returns:
+            Tuple[str, Any] -- keypath where to store value in DATA.
+        """
         key = self.config['key']
         value = self.config['func'](data, config, fs, self.config)
 
