@@ -47,7 +47,7 @@ def get_set_names_for_collection(
     config:Dict,
     collection_name:str,
     sorted_output:bool=True) -> List[str]:
-    """Finds all set names for a collection and returns thos set names, that
+    """Finds all set names for a collection and returns those set names, that
     are also specified within the `config` object. If `set_names` in `config` is
     `None`, return all set names.
 
