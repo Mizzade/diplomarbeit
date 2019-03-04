@@ -1,6 +1,5 @@
 import argparse
 import os
-import eval_support_functions as esf
 
 parser = argparse.ArgumentParser()
 
