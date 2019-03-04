@@ -83,13 +83,6 @@ parser.add_argument('--set_names',
     'Default: None',
     default=None)
 
-parser.add_argument('--allowed_extensions',
-    nargs='+',
-    help='Set the allowed file extensions for the data directory. Only files ' +
-    'with the fitting extension will be used by the detector. Default: ' +
-    '(.csv)',
-    default=['.csv'])
-
 parser.add_argument('--dry',
     dest='dry',
     action='store_true',
@@ -122,6 +115,7 @@ def get_config(argv):
         file_format += '_{}'
 
     config['kpts_file_format'] = file_format + '.csv'
+    config['desc_file_format'] = file_format + '.csv'
     config['kpts_image_format'] = file_format + '.png'
     config['eval_file_format'] = 'desc_{}_det_' + file_format + '.pkl'
 
