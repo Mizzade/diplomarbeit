@@ -5,6 +5,53 @@ import os
 import numpy as np
 import shutil
 
+def split_image_in_chunks(
+    img:np.array,
+    config:Dict) -> List[Tuple[np.array, Tuple[int, int]]]:
+    """Split an image into multiple chunks (subimage parts) and return a list
+    containing the subimage and a tuple containg (x,y) offset values fort that
+    subimage.
+    Uses `chunk_size` value in `config` to determine, in how many chunks to
+    split the image.
+    If `split_image` is set to `False`, return a one element list containing
+    the tuple containing the whole image and the offset tuple (0., 0.).
+
+
+    Arguments:
+        img {np.array} -- The image.
+        config {Dict} -- Dict-like object containt the keys `split_image` (boolean) and
+        `chunk_size` (integer).
+
+    Returns:
+        List[Tuple[np.array, Tuple[int, int]]] -- List of tuples containg the
+        subimages and their offsets.
+    """
+
+    assert 'split_image' in list(config.keys())
+    assert 'chunk_size' in list(config.keys())
+
+    image_parts_and_offsets = [] # image, (x_offset, y_offset)
+    if config['split_image']:
+        shape = img.shape
+        num_chunks_width = np.int(np.ceil(shape[1] / config['chunk_size']))
+        num_chunks_height = np.int(np.ceil(shape[0] / config['chunk_size']))
+        offset_width = np.int(shape[1] / num_chunks_width)
+        offset_height = np.int(shape[0] / num_chunks_height)
+
+        for h in range(num_chunks_height):
+            for w in range(num_chunks_width):
+                h_start = h*offset_height
+                w_start = w*offset_width
+                h_end = shape[0] if (h == num_chunks_height - 1) else (h+1) * offset_height
+                w_end = shape[1] if (w == num_chunks_width - 1) else (w+1) * offset_width
+                part = img[h_start:h_end, w_start:w_end]
+                image_parts_and_offsets.append((part, (w_start, h_start)))
+
+    else:
+        image_parts_and_offsets.append((img, (0.0, 0.0)))
+
+    return image_parts_and_offsets
+
 def draw_keypoints(
     img:np.array,
     kpts:List[cv2.KeyPoint],
