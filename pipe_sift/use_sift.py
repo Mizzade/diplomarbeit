@@ -1,4 +1,4 @@
-from typing import List, Tuple, Dict, Any
+from typing import List, Tuple, Dict, Any, Callable
 import cv2
 import numpy as np
 import sys
@@ -100,9 +100,59 @@ def detect(image_path:str, config:Dict, detector:Any) -> Tuple[List, np.array, N
     """
     img = cv2.imread(image_path, 0)
     img = io_utils.smart_scale(img, config['max_size'], prevent_upscaling=config['prevent_upscaling']) if config['max_size'] is not None else img
-    kpts = detector.detect(img, None)
+    kpts = chunkify_image(img, config, detector.detect)
     img_kp = io_utils.draw_keypoints(img, kpts, config)
     return (kpts, img_kp, None)
+
+def chunkify_image(img:np.array, config:Dict, detect:Callable) -> Tuple[List, np.array, None]:
+    """Splits an image into chunks and finds keypoints for each chunk.
+    Merges results back together."""
+
+    image_parts_and_offsets = [] # image, (x_offset, y_offset)
+    if config['split_image']:
+        shape = img.shape
+        num_chunks_width = np.int(np.ceil(shape[1] / config['chunk_size']))
+        num_chunks_height = np.int(np.ceil(shape[0] / config['chunk_size']))
+        offset_width = np.int(shape[1] / num_chunks_width)
+        offset_height = np.int(shape[0] / num_chunks_height)
+
+        for h in range(num_chunks_height):
+            for w in range(num_chunks_width):
+                h_start = h*offset_height
+                w_start = w*offset_width
+                h_end = shape[0] if (h == num_chunks_height - 1) else (h+1) * offset_height
+                w_end = shape[1] if (w == num_chunks_width - 1) else (w+1) * offset_width
+                part = img[h_start:h_end, w_start:w_end]
+                image_parts_and_offsets.append((part, (w_start, h_start)))
+
+    else:
+        image_parts_and_offsets.append((img, (0.0, 0.0)))
+
+    # Get keypoints for each partial and take the best n, so that sum of n equals
+    # config['max_num_keypoints]
+    list_kpts = []
+    num_partials = len(image_parts_and_offsets)
+    for partial_img, offsets in image_parts_and_offsets:
+        kpts = detect(partial_img, None)
+
+        # correct keypoint position depending on chunk offsets.
+        for kp in kpts:
+            pt = np.array(kp.pt)
+            off = np.array(offsets)
+            new_pt = pt + off
+            kp.pt = (new_pt[0], new_pt[1])
+
+        list_kpts += kpts
+
+    # Sort by response, take best n <= max_num_keypoints
+    list_kpts.sort(key=lambda x: x.response, reverse=True)
+
+    # Clip if more kpts as max_num_kpts exists
+    if config['max_num_keypoints']:
+        list_kpts = list_kpts[:config['max_num_keypoints']]
+
+    return list_kpts
+
 
 def main(argv: Tuple[str]) -> None:
     """Runs the TILDE model and saves the results.
