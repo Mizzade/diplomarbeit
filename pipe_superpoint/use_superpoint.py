@@ -101,27 +101,9 @@ def detectAndCompute(image:np.array, config:Dict, model: SuperPointFrontend):
 
 def chunkify_image(img:np.array, config:Dict, model:SuperPointFrontend) -> Tuple[List, np.array, None]:
     """Splits an image into chunks and finds keypoints for each chunk.
-    Merges results back together."""
-
-    image_parts_and_offsets = [] # image, (x_offset, y_offset)
-    if config['split_image']:
-        shape = img.shape
-        num_chunks_width = np.int(np.ceil(shape[1] / config['chunk_size']))
-        num_chunks_height = np.int(np.ceil(shape[0] / config['chunk_size']))
-        offset_width = np.int(shape[1] / num_chunks_width)
-        offset_height = np.int(shape[0] / num_chunks_height)
-
-        for h in range(num_chunks_height):
-            for w in range(num_chunks_width):
-                h_start = h*offset_height
-                w_start = w*offset_width
-                h_end = shape[0] if (h == num_chunks_height - 1) else (h+1) * offset_height
-                w_end = shape[1] if (w == num_chunks_width - 1) else (w+1) * offset_width
-                part = img[h_start:h_end, w_start:w_end]
-                image_parts_and_offsets.append((part, (w_start, h_start)))
-
-    else:
-        image_parts_and_offsets.append((img, (0.0, 0.0)))
+    Merges results back together.
+    """
+    image_parts_and_offsets = io_utils.split_image_in_chunks(img, config)
 
     # Get keypoints for each partial and take the best n, so that sum of n equals
     # config['max_num_keypoints]
@@ -149,16 +131,6 @@ def chunkify_image(img:np.array, config:Dict, model:SuperPointFrontend) -> Tuple
     # convert to numpy object
     list_kpts = np.vstack(list_kpts)
     list_desc = np.vstack(list_desc)
-
-    # Sort by confidence in descending order
-    sorted_idx = list_kpts[:, 2].argsort()[::-1]
-    list_kpts = list_kpts[sorted_idx]
-    list_desc = list_desc[sorted_idx]
-
-    # Clip if more kpts as max_num_kpts exists
-    if config['max_num_keypoints']:
-        list_kpts = list_kpts[:config['max_num_keypoints']]
-        list_desc = list_desc[:config['max_num_keypoints']]
 
     return list_kpts, list_desc, None
 
@@ -234,6 +206,27 @@ def computeForPatchImages(image_file_path:str, config:Dict, model:Any) -> np.arr
 
     return desc
 
+def _sort_keypoints_and_descriptors_by_confidence(
+    keypoints:np.array,
+    descriptors:np.array) -> Tuple[np.array, np.array]:
+    """Sort keypoints and corresponding descriptors by confidence in descending
+    order.
+
+    Arguments:
+        keypoints {np.array} -- Keypoints: Nx3
+        descriptors {np.array} -- Descriptors: Nx256
+
+    Returns:
+        Tuple[np.array, np.array] -- Sorted keypoints, sorted descriptors.
+    """
+    # Sort by confidence in descending order.
+    # The third column has confidence values.
+    sorted_idx = keypoints[:, 2].argsort()[::-1]
+    keypoints = keypoints[sorted_idx]
+    descriptors = descriptors[sorted_idx]
+
+    return keypoints, descriptors
+
 def detect(
     image_path:str,
     config:Dict,
@@ -257,11 +250,16 @@ def detect(
 
     _kp, desc, heatmap = detectAndCompute(img, config, model)
 
+    # Sort by confidences, descending.
+    _kp, desc = _sort_keypoints_and_descriptors_by_confidence(_kp, desc)
+
+    # Take n-th best
     max_num_kp = config['max_num_keypoints']
     if max_num_kp:
         _kp = _kp[:max_num_kp]
         desc = desc[:max_num_kp]
 
+    # Convert to list of openCV's KeyPoint
     kp = kps2KeyPoints(_kp)
     img_kp = io_utils.draw_keypoints(img, kp, config)
 
