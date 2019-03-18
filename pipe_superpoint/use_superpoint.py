@@ -80,69 +80,88 @@ def normalize_image(image: np.array) -> np.array:
 
     return (image / 255.)
 
-
-def detectAndCompute(model: SuperPointFrontend, image: np.array):
-    img = resize_image(image, model.width, model.height)
-    img = convert_image_to_float32(img)
+def detectAndCompute(image:np.array, config:Dict, model: SuperPointFrontend):
+    #img = resize_image(image, model.width, model.height)
+    img = convert_image_to_float32(image)
     img = normalize_image(img)
+
+    # Adjust values on the fly.
+    model.height = img.shape[0]
+    model.width = img.shape[1]
 
     # pts: [3 x N] = [x, y, heatmap[x, y]]^T
     # heatmap[x, y] is superpoint's confidence of this keypoint.
     # desc = [256 x N]
     # heatmap = [width x height]
-    pts, desc, heatmap = model.run(img)
 
-    return pts.T, desc.T, heatmap
+    #pts, desc, heatmap = model.run(img)
+    pts, desc, heatmap = chunkify_image(img, config, model)
 
-def nn_match_two_way(desc1, desc2, nn_thresh):
-    """
-    Performs two-way nearest neighbor matching of two sets of descriptors, such
-    that the NN match from descriptor A->B must equal the NN match from B->A.
+    return pts, desc, heatmap
 
-    Inputs:
-      desc1 - NxM numpy matrix of N corresponding M-dimensional descriptors.
-      desc2 - NxM numpy matrix of N corresponding M-dimensional descriptors.
-      nn_thresh - Optional descriptor distance below which is a good match.
+def chunkify_image(img:np.array, config:Dict, model:SuperPointFrontend) -> Tuple[List, np.array, None]:
+    """Splits an image into chunks and finds keypoints for each chunk.
+    Merges results back together."""
 
-    Returns:
-      matches - Lx3 numpy array, of L matches, where L <= N and each column i is
-                a match of two descriptors, d_i in image 1 and d_j' in image 2:
-                [d_i index, d_j' index, match_score]
-    """
-    # Check if descriptor dimensions match
-    assert desc1.shape[1] == desc2.shape[1]
+    image_parts_and_offsets = [] # image, (x_offset, y_offset)
+    if config['split_image']:
+        shape = img.shape
+        num_chunks_width = np.int(np.ceil(shape[1] / config['chunk_size']))
+        num_chunks_height = np.int(np.ceil(shape[0] / config['chunk_size']))
+        offset_width = np.int(shape[1] / num_chunks_width)
+        offset_height = np.int(shape[0] / num_chunks_height)
 
-    # Return zero matches, if one image does not have a keypoint and
-    # therefore no descriptors.
-    if desc1.shape[0] == 0 or desc2.shape[0] == 0:
-      return np.zeros((0, 3))
-    if nn_thresh < 0.0:
-      raise ValueError('\'nn_thresh\' should be non-negative')
+        for h in range(num_chunks_height):
+            for w in range(num_chunks_width):
+                h_start = h*offset_height
+                w_start = w*offset_width
+                h_end = shape[0] if (h == num_chunks_height - 1) else (h+1) * offset_height
+                w_end = shape[1] if (w == num_chunks_width - 1) else (w+1) * offset_width
+                part = img[h_start:h_end, w_start:w_end]
+                image_parts_and_offsets.append((part, (w_start, h_start)))
 
-    # Compute L2 distance. Easy since vectors are unit normalized.
-    dmat = np.dot(desc1, desc2.T)
-    dmat = np.sqrt(2-2*np.clip(dmat, -1, 1))
+    else:
+        image_parts_and_offsets.append((img, (0.0, 0.0)))
 
-    # Get NN indices and scores.
-    idx = np.argmin(dmat, axis=1)
-    scores = dmat[np.arange(dmat.shape[0]), idx]
-    # Threshold the NN matches.
-    keep = scores < nn_thresh
-    # Check if nearest neighbor goes both directions and keep those.
-    idx2 = np.argmin(dmat, axis=0)
-    keep_bi = np.arange(len(idx)) == idx2[idx]
-    keep = np.logical_and(keep, keep_bi)
-    idx = idx[keep]
-    scores = scores[keep]
-    # Get the surviving point indices.
-    m_idx1 = np.arange(desc1.shape[0])[keep]
-    m_idx2 = idx
-    # Populate the final Nx3 match data structure.
-    matches = np.zeros((int(keep.sum()), 3))
-    matches[:, 0] = m_idx1
-    matches[:, 1] = m_idx2
-    matches[:, 2] = scores
-    return matches
+    # Get keypoints for each partial and take the best n, so that sum of n equals
+    # config['max_num_keypoints]
+    list_kpts = []
+    list_desc = []
+    num_partials = len(image_parts_and_offsets)
+    for partial_img, offsets in image_parts_and_offsets:
+
+        # For SuperPoint, this must look like this.
+        partial_shape = partial_img.shape
+        model.height = partial_shape[0]
+        model.width = partial_shape[1]
+
+        kpts, desc, _ = model.run(partial_img) # ignore heatmap
+        kpts = kpts.T
+        desc = desc.T
+
+        # correct keypoint position depending on chunk offsets.
+        off = np.hstack([offsets, 0])
+        kpts += off
+
+        list_kpts.append(kpts)
+        list_desc.append(desc)
+
+    # convert to numpy object
+    list_kpts = np.vstack(list_kpts)
+    list_desc = np.vstack(list_desc)
+
+    # Sort by confidence in descending order
+    sorted_idx = list_kpts[:, 2].argsort()[::-1]
+    list_kpts = list_kpts[sorted_idx]
+    list_desc = list_desc[sorted_idx]
+
+    # Clip if more kpts as max_num_kpts exists
+    if config['max_num_keypoints']:
+        list_kpts = list_kpts[:config['max_num_keypoints']]
+        list_desc = list_desc[:config['max_num_keypoints']]
+
+    return list_kpts, list_desc, None
+
 
 def matches2DMatch(matches: np.array) -> List[cv2.DMatch]:
     """Transforms `nn_match_two_way`'s matches to a list of openCV's DMatch objects.
@@ -165,8 +184,7 @@ def kps2KeyPoints(kps: np.array) -> List[cv2.KeyPoint]:
     Returns:
         List[cv2.KeyPoint] -- List of N openCV's KeyPoint objects.
     """
-
-    return [cv2.KeyPoint(x[0], x[1], 1) for x in kps]
+    return [cv2.KeyPoint(x[0], x[1], 1, _response=x[2]) for x in kps]
 
 def scale_kps(model: SuperPointFrontend, image: np.array, kps: np.array) -> np.array:
     """Scales keypoints `kps` up to match the image's dimensions.
@@ -237,11 +255,7 @@ def detect(
     img = cv2.imread(image_path, 0)
     img = io_utils.smart_scale(img, config['max_size'], prevent_upscaling=config['prevent_upscaling']) if config['max_size'] is not None else img
 
-    # Adjust values on the fly.
-    model.height = img.shape[0]
-    model.width = img.shape[1]
-
-    _kp, desc, heatmap = detectAndCompute(model, img)
+    _kp, desc, heatmap = detectAndCompute(img, config, model)
 
     max_num_kp = config['max_num_keypoints']
     if max_num_kp:
