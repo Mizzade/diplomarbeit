@@ -60,6 +60,21 @@ parser.add_argument('--prevent_upscaling',
     'to fit MAX_SIZE. Default: True',
     default=True)
 
+parser.add_argument('--split_image',
+    dest='split_image',
+    action='store_true',
+    help='If set to true, will split image files into equal chunks, compute ' +
+    'keypoints for each chunk and merge the results. This might help if the ' +
+    'image is too large for your hardware. Default: False',
+    default=False)
+
+parser.add_argument('--chunk_size',
+    type=int,
+    help='If using SPLIT_IMAGE, set this value to compute the correct number ' +
+    'of chunks. Image dimensions will be divided by this value to get the  ' +
+    'number of chunks. The actual split of the image might be smaller than this.',
+    default=1000)
+
 parser.add_argument('--keypoint_color',
     type=int,
     nargs=3,
