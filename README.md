@@ -68,7 +68,7 @@ Manche Modell können nur Bilder bis zur einer bestimmten Größe handhaben, bev
 |:------------------|:--------------|
 | SIFT              | no Limit      |
 | LIFT              | 1200          |
-| SuperPoint        | 1700          |
+| SuperPoint        | no Limit      | (on my setuup)
 | TILDE             | no Limit      |
 | TConvDet          | no Limit      | (reduces image to 1024x768 internally)
 | DOAP              | no Limit      |
