@@ -70,7 +70,7 @@ Manche Modell können nur Bilder bis zur einer bestimmten Größe handhaben, bev
 | LIFT              | 1200          |
 | SuperPoint        | 1700          |
 | TILDE             | no Limit      |
-| TConvDet          | 1024x768      |
+| TConvDet          | no Limit      | (reduces image to 1024x768 internally)
 | DOAP              | no Limit      |
 | TFeat             | 1400          |
 
