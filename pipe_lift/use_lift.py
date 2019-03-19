@@ -1,4 +1,4 @@
-from typing import List, Tuple, Dict, Any
+from typing import List, Tuple, Dict, Any, Callable
 import cv2
 import numpy as np
 import sys
@@ -167,7 +167,6 @@ def loadKpListFromTxt(kp_file_name):
 
     return kp_list
 
-
 def saveKpListToTxt(kp_list, orig_kp_file_name, kp_file_name):
 
     # first line KP_LIST_LEN to indicate we have the full
@@ -207,6 +206,27 @@ def saveKpListToTxt(kp_list, orig_kp_file_name, kp_file_name):
 
 # Deactivates compiler warnings for tensorflow cpu
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
+class CustomModelLift():
+    def __init__(self):
+        pass
+
+    def detect(self,
+        lift_path:str,
+        num_kpts:int,
+        path_tmp_img:str,
+        path_tmp_kpts:str) -> None:
+        subprocess.check_call(['python',
+            'main.py',
+            '--subtask=kp',
+            '--test_num_keypoint={}'.format(num_kpts),
+            '--test_img_file={}'.format(path_tmp_img),
+            '--test_out_file={}'.format(path_tmp_kpts)],
+            cwd=lift_path)
+
+def load_model() -> CustomModelLift:
+    return CustomModelLift()
+
 
 def compute(image_file_path:str, config:Dict, model:Any) -> np.array:
     """
@@ -294,9 +314,21 @@ def compute(image_file_path:str, config:Dict, model:Any) -> np.array:
 
     return descriptors
 
+def _sort_keypoints_by_response(keypoints:np.array) -> np.array:
+    """Sorts LIFT keypoints by response, in descending order.
 
+    Arguments:
+        keypoints {np.array} -- LIFT keypoints, Nx13
 
-def detect(image_path:str, config:Dict, detector:Any) -> None:
+    Returns:
+        np.array -- Sorted LIFT keypoints, Nx13
+    """
+    sorted_idx = keypoints[:, 4].argsort()[::-1]
+    keypoints = keypoints[sorted_idx]
+
+    return keypoints
+
+def detect(image_path:str, config:Dict, model:CustomModelLift) -> None:
     """Detects keypoints for a given input image.
     Draws keypoints into the image.
     Returns keypoints, heatmap and image with keypoints.
@@ -316,32 +348,14 @@ def detect(image_path:str, config:Dict, detector:Any) -> None:
     img = cv2.imread(image_path, 0)
     img = io_utils.smart_scale(img, config['max_size'], prevent_upscaling=config['prevent_upscaling']) if config['max_size'] is not None else img
 
-    # Build paths
-    path_tmp_img = os.path.join(config['tmp_dir_lift'], 'tmp_img.png')
-    path_tmp_kpts = os.path.join(config['tmp_dir_lift'], 'tmp_kpts.txt')
-    path_tmp_ori = os.path.join(config['tmp_dir_lift'], 'tmp_ori.txt')
-    path_tmp_desc = os.path.join(config['tmp_dir_lift'], 'tmp_desc.h5')
+    kpts_numpy = chunkify_image(img, config, model)
 
-    # 2) Save image for lift to use
-    cv2.imwrite(path_tmp_img, img)
+    # Sort by response
+    kpts_numpy = _sort_keypoints_by_response(kpts_numpy)
 
-    # 3) Keypoints
-    num_kpts = 1000 if config['max_num_keypoints'] is None else config['max_num_keypoints']
-    try:
-        subprocess.check_call(['python',
-            'main.py',
-            '--subtask=kp',
-            '--test_num_keypoint={}'.format(num_kpts),
-            '--test_img_file={}'.format(path_tmp_img),
-            '--test_out_file={}'.format(path_tmp_kpts)],
-            cwd=lift_path)
-    except Exception as e:
-        print('Could not process image {} at max_size {}. Skip.'.format(image_path, config['max_size']))
-        return (None, None, None)
-
-
-    # 4) Load text file as list of N np.arrays of shape [1x13]
-    kpts_numpy = loadKpListFromTxt(path_tmp_kpts)
+    # Take n-th best
+    if config['max_num_keypoints']:
+        kpts_numpy = kpts_numpy[:config['max_num_keypoints']]
 
     # 5) Convert to cv2.KeyPoint list
     kpts_cv2 = kp_list_2_opencv_kp_list(kpts_numpy)
@@ -350,6 +364,51 @@ def detect(image_path:str, config:Dict, detector:Any) -> None:
     img_kp = io_utils.draw_keypoints(img, kpts_cv2, config)
 
     return (kpts_cv2, img_kp, None)
+
+def chunkify_image(
+    img:np.array,
+    config:Dict,
+    model:CustomModelLift) -> Tuple[List, np.array, None]:
+    """Splits an image into chunks and finds keypoints for each chunk.
+    Merges results back together.
+    """
+    # Build paths
+    lift_path = os.path.join(config['root_dir_lift'], 'tf-lift')
+    path_tmp_img = os.path.join(config['tmp_dir_lift'], 'tmp_img.png')
+    path_tmp_kpts = os.path.join(config['tmp_dir_lift'], 'tmp_kpts.txt')
+
+    image_parts_and_offsets = io_utils.split_image_in_chunks(img, config)
+
+    # Get keypoints for each partial and take the best n, so that sum of n equals
+    # config['max_num_keypoints]
+    list_kpts = []
+    num_partials = len(image_parts_and_offsets)
+    num_kpts_total = 1000 if config['max_num_keypoints'] is None \
+        else config['max_num_keypoints']
+    num_kpts = np.int(np.ceil(num_kpts_total / num_partials))
+
+    for partial_img, offsets in image_parts_and_offsets:
+        #print('img.shape: ', img.shape, ' partial: ', partial_img.shape, ' offset: ', offsets, ' num_kpts: ', num_kpts)
+
+        # Save partial image in tmp folder
+        cv2.imwrite(path_tmp_img, partial_img)
+
+        # Detect keypoints.
+        #try:
+        model.detect(lift_path, num_kpts, path_tmp_img, path_tmp_kpts)
+        kpts_numpy_partial = loadKpListFromTxt(path_tmp_kpts)
+        kpts_numpy_partial = np.vstack(kpts_numpy_partial)
+
+        # correct keypoint position depending on chunk offsets.
+        kpts_numpy_partial[:, :2] = kpts_numpy_partial[:, :2] + offsets
+        list_kpts.append(kpts_numpy_partial)
+        #except Exception as e:
+        #    print('Could not process image at max_size {}. Skip.'.format(config['max_size']))
+        #    print(e)
+
+    list_kpts = np.vstack(list_kpts)
+
+    return list_kpts
 
 def main(argv: Tuple[str]) -> None:
     """Runs the LIFT model and saves the results.
@@ -366,11 +425,11 @@ def main(argv: Tuple[str]) -> None:
         config_file = pickle.load(src, encoding='utf-8')
 
     config, file_list = config_file
-    model = None
+    model = load_model()
 
     if config['task'] == 'keypoints':
         for file in tqdm(file_list):
-            keypoints, keypoints_image, heatmap_image = detect(file, config, None)
+            keypoints, keypoints_image, heatmap_image = detect(file, config, model)
             if keypoints is not None:
                 io_utils.save_detector_output(
                     file,
