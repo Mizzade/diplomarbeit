@@ -47,3 +47,4 @@
 # MISC
 .vscode
 *.pyc
+.ipynb_checkpoints
