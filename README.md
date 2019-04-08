@@ -27,7 +27,6 @@
   - **evaluation**: Modul zur Evaluierung der Detektor und Deskriptoren.
     - detectors
     - descriptors
-  - **examples**: Enthält Beispielcode für die einzelnen Detektoren und Deskriptoren.
   - **extern**: Enthält 3rd-party code der für das Setup des Projektes benötigt wird.
   - **desc_doap**: Modul für DOAP Deskriptor.
   - **desc_tfeat**: Modul für TFeat Deskriptor.
@@ -35,8 +34,6 @@
   - **pipe_lift**: Modul für LIFT Detektor und Deskriptor
   - **pipe_sift**: Modul für SIFT Detektor und Deskriptor
   - **pipe_superpoint**: Modul für SuperPoint Detektor und Deskriptor
-  - **outputs**: Standard Ausgabeordner für Detektoren und Deskriptoren.
-  - **output_evaluation**: Standard Ausgabeordner für Pickle Dateine bei der Evaluierung der Detetkoren und Deskriptoren.
     - detectors
     - descriptors
 
@@ -59,35 +56,6 @@ Der CUDA Treiber hat aufgehangen. Tippe folgendes in die Konsole:
         $ sudo modprobe nvidia_modeset
         $ sudo modprobe nvidia_drm
         $ sudo modprobe nvidia_uvm
-
-
-### Bildgrößen
-Manche Modell können nur Bilder bis zur einer bestimmten Größe handhaben, bevor sie abstürzen. Die folgende Liste fast diese Größen zusammen. Bei der Benutzung der Modell mit größeren Bilder muss daran gedacht werden, die Bilder entsprechend herunter zu skalieren.
-
-| MODEL             | max Size (px) |
-|:------------------|:--------------|
-| SIFT              | no Limit      |
-| LIFT              | 1200          |
-| SuperPoint        | no Limit      | (on my setuup)
-| TILDE             | no Limit      |
-| TConvDet          | no Limit      | (reduces image to 1024x768 internally)
-| DOAP              | no Limit      |
-| TFeat             | 1400          |
-
-
-### Patchgrößen für Deskriptoren
-Dies sind die Größen, die die Patches haben müssen, um mit dem jeweiligen
-Deskriptor zu funktionieren.
-
-| MODEL             | Patch Size (px) |
-|:------------------|:----------------|
-| SIFT              | no Limit        |
-| LIFT              | 128x128         |
-| SuperPoint        | ?               |
-| DOAP              | 32x32           |
-| DOAP ST           | 42x42           | (in diesem Repo)
-| TFeat             | 32x32           |
-
 
 
 ### Starten der Detektoren und Deskriptoren
